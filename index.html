@@ -214,7 +214,9 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 /* ANALYSIS PANEL */
 .analysis-section { margin-bottom:10px; }
 .analysis-section h3 { font-size:.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; margin-bottom:8px; }
-.weakness-panels { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px; }
+.weakness-panels { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px; align-items:start; }
+.weakness-left-col { display:flex; flex-direction:column; gap:0; }
+.weakness-left-col .analysis-section { margin-top:14px; }
 .weakness-section h3 { font-size:.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
 .weakness-chips { display:flex; flex-wrap:wrap; gap:6px; }
 .weakness-chip { padding:4px 10px; border-radius:20px; font-size:.73rem; font-weight:700; border:1px solid transparent; }
@@ -223,8 +225,8 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 .weakness-low { background:#3d3000; border-color:#f1c40f; color:#f4d03f; }
 
 /* individual weakness */
-.individual-weakness-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-.indiv-card { background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:10px; }
+.individual-weakness-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; align-items:stretch; }
+.indiv-card { background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:10px; min-height:160px; }
 .indiv-card-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
 .indiv-card-header img { width:36px; height:36px; image-rendering:pixelated; }
 .indiv-name { font-weight:700; font-size:.8rem; color:#fff; }
@@ -241,31 +243,33 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 .rec-type-chips { display:flex; flex-wrap:wrap; gap:6px; }
 .rec-chip { padding:4px 12px; border-radius:20px; font-size:.73rem; font-weight:700; border:1px solid var(--border2); background:var(--bg3); color:var(--accent); }
 
-/* ── raw weakness / resistance chip grids ──
-   Each chip: padding 4px 10px + ~55px text + 2px border = ~75px
-   9 chips + 8 gaps of 6px = 9*75 + 8*6 = 675 + 48 = 723px
-   Use display:grid with 9 fixed columns so it ALWAYS wraps at 9 exactly */
+/* ── raw weakness / resistance chip grids ── */
 .type-grid {
     display: grid;
     grid-template-columns: repeat(9, max-content);
     gap: 6px;
-    width: fit-content;
-    max-width: 100%;
 }
 .type-count-chip {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: .73rem;
+    padding: 3px 9px;
+    border-radius: 14px;
+    font-size: .7rem;
     font-weight: 700;
     border: 1px solid transparent;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
 }
 .tc-weak { background:#2d0000; border-color:#c0392b; color:#ff6b6b; }
 .tc-resist { background:#003020; border-color:#27ae60; color:#2ecc71; }
 .tc-count { font-size:.65rem; opacity:.8; }
 
 /* offensive coverage */
-.coverage-grid { display:flex; flex-wrap:wrap; gap:5px; }
+.coverage-grid {
+    display: grid;
+    grid-template-columns: repeat(9, max-content);
+    gap: 5px;
+}
 .cov-chip { padding:3px 9px; border-radius:14px; font-size:.7rem; font-weight:700; border:1px solid transparent; display:flex; align-items:center; gap:4px; }
 .cov-hit { background:#002d3d; border-color:#3498db; color:#5dade2; }
 .cov-none { background:#1a1a1a; border-color:#444; color:#666; }
@@ -360,30 +364,30 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
         <div class="panel">
             <h2>🛡️ Team Analysis</h2>
             <div class="weakness-panels">
-                <div class="weakness-section">
+                <div class="weakness-section weakness-left-col">
                     <h3>Overall Team Weaknesses</h3>
                     <div class="weakness-chips" id="weakness"></div>
+                    <div class="analysis-section">
+                        <h3>Raw Type Weakness Totals (all weaknesses, ignoring resistances)</h3>
+                        <div class="type-grid" id="rawWeakness"></div>
+                    </div>
+                    <div class="analysis-section">
+                        <h3>Recommended Typings to Add</h3>
+                        <div class="rec-type-chips" id="recTypings"></div>
+                    </div>
+                    <div class="analysis-section">
+                        <h3>Team Resistances</h3>
+                        <div class="type-grid" id="teamResistances"></div>
+                    </div>
+                    <div class="analysis-section">
+                        <h3>Offensive Coverage (Active Damaging Moves)</h3>
+                        <div class="coverage-grid" id="offensiveCoverage"></div>
+                    </div>
                 </div>
                 <div class="weakness-section">
                     <h3>Individual Pokémon Weaknesses</h3>
                     <div class="individual-weakness-grid" id="individualWeakness"></div>
                 </div>
-            </div>
-            <div class="analysis-section">
-                <h3>Raw Type Weakness Totals (all weaknesses, ignoring resistances)</h3>
-                <div class="type-grid" id="rawWeakness"></div>
-            </div>
-            <div class="analysis-section">
-                <h3>Recommended Typings to Add</h3>
-                <div class="rec-type-chips" id="recTypings"></div>
-            </div>
-            <div class="analysis-section">
-                <h3>Team Resistances</h3>
-                <div class="type-grid" id="teamResistances"></div>
-            </div>
-            <div class="analysis-section">
-                <h3>Offensive Coverage (Active Damaging Moves)</h3>
-                <div class="coverage-grid" id="offensiveCoverage"></div>
             </div>
         </div>
     </div>
@@ -1021,7 +1025,18 @@ function renderWeaknesses() {
             } else {
                 results.forEach(([type, net]) => {
                     const chip = document.createElement('div');
-                    chip.className = 'weakness-chip '+(net>=3?'weakness-high':net===2?'weakness-mid':'weakness-low');
+                    const wkGrad = [
+                        null,
+                        {bg:'#312000',bc:'#c47a00',cl:'#f4b000'},
+                        {bg:'#321500',bc:'#cc5500',cl:'#f48020'},
+                        {bg:'#300e00',bc:'#cc3800',cl:'#f06030'},
+                        {bg:'#2e0505',bc:'#cc2020',cl:'#f05050'},
+                        {bg:'#2a0000',bc:'#dd1515',cl:'#f46060'},
+                        {bg:'#280000',bc:'#ee2020',cl:'#ff7070'},
+                    ];
+                    const g = wkGrad[Math.min(net, 6)];
+                    chip.className = 'weakness-chip';
+                    chip.style.cssText = `background:${g.bg};border-color:${g.bc};color:${g.cl};border:1px solid ${g.bc};`;
                     chip.textContent = `${type} ×${net}`;
                     teamWkEl.appendChild(chip);
                 });
@@ -1036,30 +1051,86 @@ function renderWeaknesses() {
         if (team.length === 0) {
             recEl.innerHTML = '<em style="color:#666;font-size:.8rem">—</em>';
         } else {
-            const teamWeakTypes = new Set();
-            ALL_TYPES.forEach(atkT => {
-                let weakCount = 0;
-                team.forEach(p => { const mult = getTypeDefenseWithAbility(p._data.type, p.ability); if (mult[atkT] > 1) weakCount++; });
-                if (weakCount > 0) teamWeakTypes.add(atkT);
-            });
-            const scores = ALL_TYPES.map(candidateType => {
-                const td = typeChart[candidateType]; if (!td) return {type:candidateType, score:0};
-                let helps = 0;
-                td.resists.forEach(t => { if (teamWeakTypes.has(t)) helps++; });
-                td.immuneTo.forEach(t => { if (teamWeakTypes.has(t)) helps += 2; });
-                let hurts = 0;
-                td.weakTo.forEach(wkT => {
-                    const alreadyCovered = team.some(p => { const mult = getTypeDefenseWithAbility(p._data.type, p.ability); return mult[wkT] < 1; });
-                    if (!alreadyCovered) hurts++;
+            // --- Build per-type weakness/resistance profile of current team ---
+            // weaknessCounts[t] = how many team members are weak to t (raw count, ignoring resistances)
+            // netWeakCounts[t]  = net weakness count after subtracting resisters/immunes
+            // resistCounts[t]   = how many team members resist or are immune to t
+            const weaknessCounts = {}, resistCounts = {}, netWeakCounts = {};
+            ALL_TYPES.forEach(t => { weaknessCounts[t] = 0; resistCounts[t] = 0; });
+            team.forEach(p => {
+                const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
+                ALL_TYPES.forEach(t => {
+                    if (mult[t] > 1)      weaknessCounts[t]++;
+                    else if (mult[t] < 1) resistCounts[t]++;
                 });
-                return {type:candidateType, score: helps * 2 - hurts};
             });
-            scores.sort((a,b) => b.score - a.score);
+            ALL_TYPES.forEach(t => { netWeakCounts[t] = Math.max(0, weaknessCounts[t] - resistCounts[t]); });
+
+            // --- Build offensive coverage gaps ---
+            // coveredOffensively[t] = true if the team already has a move type that hits t super-effectively
+            // (approximate from move cache — same logic as the offensive coverage section)
+            const coveredOffensively = {};
+            ALL_TYPES.forEach(t => coveredOffensively[t] = false);
+            team.forEach(p => {
+                p.moves.forEach(moveName => {
+                    if (!moveName) return;
+                    const md = moveCache[moveName.toLowerCase().replace(/\s+/g, '-')];
+                    if (!md || md.category === 'status' || !md.power || md.power === '—' || md.power === 0) return;
+                    (offenseChart[md.type] || []).forEach(defType => { coveredOffensively[defType] = true; });
+                });
+            });
+
+            // --- Score each candidate type ---
+            const scores = ALL_TYPES.map(candidateType => {
+                const td = typeChart[candidateType];
+                if (!td) return { type: candidateType, score: 0 };
+
+                let score = 0;
+
+                // 1. DEFENSIVE VALUE: reward resisting/being immune to types the team is net-weak to
+                //    Weight heavily by how many are weak (×3 for a 4-wide weakness, ×2 for spread, ×1 for minor)
+                td.resists.forEach(t => {
+                    const nw = netWeakCounts[t];
+                    if (nw >= 3)      score += 4;   // team-wide weakness, badly need a check
+                    else if (nw === 2) score += 2.5;
+                    else if (nw === 1) score += 1;
+                    // Already well-covered (nw=0): no defensive benefit
+                });
+                td.immuneTo.forEach(t => {
+                    const nw = netWeakCounts[t];
+                    if (nw >= 3)      score += 7;   // immunity to a team-wide weakness = massive
+                    else if (nw === 2) score += 5;
+                    else if (nw === 1) score += 3;
+                    else               score += 1.5; // free immunity always has some value
+                });
+
+                // 2. WEAKNESS PENALTY: penalise new weaknesses, scaled by how exposed the team already is
+                td.weakTo.forEach(wkT => {
+                    const alreadyBad = netWeakCounts[wkT]; // if team already struggles here, making it worse is costly
+                    if (alreadyBad >= 3)      score -= 5;
+                    else if (alreadyBad >= 2) score -= 3;
+                    else if (alreadyBad >= 1) score -= 1.5;
+                    else                       score -= 0.5; // minor penalty even for clean teams
+                });
+
+                // 3. OFFENSIVE COVERAGE BONUS: reward types that hit things the team can't currently threaten
+                (offenseChart[candidateType] || []).forEach(defType => {
+                    if (!coveredOffensively[defType]) score += 1.2; // filling an offensive gap
+                });
+
+                // 4. REDUNDANCY PENALTY: if this type is already on the team, diminishing returns
+                const alreadyOnTeam = team.filter(p => p._data.type.includes(candidateType)).length;
+                score -= alreadyOnTeam * 1.5;
+
+                return { type: candidateType, score };
+            });
+
+            scores.sort((a, b) => b.score - a.score);
             const top = scores.filter(s => s.score > 0).slice(0, 7);
             if (top.length === 0) {
                 recEl.innerHTML = '<em style="color:#2ecc71;font-size:.8rem">Team looks well-covered!</em>';
             } else {
-                top.forEach(({type}) => {
+                top.forEach(({ type }) => {
                     const chip = document.createElement('span');
                     chip.className = 'rec-chip';
                     const c = typeColors[type];
@@ -1124,7 +1195,19 @@ function renderWeaknesses() {
             } else {
                 entries.forEach(([type, count]) => {
                     const chip = document.createElement('div');
-                    chip.className = 'type-count-chip tc-weak';
+                    // Gradient: 1=amber, 2=orange, 3=orange-red, 4=light-red, 5=red, 6=bright-red (never too dark)
+                    const weakGrad = [
+                        null,
+                        {bg:'#312000',bc:'#c47a00',cl:'#f4b000'}, // 1 amber
+                        {bg:'#321500',bc:'#cc5500',cl:'#f48020'}, // 2 orange
+                        {bg:'#300e00',bc:'#cc3800',cl:'#f06030'}, // 3 orange-red
+                        {bg:'#2e0505',bc:'#cc2020',cl:'#f05050'}, // 4 soft-red
+                        {bg:'#2a0000',bc:'#dd1515',cl:'#f46060'}, // 5 red
+                        {bg:'#280000',bc:'#ee2020',cl:'#ff7070'}, // 6 bright-red — pops, not muddy
+                    ];
+                    const g = weakGrad[Math.min(count, 6)];
+                    chip.className = 'type-count-chip';
+                    chip.style.cssText = `background:${g.bg};border-color:${g.bc};color:${g.cl};`;
                     chip.innerHTML = `${type} <span class="tc-count">×${count}</span>`;
                     rawEl.appendChild(chip);
                 });
@@ -1151,7 +1234,19 @@ function renderWeaknesses() {
             } else {
                 entries.forEach(([type, count]) => {
                     const chip = document.createElement('div');
-                    chip.className = 'type-count-chip tc-resist';
+                    // Gradient: 1=yellow-green, stepping to bright vivid green at 6 (never dark/muddy)
+                    const resGrad = [
+                        null,
+                        {bg:'#252800',bc:'#8aaa00',cl:'#cce000'}, // 1 yellow-green
+                        {bg:'#1a2e00',bc:'#5a9e00',cl:'#9ad820'}, // 2 lime
+                        {bg:'#123400',bc:'#3a9000',cl:'#6ece28'}, // 3 medium-green
+                        {bg:'#0a3010',bc:'#209830',cl:'#4ed050'}, // 4 green
+                        {bg:'#063820',bc:'#18a840',cl:'#38e060'}, // 5 bright-green
+                        {bg:'#043a22',bc:'#10cc50',cl:'#30f070'}, // 6 vivid-green — pops, not dark
+                    ];
+                    const g = resGrad[Math.min(count, 6)];
+                    chip.className = 'type-count-chip';
+                    chip.style.cssText = `background:${g.bg};border-color:${g.bc};color:${g.cl};`;
                     chip.innerHTML = `${type} <span class="tc-count">×${count}</span>`;
                     resEl.appendChild(chip);
                 });
@@ -1187,13 +1282,34 @@ function renderWeaknesses() {
             const uncovered = ALL_TYPES.filter(t => seHits[t] === 0);
             covered.forEach(([type, count]) => {
                 const chip = document.createElement('div');
-                chip.className = 'cov-chip cov-hit';
+                // Light→medium blue gradient: very slow ramp, max is a comfortable mid-blue (never near-black)
+                const covGrad = [
+                    null,
+                    {bg:'#001e30',bc:'#2878a8',cl:'#b0d8f0'}, // 1  very pale blue
+                    {bg:'#001c2e',bc:'#2874a4',cl:'#a8d2ec'}, // 2
+                    {bg:'#001a2c',bc:'#286ea0',cl:'#a0cce8'}, // 3
+                    {bg:'#00182a',bc:'#28689c',cl:'#98c6e4'}, // 4
+                    {bg:'#001628',bc:'#286298',cl:'#90c0e0'}, // 5
+                    {bg:'#001426',bc:'#285c94',cl:'#88badc'}, // 6
+                    {bg:'#001224',bc:'#285690',cl:'#80b4d8'}, // 7
+                    {bg:'#001022',bc:'#28508c',cl:'#78aed4'}, // 8
+                    {bg:'#000e20',bc:'#284a88',cl:'#70a8d0'}, // 9
+                    {bg:'#000c1e',bc:'#284484',cl:'#68a2cc'}, // 10
+                    {bg:'#000a1c',bc:'#283e80',cl:'#609cc8'}, // 11
+                    {bg:'#00081a',bc:'#28387c',cl:'#5896c4'}, // 12
+                    {bg:'#000718',bc:'#283278',cl:'#5090c0'}, // 13
+                    {bg:'#000616',bc:'#282c74',cl:'#4a8abc'}, // 14
+                    {bg:'#000514',bc:'#282670',cl:'#4484b8'}, // 15+
+                ];
+                const g = covGrad[Math.min(count, 15)];
+                chip.className = 'cov-chip';
+                chip.style.cssText = `background:${g.bg};border-color:${g.bc};color:${g.cl};border:1px solid ${g.bc};`;
                 chip.innerHTML = `${type} <span class="tc-count">×${count}</span>`;
                 covEl.appendChild(chip);
             });
             if (uncovered.length > 0) {
                 const sep = document.createElement('div');
-                sep.style.cssText = 'width:100%;font-size:.68rem;color:var(--muted);margin-top:6px;';
+                sep.style.cssText = 'grid-column:1/-1;font-size:.68rem;color:var(--muted);margin-top:2px;';
                 sep.textContent = 'No coverage: ' + uncovered.join(', ');
                 covEl.appendChild(sep);
             }
