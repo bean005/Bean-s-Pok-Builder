@@ -234,9 +234,9 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 .indiv-chips { display:flex; flex-wrap:wrap; gap:4px; }
 .indiv-chip { padding:2px 7px; border-radius:12px; font-size:.66rem; font-weight:700; border:1px solid transparent; }
 .indiv-4x { background:#5d0000; border-color:#ff0000; color:#ff6b6b; }
-.indiv-2x { background:#3d0000; border-color:var(--red); color:#ff6b6b; }
-.indiv-half { background:#003d1a; border-color:var(--green); color:var(--green); }
-.indiv-quarter { background:#004d22; border-color:#00ff88; color:#00ff88; }
+.indiv-2x { background:#3d1f00; border-color:#e67e22; color:#f39c12; }
+.indiv-half { background:#2d3d00; border-color:#9acd32; color:#c5e063; }
+.indiv-quarter { background:#0d2818; border-color:#2d5a3d; color:#5fae7a; }
 .indiv-immune { background:#1a003d; border-color:var(--accent); color:var(--accent); }
 
 /* recommended typings */
@@ -244,7 +244,7 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 .rec-chip { padding:4px 12px; border-radius:20px; font-size:.73rem; font-weight:700; border:1px solid var(--border2); background:var(--bg3); color:var(--accent); }
 
 /* raw weakness / resistance rows */
-.type-grid { display:flex; flex-wrap:wrap; gap:5px; }
+.type-grid { display:grid; grid-template-columns:repeat(9,max-content); gap:5px; justify-content:center; }
 .type-count-chip { padding:3px 9px; border-radius:14px; font-size:.7rem; font-weight:700; border:1px solid transparent; display:flex; align-items:center; gap:4px; }
 .tc-weak { background:#2d0000; border-color:#c0392b; color:#ff6b6b; }
 .tc-resist { background:#003020; border-color:#27ae60; color:#2ecc71; }
@@ -410,6 +410,28 @@ const typeChart = {
 };
 const ALL_TYPES = Object.keys(typeChart);
 
+/* per-type colors for chips (recommended typings) */
+const typeColors = {
+    Normal:   {bg:'#3a3a32', border:'#a8a878', text:'#c6c6a7'},
+    Fire:     {bg:'#4a1f0a', border:'#f08030', text:'#f5ac78'},
+    Water:    {bg:'#0a2a4a', border:'#6890f0', text:'#9db7f5'},
+    Grass:    {bg:'#1a3a14', border:'#78c850', text:'#a7db8d'},
+    Electric: {bg:'#4a4308', border:'#f8d030', text:'#fae078'},
+    Ground:   {bg:'#4a3a1a', border:'#e0c068', text:'#ebd69d'},
+    Rock:     {bg:'#3a3214', border:'#b8a038', text:'#d1c17d'},
+    Dragon:   {bg:'#1a1a4a', border:'#7038f8', text:'#a27dfa'},
+    Fairy:    {bg:'#4a1a30', border:'#ee99ac', text:'#f4bdc9'},
+    Steel:    {bg:'#2e2e36', border:'#b8b8d0', text:'#d1d1e0'},
+    Psychic:  {bg:'#4a0a2a', border:'#f85888', text:'#fa92b2'},
+    Ice:      {bg:'#0a3a3a', border:'#98d8d8', text:'#bce6e6'},
+    Dark:     {bg:'#1a1410', border:'#705848', text:'#a29288'},
+    Poison:   {bg:'#3a0a4a', border:'#a040a0', text:'#c183c1'},
+    Ghost:    {bg:'#241a3a', border:'#705898', text:'#a292bc'},
+    Fighting: {bg:'#3a0a08', border:'#c03028', text:'#d67873'},
+    Bug:      {bg:'#2a3a08', border:'#a8b820', text:'#c6d16e'},
+    Flying:   {bg:'#1a2a4a', border:'#a890f0', text:'#c6b7f5'}
+};
+
 /* offensive coverage table: for each attacking type, which defending types it hits super-effectively */
 const offenseChart = {};
 ALL_TYPES.forEach(atkType => {
@@ -418,7 +440,6 @@ ALL_TYPES.forEach(atkType => {
         return td && td.weakTo.includes(atkType);
     });
 });
-
 /* ══════════════════════════════════════════
    ABILITY IMMUNITY MAP
    Maps ability name (lowercase) -> {immune:[types], halfDmg:[types]}
@@ -1115,6 +1136,8 @@ function renderWeaknesses() {
                 top.forEach(({type}) => {
                     const chip = document.createElement('span');
                     chip.className = 'rec-chip';
+                    const c = typeColors[type];
+                    if (c) chip.style.cssText = `background:${c.bg};border-color:${c.border};color:${c.text};`;
                     chip.textContent = type;
                     recEl.appendChild(chip);
                 });
