@@ -350,10 +350,6 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
                 <div class="weakness-section">
                     <h3>Overall Team Weaknesses</h3>
                     <div class="weakness-chips" id="weakness"></div>
-                    <div style="margin-top:14px">
-                        <h3>Recommended Typings to Add</h3>
-                        <div class="rec-type-chips" id="recTypings"></div>
-                    </div>
                 </div>
                 <div class="weakness-section">
                     <h3>Individual Pokémon Weaknesses</h3>
@@ -365,14 +361,19 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
                 <h3>Raw Type Weakness Totals (all weaknesses, ignoring resistances)</h3>
                 <div class="type-grid" id="rawWeakness"></div>
             </div>
-            <!-- Row 3: team resistances -->
+            <!-- Row 3: recommended typings -->
+            <div class="analysis-section">
+                <h3>Recommended Typings to Add</h3>
+                <div class="rec-type-chips" id="recTypings"></div>
+            </div>
+            <!-- Row 4: team resistances -->
             <div class="analysis-section">
                 <h3>Team Resistances</h3>
                 <div class="type-grid" id="teamResistances"></div>
             </div>
-            <!-- Row 4: offensive coverage -->
+            <!-- Row 5: offensive coverage -->
             <div class="analysis-section">
-                <h3>Offensive Coverage (Super Effective hits from active team moves)</h3>
+                <h3>Offensive Coverage (Active Damaging Moves)</h3>
                 <div class="coverage-grid" id="offensiveCoverage"></div>
             </div>
         </div>
