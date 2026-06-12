@@ -213,7 +213,7 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 
 /* ANALYSIS PANEL */
 .analysis-section { margin-bottom:10px; }
-.analysis-section h3 { font-size:.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
+.analysis-section h3 { font-size:.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; margin-bottom:8px; }
 .weakness-panels { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px; }
 .weakness-section h3 { font-size:.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
 .weakness-chips { display:flex; flex-wrap:wrap; gap:6px; }
@@ -241,9 +241,25 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 .rec-type-chips { display:flex; flex-wrap:wrap; gap:6px; }
 .rec-chip { padding:4px 12px; border-radius:20px; font-size:.73rem; font-weight:700; border:1px solid var(--border2); background:var(--bg3); color:var(--accent); }
 
-/* raw weakness / resistance rows */
-.type-grid { display:flex; flex-wrap:wrap; gap:6px; max-width:41%; }
-.type-count-chip { padding:4px 10px; border-radius:20px; font-size:.73rem; font-weight:700; border:1px solid transparent; display:inline-flex; align-items:center; justify-content:center; gap:4px; flex-shrink:0; white-space:nowrap; }
+/* ── raw weakness / resistance chip grids ──
+   Each chip: padding 4px 10px + ~55px text + 2px border = ~75px
+   9 chips + 8 gaps of 6px = 9*75 + 8*6 = 675 + 48 = 723px
+   Use display:grid with 9 fixed columns so it ALWAYS wraps at 9 exactly */
+.type-grid {
+    display: grid;
+    grid-template-columns: repeat(9, max-content);
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+}
+.type-count-chip {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: .73rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
 .tc-weak { background:#2d0000; border-color:#c0392b; color:#ff6b6b; }
 .tc-resist { background:#003020; border-color:#27ae60; color:#2ecc71; }
 .tc-count { font-size:.65rem; opacity:.8; }
@@ -343,7 +359,6 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
         </div>
         <div class="panel">
             <h2>🛡️ Team Analysis</h2>
-            <!-- Row 1: overall weaknesses + individual -->
             <div class="weakness-panels">
                 <div class="weakness-section">
                     <h3>Overall Team Weaknesses</h3>
@@ -354,22 +369,18 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
                     <div class="individual-weakness-grid" id="individualWeakness"></div>
                 </div>
             </div>
-            <!-- Row 2: raw totals -->
             <div class="analysis-section">
                 <h3>Raw Type Weakness Totals (all weaknesses, ignoring resistances)</h3>
                 <div class="type-grid" id="rawWeakness"></div>
             </div>
-            <!-- Row 3: recommended typings -->
             <div class="analysis-section">
                 <h3>Recommended Typings to Add</h3>
                 <div class="rec-type-chips" id="recTypings"></div>
             </div>
-            <!-- Row 4: team resistances -->
             <div class="analysis-section">
                 <h3>Team Resistances</h3>
                 <div class="type-grid" id="teamResistances"></div>
             </div>
-            <!-- Row 5: offensive coverage -->
             <div class="analysis-section">
                 <h3>Offensive Coverage (Active Damaging Moves)</h3>
                 <div class="coverage-grid" id="offensiveCoverage"></div>
@@ -383,9 +394,6 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 <script>
 'use strict';
 
-/* ══════════════════════════════════════════
-   TYPE CHART
-══════════════════════════════════════════ */
 const typeChart = {
     Normal:   {weakTo:["Fighting"],resists:[],immuneTo:["Ghost"]},
     Fire:     {weakTo:["Water","Ground","Rock"],resists:["Fire","Grass","Ice","Bug","Steel","Fairy"],immuneTo:[]},
@@ -408,7 +416,6 @@ const typeChart = {
 };
 const ALL_TYPES = Object.keys(typeChart);
 
-/* per-type colors for chips (recommended typings) */
 const typeColors = {
     Normal:   {bg:'#3a3a32', border:'#a8a878', text:'#c6c6a7'},
     Fire:     {bg:'#4a1f0a', border:'#f08030', text:'#f5ac78'},
@@ -430,7 +437,6 @@ const typeColors = {
     Flying:   {bg:'#1a2a4a', border:'#a890f0', text:'#c6b7f5'}
 };
 
-/* offensive coverage table: for each attacking type, which defending types it hits super-effectively */
 const offenseChart = {};
 ALL_TYPES.forEach(atkType => {
     offenseChart[atkType] = ALL_TYPES.filter(defType => {
@@ -438,10 +444,7 @@ ALL_TYPES.forEach(atkType => {
         return td && td.weakTo.includes(atkType);
     });
 });
-/* ══════════════════════════════════════════
-   ABILITY IMMUNITY MAP
-   Maps ability name (lowercase) -> {immune:[types], halfDmg:[types]}
-══════════════════════════════════════════ */
+
 const abilityImmunityMap = {
     'levitate':           {immune:['Ground'], halfDmg:[]},
     'volt absorb':        {immune:['Electric'], halfDmg:[]},
@@ -461,7 +464,7 @@ const abilityImmunityMap = {
     'thick fat':          {immune:[], halfDmg:['Fire','Ice']},
     'heatproof':          {immune:[], halfDmg:['Fire']},
     'water bubble':       {immune:[], halfDmg:['Fire']},
-    'fluffy':             {immune:[], halfDmg:['Fire']}, // actually takes 2x from fire but halves contact; simplified here
+    'fluffy':             {immune:[], halfDmg:['Fire']},
     'solid rock':         {immune:[], halfDmg:[]},
     'filter':             {immune:[], halfDmg:[]},
     'prism armor':        {immune:[], halfDmg:[]},
@@ -476,9 +479,6 @@ const abilityImmunityMap = {
     'psychic surge':      {immune:[], halfDmg:[]},
 };
 
-/* ══════════════════════════════════════════
-   ABILITY DESCRIPTIONS
-══════════════════════════════════════════ */
 const abilityDescriptions = {
     'levitate': 'Gives immunity to Ground-type moves. The Pokémon hovers above ground.',
     'volt absorb': 'Restores HP if hit by an Electric-type move, instead of taking damage.',
@@ -493,20 +493,20 @@ const abilityDescriptions = {
     'thick fat': 'Halves damage from Fire-type and Ice-type moves.',
     'heatproof': 'Halves damage from Fire-type moves and burns.',
     'wonder guard': 'Only supereffective moves and certain other moves will work on the Pokémon.',
-    'intimidate': 'Lowers the foe\'s Attack stat by one stage upon entering battle.',
-    'multiscale': 'Reduces damage taken when at full HP.',
+    'intimidate': 'Lowers foe\'s Attack by 1 stage on entry.',
+    'multiscale': 'Halves damage taken when at full HP.',
     'magic bounce': 'Reflects status and entry hazard moves back at the user.',
-    'regenerator': 'Restores 1/3 of max HP when withdrawn from battle.',
+    'regenerator': 'Restores 1/3 of max HP upon switching out.',
     'protean': 'Changes the Pokémon\'s type to match the move it\'s about to use.',
     'libero': 'Changes the Pokémon\'s type to the type of the move it uses (once per switch-in).',
-    'speed boost': 'Boosts Speed by one stage at the end of each turn.',
+    'speed boost': 'Raises Speed by 1 stage at the end of each turn.',
     'moody': 'Sharply raises one random stat and lowers another each turn.',
     'huge power': 'Doubles the Pokémon\'s Attack stat.',
     'pure power': 'Doubles the Pokémon\'s Attack stat.',
     'unburden': 'Doubles Speed when the held item is used or lost.',
-    'moxie': 'Raises Attack by one stage when the Pokémon knocks out a foe.',
+    'moxie': 'Attack is raised by 1 stage after knocking out a foe.',
     'guts': 'Boosts Attack by 1.5× if the Pokémon has a status condition.',
-    'adaptability': 'STAB bonus increases from 1.5× to 2×.',
+    'adaptability': 'Raises STAB bonus from 1.5× to 2×.',
     'technician': 'Boosts the power of moves with base power 60 or less by 1.5×.',
     'sheer force': 'Removes additional effects of moves, but boosts their power by 1.3×.',
     'tough claws': 'Boosts the power of contact moves by 1.3×.',
@@ -514,16 +514,12 @@ const abilityDescriptions = {
     'reckless': 'Boosts the power of recoil moves by 1.2×.',
     'sand rush': 'Doubles Speed in a sandstorm.',
     'sand force': 'Boosts Rock, Ground, and Steel moves by 1.3× in a sandstorm.',
-    'mold breaker': 'Moves can be used on the target regardless of its Abilities.',
-    'magic guard': 'Only takes damage from direct attacks; no residual damage.',
+    'mold breaker': 'Ignores opponent\'s ability when using moves.',
     'sturdy': 'Cannot be knocked out in one hit if at full HP. Also protects from OHKO moves.',
-    'natural cure': 'Status conditions are cured when the Pokémon is withdrawn.',
-    'regenerator': 'Restores 1/3 of max HP upon switching out.',
+    'natural cure': 'Status conditions are healed upon switching out.',
     'pressure': 'When hit by a foe\'s move, that move loses 2 PP instead of 1.',
     'inner focus': 'The Pokémon will not flinch. Also protects from Intimidate.',
     'steadfast': 'Raises Speed by 1 stage if the Pokémon flinches.',
-    'multiscale': 'Halves damage taken when at full HP.',
-    'intimidate': 'Lowers foe\'s Attack by 1 stage on entry.',
     'snow warning': 'Summons hail / snow when the Pokémon enters battle.',
     'drought': 'Summons harsh sunlight when the Pokémon enters battle.',
     'drizzle': 'Summons rain when the Pokémon enters battle.',
@@ -540,7 +536,6 @@ const abilityDescriptions = {
     'soundproof': 'Protects from sound-based moves.',
     'infiltrator': 'Ignores effects of Reflect, Light Screen, Safeguard, Mist, and Aurora Veil.',
     'unseen fist': 'Contact moves bypass Protect and similar moves.',
-    'mold breaker': 'Ignores opponent\'s ability when using moves.',
     'no guard': 'All moves by and against this Pokémon always hit.',
     'stalwart': 'Ignores the effects of moves and abilities that draw in moves.',
     'spicy spray': 'When this Pokémon uses a move that makes contact, the foe may become confused.',
@@ -548,7 +543,6 @@ const abilityDescriptions = {
     'piercing drill': 'Drill and biting moves ignore type immunities.',
     'dragonize': 'Turns Normal-type moves into Dragon-type moves with a power boost.',
     'mega sol': 'Boosts Grass-type moves in strong sunlight.',
-    'adaptability': 'Raises STAB bonus from 1.5× to 2×.',
     'chlorophyll': 'Doubles Speed in harsh sunlight.',
     'blaze': 'Powers up Fire-type moves when HP is low (below 1/3).',
     'overgrow': 'Powers up Grass-type moves when HP is low.',
@@ -585,23 +579,16 @@ const abilityDescriptions = {
     'cursed body': 'May disable the move used against this Pokémon.',
     'snow cloak': 'Boosts evasion in hail/snow.',
     'illuminate': 'No competitive effect; raises the encounter rate of wild Pokémon.',
-    'natural cure': 'Status conditions are healed upon switching out.',
     'analytic': 'Boosts move power when moving last.',
     'limber': 'Prevents paralysis.',
     'quick feet': 'Boosts Speed when afflicted with a status condition.',
     'klutz': 'Cannot use held items.',
-    'speed boost': 'Raises Speed by 1 stage at the end of each turn.',
     'gluttony': 'Uses Berries earlier (at 50% HP instead of 25%).',
     'leaf guard': 'Prevents status conditions in harsh sunlight.',
     'bad dreams': 'Reduces HP of sleeping foes by 1/8 each turn.',
-    'volt absorb': 'Restores HP instead of taking damage from Electric-type moves.',
-    'moxie': 'Attack is raised by 1 stage after knocking out a foe.',
     'insomnia': 'Prevents sleep.',
 };
 
-/* ══════════════════════════════════════════
-   NATURES
-══════════════════════════════════════════ */
 const natureData = {
     Hardy:{up:null,down:null},Docile:{up:null,down:null},Serious:{up:null,down:null},Bashful:{up:null,down:null},Quirky:{up:null,down:null},
     Lonely:{up:"atk",down:"def"},Brave:{up:"atk",down:"spe"},Adamant:{up:"atk",down:"spa"},Naughty:{up:"atk",down:"spd"},
@@ -611,9 +598,6 @@ const natureData = {
     Calm:{up:"spd",down:"atk"},Gentle:{up:"spd",down:"def"},Sassy:{up:"spd",down:"spe"},Careful:{up:"spd",down:"spa"}
 };
 
-/* ══════════════════════════════════════════
-   Z-A MEGA DB
-══════════════════════════════════════════ */
 const zaMegaDB = {
     "Raichu-Mega-X":          {id:26,  zaSprite:true, type:["Electric"],          gender:"mf",  abilities:["Electric Surge"],  baseAbilities:["Static","Lightning Rod"],                   baseStats:{hp:60, atk:135,def:95, spa:90, spd:95, spe:110}},
     "Raichu-Mega-Y":          {id:26,  zaSprite:true, type:["Electric"],          gender:"mf",  abilities:["No Guard"],         baseAbilities:["Static","Lightning Rod"],                   baseStats:{hp:60, atk:100,def:55, spa:160,spd:80, spe:130}},
@@ -658,9 +642,6 @@ const zaMegaDB = {
     "Baxcalibur-Mega":        {id:997, zaSprite:true, type:["Dragon","Ice"],      gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Thermal Exchange","Ice Body","Unaware"],baseStats:{hp:115,atk:175,def:117,spa:105,spd:101,spe:87}}
 };
 
-/* ══════════════════════════════════════════
-   STATE
-══════════════════════════════════════════ */
 let pokemonList = [];
 let itemCache = [];
 let moveCache = {};
@@ -672,9 +653,6 @@ let currentTeamId = null;
 const MAX_POOL = { regular: 6, draft: 30 };
 const pokemonIdMap = {};
 
-/* ══════════════════════════════════════════
-   POKEMON NAME LIST
-══════════════════════════════════════════ */
 async function loadAllPokemonNames() {
     try {
         const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1500');
@@ -748,9 +726,6 @@ document.addEventListener('click', e => {
     }
 });
 
-/* ══════════════════════════════════════════
-   SCREEN NAV
-══════════════════════════════════════════ */
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -773,9 +748,6 @@ function loadTeamById(id) {
     showScreen('builderScreen'); render();
 }
 
-/* ══════════════════════════════════════════
-   SAVE / LOAD / DELETE
-══════════════════════════════════════════ */
 function saveCurrentTeam() {
     currentTeamName = document.getElementById('teamNameInput').value.trim() || 'Unnamed Team';
     document.getElementById('teamNameInput').value = currentTeamName;
@@ -816,7 +788,6 @@ function renderSavedTeams() {
     }).join('');
 }
 
-/* TOAST & CONFIRM */
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
 function showConfirm(title, body, onYes) {
     const overlay=document.createElement('div'); overlay.className='modal-overlay';
@@ -827,9 +798,6 @@ function showConfirm(title, body, onYes) {
     overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
 }
 
-/* ══════════════════════════════════════════
-   HELPERS
-══════════════════════════════════════════ */
 function getNatureData(n) { return natureData[n]||natureData.Hardy; }
 function getTotalEVs(p) { return Object.values(p.evs).reduce((a,b)=>a+b,0); }
 function find(name) { return pokemonList.find(p=>p.name===name); }
@@ -863,9 +831,6 @@ function makePokemon(name, data) {
         _data:data, _learnset:[] };
 }
 
-/* ══════════════════════════════════════════
-   ABILITY HELPERS
-══════════════════════════════════════════ */
 function getAbilityImmunities(abilityName) {
     if (!abilityName) return {immune:[], halfDmg:[]};
     const key = abilityName.toLowerCase().trim();
@@ -878,10 +843,7 @@ function getAbilityDesc(abilityName) {
     return abilityDescriptions[key] || '';
 }
 
-/* ══════════════════════════════════════════
-   POKEAPI FETCH — with full evo chain learnset
-══════════════════════════════════════════ */
-const learnsetCache = {}; // slug -> array of move names
+const learnsetCache = {};
 
 async function fetchLearnsetForSlug(slug) {
     if (learnsetCache[slug]) return learnsetCache[slug];
@@ -896,7 +858,6 @@ async function fetchLearnsetForSlug(slug) {
 }
 
 async function fetchFullEvoLearnset(speciesUrl) {
-    // Get evolution chain and collect all forms
     try {
         const sr = await fetch(speciesUrl);
         if (!sr.ok) return null;
@@ -905,19 +866,11 @@ async function fetchFullEvoLearnset(speciesUrl) {
         const ecr = await fetch(ecUrl);
         if (!ecr.ok) return null;
         const ecd = await ecr.json();
-        // Walk evo chain and collect all species names
         const slugs = [];
-        function walk(node) {
-            slugs.push(node.species.name);
-            node.evolves_to.forEach(walk);
-        }
+        function walk(node) { slugs.push(node.species.name); node.evolves_to.forEach(walk); }
         walk(ecd.chain);
-        // Fetch learnsets for all forms in chain
         const allMoves = new Set();
-        await Promise.all(slugs.map(async s => {
-            const ls = await fetchLearnsetForSlug(s);
-            ls.forEach(m => allMoves.add(m));
-        }));
+        await Promise.all(slugs.map(async s => { const ls = await fetchLearnsetForSlug(s); ls.forEach(m => allMoves.add(m)); }));
         return Array.from(allMoves);
     } catch(e) { return null; }
 }
@@ -927,11 +880,9 @@ async function fetchPokemonFromAPI(rawName) {
     const status = document.getElementById('searchStatus');
     if (status) status.textContent = `Searching for "${rawName}"…`;
 
-    // Z-A Mega check
     const zaKey = Object.keys(zaMegaDB).find(k => k.toLowerCase() === slug);
     if (zaKey) {
         const zaData = zaMegaDB[zaKey];
-        // fetch base form + all pre-evos learnset
         let learnset = [];
         try {
             const baseSlug = zaKey.split('-')[0].toLowerCase();
@@ -970,11 +921,8 @@ async function fetchPokemonFromAPI(rawName) {
         const data = {id:d.id, type:types, gender, abilities, baseStats, zaSprite:false};
         const name = d.name.charAt(0).toUpperCase()+d.name.slice(1).replace(/-./g,s=>'-'+s[1].toUpperCase());
         const p = makePokemon(name, data);
-
-        // Fetch full evo chain learnset
         const evoLearnset = await fetchFullEvoLearnset(d.species.url);
         p._learnset = evoLearnset || d.moves.map(m=>m.move.name);
-
         if(status) status.textContent=`Added ${p.name}!`;
         return p;
     } catch(e) {
@@ -994,7 +942,6 @@ async function searchAndAddPokemon() {
     if(p){pokemonList.push(p);input.value='';render();}
 }
 
-/* ITEMS */
 const ZA_MEGA_STONES=["Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite"];
 async function loadItems() {
     if(itemCache.length>0)return;
@@ -1011,7 +958,6 @@ function filterItems(q) {
     return itemCache.filter(i=>i.toLowerCase().includes(q.toLowerCase())).slice(0,30);
 }
 
-/* MOVES */
 async function fetchMoveData(moveName) {
     const slug=moveName.toLowerCase().replace(/\s+/g,'-');
     if(moveCache[slug])return moveCache[slug];
@@ -1034,9 +980,6 @@ function filterMoves(learnset, query) {
     return [...starts,...contains].slice(0,25).map(format);
 }
 
-/* ══════════════════════════════════════════
-   WEAKNESS — with ability immunity support
-══════════════════════════════════════════ */
 function getTypeDefenseWithAbility(types, abilityName) {
     const mult = {};
     ALL_TYPES.forEach(t => mult[t] = 1);
@@ -1046,28 +989,23 @@ function getTypeDefenseWithAbility(types, abilityName) {
         td.resists.forEach(t => mult[t] = (mult[t]||1) * 0.5);
         td.immuneTo.forEach(t => mult[t] = 0);
     });
-    // Apply ability modifiers
     const ab = getAbilityImmunities(abilityName);
     ab.immune.forEach(t => { if (mult[t] !== undefined) mult[t] = 0; });
     ab.halfDmg.forEach(t => { if (mult[t] !== undefined) mult[t] = mult[t] * 0.5; });
     return mult;
 }
 
-/* ══════════════════════════════════════════
-   ANALYSIS RENDER
-══════════════════════════════════════════ */
 function renderWeaknesses() {
     const team = getActiveTeam();
 
-    // ── Overall team weaknesses (net, ability-aware) ──
+    // Overall team weaknesses
     const teamWkEl = document.getElementById('weakness');
     if (teamWkEl) {
         teamWkEl.innerHTML = '';
         if (team.length === 0) {
             teamWkEl.innerHTML = '<em style="color:#666;font-size:.8rem">Add Pokémon to your active team</em>';
         } else {
-            // Count actual weak/resist/immune per attacking type across team
-            const netCount = {}; // type -> net (weak - resist - immune)
+            const netCount = {};
             ALL_TYPES.forEach(t => netCount[t] = 0);
             team.forEach(p => {
                 const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
@@ -1091,37 +1029,27 @@ function renderWeaknesses() {
         }
     }
 
-    // ── Recommended typings ──
+    // Recommended typings
     const recEl = document.getElementById('recTypings');
     if (recEl) {
         recEl.innerHTML = '';
         if (team.length === 0) {
             recEl.innerHTML = '<em style="color:#666;font-size:.8rem">—</em>';
         } else {
-            // Score each type by how many team weaknesses it resists/is immune to, minus how many it adds
             const teamWeakTypes = new Set();
             ALL_TYPES.forEach(atkT => {
                 let weakCount = 0;
-                team.forEach(p => {
-                    const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
-                    if (mult[atkT] > 1) weakCount++;
-                });
+                team.forEach(p => { const mult = getTypeDefenseWithAbility(p._data.type, p.ability); if (mult[atkT] > 1) weakCount++; });
                 if (weakCount > 0) teamWeakTypes.add(atkT);
             });
             const scores = ALL_TYPES.map(candidateType => {
                 const td = typeChart[candidateType]; if (!td) return {type:candidateType, score:0};
-                // How many of the team's weak types does this candidate resist or immune?
                 let helps = 0;
                 td.resists.forEach(t => { if (teamWeakTypes.has(t)) helps++; });
                 td.immuneTo.forEach(t => { if (teamWeakTypes.has(t)) helps += 2; });
-                // How many new weaknesses does it introduce (that the team doesn't already cover)?
                 let hurts = 0;
                 td.weakTo.forEach(wkT => {
-                    // Check if team has something that resists this
-                    const alreadyCovered = team.some(p => {
-                        const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
-                        return mult[wkT] < 1;
-                    });
+                    const alreadyCovered = team.some(p => { const mult = getTypeDefenseWithAbility(p._data.type, p.ability); return mult[wkT] < 1; });
                     if (!alreadyCovered) hurts++;
                 });
                 return {type:candidateType, score: helps * 2 - hurts};
@@ -1143,7 +1071,7 @@ function renderWeaknesses() {
         }
     }
 
-    // ── Individual Pokémon weaknesses (ability-aware, 4x/2x/.5x/.25x/immune) ──
+    // Individual weaknesses
     const indivEl = document.getElementById('individualWeakness');
     if (indivEl) {
         indivEl.innerHTML = '';
@@ -1177,7 +1105,7 @@ function renderWeaknesses() {
         }
     }
 
-    // ── Raw type weakness totals (just count weaknesses, no offset) ──
+    // Raw type weakness totals
     const rawEl = document.getElementById('rawWeakness');
     if (rawEl) {
         rawEl.innerHTML = '';
@@ -1204,7 +1132,7 @@ function renderWeaknesses() {
         }
     }
 
-    // ── Team resistances ──
+    // Team resistances
     const resEl = document.getElementById('teamResistances');
     if (resEl) {
         resEl.innerHTML = '';
@@ -1231,15 +1159,14 @@ function renderWeaknesses() {
         }
     }
 
-    // ── Offensive coverage ──
+    // Offensive coverage
     const covEl = document.getElementById('offensiveCoverage');
     if (covEl) {
         covEl.innerHTML = '';
         if (team.length === 0) {
             covEl.innerHTML = '<em style="color:#666;font-size:.8rem">—</em>';
         } else {
-            // For each active pokemon, look at their 4 moves, find damaging ones, see what types they hit SE
-            const seHits = {}; // defending type -> count of SE hits
+            const seHits = {};
             ALL_TYPES.forEach(t => seHits[t] = 0);
             team.forEach(p => {
                 p.moves.forEach(moveName => {
@@ -1247,15 +1174,12 @@ function renderWeaknesses() {
                     const slug = moveName.toLowerCase().replace(/\s+/g, '-');
                     const md = moveCache[slug];
                     if (!md) return;
-                    if (md.category === 'status') return; // skip status moves
-                    if (!md.power || md.power === '—' || md.power === 0) return; // skip 0 power
+                    if (md.category === 'status') return;
+                    if (!md.power || md.power === '—' || md.power === 0) return;
                     const atkType = md.type;
-                    // Find all types this move hits super effectively
                     ALL_TYPES.forEach(defType => {
                         const td = typeChart[defType];
-                        if (td && td.weakTo.includes(atkType)) {
-                            seHits[defType]++;
-                        }
+                        if (td && td.weakTo.includes(atkType)) seHits[defType]++;
                     });
                 });
             });
@@ -1280,9 +1204,6 @@ function renderWeaknesses() {
     }
 }
 
-/* ══════════════════════════════════════════
-   RENDER
-══════════════════════════════════════════ */
 function render() {
     const teamEl=document.getElementById('team'), poolEl=document.getElementById('pool');
     const teamCount=document.getElementById('teamCount'), poolCount=document.getElementById('poolCount');
@@ -1296,9 +1217,6 @@ function render() {
     renderWeaknesses();
 }
 
-/* ══════════════════════════════════════════
-   BUILD CARD
-══════════════════════════════════════════ */
 function buildCard(p) {
     const wrap=document.createElement('div');
     wrap.className='pokemon'+(p.active?' active':'')+(p.expanded?' is-expanded':'');
@@ -1327,9 +1245,6 @@ function buildCard(p) {
     return wrap;
 }
 
-/* ══════════════════════════════════════════
-   BUILD EXPANDED
-══════════════════════════════════════════ */
 function buildExpanded(p, stats) {
     const statKeys=['hp','atk','def','spa','spd','spe'];
     const statNames={hp:'HP',atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};
@@ -1345,7 +1260,6 @@ function buildExpanded(p, stats) {
         return 'neutral';
     }
 
-    // bar max: max possible stat at this pokemon's CURRENT level
     function barMax(k) {
         return k==='hp'
             ? calcHP(pData.baseStats[k], 31, 252, lv)
@@ -1398,7 +1312,6 @@ function buildExpanded(p, stats) {
         </div>`;
     }).join('');
 
-    // ability info icon
     const abilityDesc = getAbilityDesc(p.ability);
     const abilityInfoIcon = abilityDesc
         ? `<span class="ability-info-icon">ℹ<div class="ability-tooltip">${abilityDesc}</div></span>`
@@ -1407,7 +1320,6 @@ function buildExpanded(p, stats) {
     const bstBase = Object.values(pData.baseStats).reduce((a,b)=>a+b,0);
     const bstLive = Object.values(stats).reduce((a,b)=>a+b,0);
 
-    // Ability select HTML
     const abilitySelectHTML = (() => {
         const mainAbility = pData.abilities[0]||'';
         const isUnknown = mainAbility.startsWith('Unknown');
@@ -1505,7 +1417,6 @@ function buildExpanded(p, stats) {
     <div class="stats-col">
         <div class="stats-col-header">EVs</div>
         ${statKeys.map(k=>{
-            const dis=(totalEVs>=510&&p.evs[k]===0)?'disabled':'';
             return `<div class="ev-combo-cell">
                 <input type="number" class="ev-num-input" min="0" max="252" value="${p.evs[k]}"
                     data-name="${p.name}" data-stat="${k}"
@@ -1545,9 +1456,6 @@ function buildExpanded(p, stats) {
 </div>`;
 }
 
-/* ══════════════════════════════════════════
-   ITEM SEARCH
-══════════════════════════════════════════ */
 async function onItemInput(input, pokeName) {
     await loadItems();
     const q=input.value.trim();
@@ -1566,9 +1474,6 @@ function selectItem(pokeName, item) {
 }
 function closeItemDropdown(pokeName) { setTimeout(()=>{const d=document.getElementById(`itemDrop-${pokeName}`);if(d)d.style.display='none';},150); }
 
-/* ══════════════════════════════════════════
-   MOVE SEARCH
-══════════════════════════════════════════ */
 function showMoveDropdown(input, pokeName, slot, query) {
     const p=find(pokeName); if(!p) return;
     const drop=document.getElementById(`movedrop-${pokeName}-${slot}`); if(!drop) return;
@@ -1607,7 +1512,6 @@ async function selectMove(pokeName, slot, moveName) {
 function clearMove(pokeName, slot) { const p=find(pokeName);if(!p)return;p.moves[slot]='';render(); }
 function closeMoveDropdown(pokeName, slot) { setTimeout(()=>{const d=document.getElementById(`movedrop-${pokeName}-${slot}`);if(d)d.style.display='none';},150); }
 
-/* EV */
 function updateEVFromSlider(name, stat, rawVal) {
     const p=find(name); if(!p)return;
     let v=Math.max(0,Math.min(252,Number(rawVal)));
@@ -1625,10 +1529,8 @@ function updateEVFromInput(name, stat, rawVal) {
     const slider=document.getElementById(`evslider-${name}-${stat}`);
     if(slider) slider.value=v;
 }
-function syncEVSlider(name, stat) { render(); }
 function updateEV(name, stat, rawVal) { updateEVFromInput(name,stat,rawVal); }
 
-/* IV */
 function liveIVInput(el, name, stat) {
     const raw=el.value.replace(/[^0-9]/g,''); el.value=raw;
     if(raw==='')return;
@@ -1649,17 +1551,14 @@ function adjustIV(name, stat, delta) {
     render();
 }
 
-/* FIELD */
 function updateField(name, field, value) { const p=find(name);if(!p)return;p[field]=value;render(); }
 
-/* REMOVE */
 function confirmRemovePokemon(name) {
     showConfirm(`Remove ${name}?`, 'This will remove them from the pool entirely.', () => {
         pokemonList=pokemonList.filter(p=>p.name!==name); render();
     });
 }
 
-/* TEAM TOGGLE */
 function handleToggleTeam(name) {
     const p=find(name); if(!p)return;
     if(p.active){p.active=false;render();return;}
@@ -1688,7 +1587,6 @@ async function toggleExpand(name) {
     render();
 }
 
-/* TOOLTIP POSITIONING */
 document.addEventListener('mousemove', e => {
     document.querySelectorAll('.move-tooltip, .ability-tooltip').forEach(t => {
         if(t.parentElement.matches(':hover')){
@@ -1702,12 +1600,6 @@ document.addEventListener('mousemove', e => {
 
 async function init() { renderSavedTeams(); loadAllPokemonNames(); }
 init();
-</script>
-</body>
-</html>
-ENDOFFILE
-echo "Done. Lines: $(wc -l < /home/claude/pokemon-v2.html)"
-
 </script>
 </body>
 </html>
