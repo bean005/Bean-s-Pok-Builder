@@ -1,3 +1,6 @@
+bash
+cat > /home/claude/pokemon-v2.html << 'ENDOFFILE'
+<!-- Built by Bean -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,526 +9,284 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-    --bg:        #1a1a2e;
-    --bg2:       #16213e;
-    --bg3:       #0f3460;
-    --bg4:       #0a0a1e;
-    --border:    #2e2e4e;
-    --border2:   #2e2e5e;
-    --accent:    #a0c4ff;
-    --green:     #2ecc71;
-    --red:       #e74c3c;
-    --orange:    #e67e22;
-    --text:      #e0e0e0;
-    --muted:     #888;
-    --muted2:    #ccc;
+    --bg:#1a1a2e; --bg2:#16213e; --bg3:#0f3460; --bg4:#0a0a1e;
+    --border:#2e2e4e; --border2:#2e2e5e; --accent:#a0c4ff;
+    --green:#2ecc71; --red:#e74c3c; --orange:#e67e22;
+    --text:#e0e0e0; --muted:#888; --muted2:#ccc;
 }
-body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg); color: var(--text);
-    min-height: 100vh; padding: 0;
-}
+body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:0; }
+.screen { display:none; }
+.screen.active { display:block; }
 
-/* ══ SCREENS ══ */
-.screen { display: none; }
-.screen.active { display: block; }
+/* HOME */
+#homeScreen { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 16px; background:radial-gradient(ellipse at 50% 0%,#0d3b6e 0%,#1a1a2e 60%); }
+.home-logo { font-size:2.8rem; font-weight:900; letter-spacing:.04em; color:#fff; margin-bottom:6px; text-align:center; line-height:1.1; }
+.home-logo span { color:var(--accent); font-size:2.2rem; display:block; font-weight:700; letter-spacing:.06em; }
+.home-subtitle { font-size:.95rem; color:var(--muted2); margin-bottom:48px; text-align:center; }
+.mode-cards { display:flex; gap:24px; flex-wrap:wrap; justify-content:center; margin-bottom:48px; }
+.mode-card { background:var(--bg2); border:2px solid var(--border2); border-radius:16px; padding:32px 28px; width:240px; text-align:center; cursor:pointer; transition:border-color .2s,transform .15s,box-shadow .2s; position:relative; overflow:hidden; }
+.mode-card:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.5); }
+.mode-card .mode-icon { font-size:3rem; margin-bottom:14px; display:block; }
+.mode-card .mode-title { font-size:1.2rem; font-weight:800; color:#fff; margin-bottom:8px; }
+.mode-card .mode-desc { font-size:.82rem; color:var(--muted2); line-height:1.6; }
+.mode-card .mode-badge { position:absolute; top:12px; right:12px; background:var(--accent); color:#000; font-size:.65rem; font-weight:800; padding:2px 8px; border-radius:20px; letter-spacing:.06em; }
+.mode-card.draft-card { border-color:#4a3a6e; }
+.mode-card.draft-card:hover { border-color:#c084fc; box-shadow:0 12px 40px rgba(192,132,252,.15); }
+.mode-card.draft-card .mode-badge { background:#c084fc; }
+.home-teams { width:100%; max-width:720px; }
+.home-teams h3 { font-size:.9rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; text-align:center; }
+.saved-team-list { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+.saved-team-btn { background:var(--bg2); border:1px solid var(--border2); border-radius:10px; padding:10px 16px; cursor:pointer; transition:border-color .15s,background .15s; display:flex; align-items:center; gap:10px; min-width:200px; }
+.saved-team-btn:hover { border-color:var(--accent); background:#1a2a4e; }
+.saved-team-btn .stb-name { font-size:.9rem; font-weight:700; color:#fff; }
+.saved-team-btn .stb-meta { font-size:.72rem; color:var(--muted); margin-top:2px; }
+.saved-team-btn .stb-mode { font-size:.65rem; background:var(--bg3); color:var(--accent); padding:2px 7px; border-radius:10px; font-weight:700; }
+.stb-del { background:none; border:none; color:var(--muted); font-size:.9rem; cursor:pointer; padding:4px; border-radius:4px; margin-left:auto; transition:color .15s; }
+.stb-del:hover { color:var(--red); }
+.home-no-teams { text-align:center; color:var(--muted); font-size:.82rem; }
 
-/* ══ HOME SCREEN ══ */
-#homeScreen {
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 32px 16px;
-    background: radial-gradient(ellipse at 50% 0%, #0d3b6e 0%, #1a1a2e 60%);
-}
-.home-logo {
-    font-size: 2.8rem; font-weight: 900; letter-spacing: .04em;
-    color: #fff; margin-bottom: 6px; text-align: center; line-height: 1.1;
-}
-.home-logo span { color: var(--accent); font-size: 2.2rem; display: block; font-weight: 700; letter-spacing: .06em; }
-.home-subtitle { font-size: .95rem; color: var(--muted2); margin-bottom: 48px; text-align: center; }
-.mode-cards {
-    display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
-    margin-bottom: 48px;
-}
-.mode-card {
-    background: var(--bg2); border: 2px solid var(--border2);
-    border-radius: 16px; padding: 32px 28px;
-    width: 240px; text-align: center; cursor: pointer;
-    transition: border-color .2s, transform .15s, box-shadow .2s;
-    position: relative; overflow: hidden;
-}
-.mode-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.5); }
-.mode-card .mode-icon { font-size: 3rem; margin-bottom: 14px; display: block; }
-.mode-card .mode-title { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
-.mode-card .mode-desc { font-size: .82rem; color: var(--muted2); line-height: 1.6; }
-.mode-card .mode-badge {
-    position: absolute; top: 12px; right: 12px;
-    background: var(--accent); color: #000;
-    font-size: .65rem; font-weight: 800; padding: 2px 8px;
-    border-radius: 20px; letter-spacing: .06em;
-}
-.mode-card.draft-card { border-color: #4a3a6e; }
-.mode-card.draft-card:hover { border-color: #c084fc; box-shadow: 0 12px 40px rgba(192,132,252,.15); }
-.mode-card.draft-card .mode-badge { background: #c084fc; }
+/* BUILDER */
+#builderScreen { padding:16px; }
+.builder-header { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border-bottom:1px solid var(--border); margin:-16px -16px 16px; }
+.builder-back { background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--accent); font-size:.85rem; padding:6px 14px; cursor:pointer; transition:background .15s; }
+.builder-back:hover { background:#1a4a7a; }
+.team-name-wrap { display:flex; align-items:center; gap:8px; flex:1; }
+.team-name-input { background:transparent; border:none; border-bottom:2px solid var(--border2); color:#fff; font-size:1.1rem; font-weight:700; padding:2px 6px; outline:none; width:220px; transition:border-color .15s; }
+.team-name-input:focus { border-bottom-color:var(--accent); }
+.mode-badge-header { background:var(--bg3); color:var(--accent); font-size:.7rem; font-weight:800; padding:3px 10px; border-radius:20px; letter-spacing:.06em; }
+.builder-actions { display:flex; gap:8px; margin-left:auto; }
+.btn { padding:7px 16px; border-radius:8px; border:none; font-size:.82rem; font-weight:700; cursor:pointer; transition:background .15s,transform .1s; }
+.btn:active { transform:scale(.97); }
+.btn-save { background:#1a5e3a; color:var(--green); border:1px solid #2e7d4a; }
+.btn-save:hover { background:#236b44; }
+.btn-new { background:var(--bg3); color:var(--accent); border:1px solid var(--border2); }
+.btn-new:hover { background:#1a4a7a; }
 
-/* ── Saved Teams on Home ── */
-.home-teams { width: 100%; max-width: 720px; }
-.home-teams h3 { font-size: .9rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; text-align: center; }
-.saved-team-list { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.saved-team-btn {
-    background: var(--bg2); border: 1px solid var(--border2);
-    border-radius: 10px; padding: 10px 16px;
-    cursor: pointer; transition: border-color .15s, background .15s;
-    display: flex; align-items: center; gap: 10px;
-    min-width: 200px;
-}
-.saved-team-btn:hover { border-color: var(--accent); background: #1a2a4e; }
-.saved-team-btn .stb-info { text-align: left; }
-.saved-team-btn .stb-name { font-size: .9rem; font-weight: 700; color: #fff; }
-.saved-team-btn .stb-meta { font-size: .72rem; color: var(--muted); margin-top: 2px; }
-.saved-team-btn .stb-mode { font-size: .65rem; background: var(--bg3); color: var(--accent); padding: 2px 7px; border-radius: 10px; font-weight: 700; }
-.stb-del { background: none; border: none; color: var(--muted); font-size: .9rem; cursor: pointer; padding: 4px; border-radius: 4px; margin-left: auto; transition: color .15s; }
-.stb-del:hover { color: var(--red); }
-.home-no-teams { text-align: center; color: var(--muted); font-size: .82rem; }
+/* PANEL */
+.panel { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:16px; margin:0 auto 16px; width:100%; max-width:2000px; box-shadow:0 4px 20px rgba(0,0,0,.4); }
+h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+.pool-count { font-size:.75rem; color:var(--muted); font-weight:400; margin-left:4px; }
 
-/* ══ BUILDER SCREEN ══ */
-#builderScreen { padding: 16px; }
-.builder-header {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 16px; background: var(--bg2);
-    border-bottom: 1px solid var(--border); margin: -16px -16px 16px;
-}
-.builder-back {
-    background: var(--bg3); border: 1px solid var(--border2);
-    border-radius: 8px; color: var(--accent); font-size: .85rem;
-    padding: 6px 14px; cursor: pointer; transition: background .15s;
-}
-.builder-back:hover { background: #1a4a7a; }
-.team-name-wrap { display: flex; align-items: center; gap: 8px; flex: 1; }
-.team-name-input {
-    background: transparent; border: none; border-bottom: 2px solid var(--border2);
-    color: #fff; font-size: 1.1rem; font-weight: 700; padding: 2px 6px;
-    outline: none; width: 220px; transition: border-color .15s;
-}
-.team-name-input:focus { border-bottom-color: var(--accent); }
-.mode-badge-header {
-    background: var(--bg3); color: var(--accent); font-size: .7rem;
-    font-weight: 800; padding: 3px 10px; border-radius: 20px; letter-spacing: .06em;
-}
-.builder-actions { display: flex; gap: 8px; margin-left: auto; }
-.btn {
-    padding: 7px 16px; border-radius: 8px; border: none;
-    font-size: .82rem; font-weight: 700; cursor: pointer; transition: background .15s, transform .1s;
-}
-.btn:active { transform: scale(.97); }
-.btn-save   { background: #1a5e3a; color: var(--green); border: 1px solid #2e7d4a; }
-.btn-save:hover { background: #236b44; }
-.btn-new    { background: var(--bg3); color: var(--accent); border: 1px solid var(--border2); }
-.btn-new:hover { background: #1a4a7a; }
+/* GRID */
+#team,#pool { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:start; }
+.pokemon.is-expanded { grid-column:1/-1; }
 
-/* ══ PANEL ══ */
-.panel {
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px;
-    margin: 0 auto 16px; width: 100%; max-width: 2000px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.4);
-}
-h2 {
-    font-size: .95rem; font-weight: 700; letter-spacing: .08em;
-    text-transform: uppercase; color: var(--accent);
-    margin-bottom: 12px; padding-bottom: 8px;
-    border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px;
-}
-.pool-count { font-size: .75rem; color: var(--muted); font-weight: 400; margin-left: 4px; }
+/* POKEMON CARD */
+.pokemon { background:var(--bg3); border:1px solid var(--border2); border-radius:10px; padding:10px; overflow:visible; transition:border-color .2s; }
+.pokemon.active { background:#0d3b2e; border-color:var(--green); }
+.pokemon:hover { border-color:var(--accent); }
+.pokemon *:focus { outline:none!important; box-shadow:none!important; }
+.pokemon-summary { display:grid; grid-template-columns:72px 1fr 1fr 1fr 60px; align-items:center; gap:8px; }
+.poke-img { width:64px; height:64px; image-rendering:pixelated; }
+.summary-info .poke-name { font-weight:700; font-size:.88rem; color:#fff; }
+.summary-info .poke-type { color:var(--accent); font-size:.75rem; }
+.summary-info div { font-size:.75rem; line-height:1.55; }
+.summary-meta div { font-size:.72rem; line-height:1.6; color:var(--muted2); }
+.summary-moves div { font-size:.7rem; line-height:1.55; color:#ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.action-buttons { display:flex; flex-direction:column; gap:4px; align-items:center; }
+.action-buttons button { width:26px; height:26px; border:none; border-radius:6px; background:#2e2e5e; color:var(--accent); font-size:.85rem; cursor:pointer; transition:background .15s; display:flex; align-items:center; justify-content:center; }
+.action-buttons button:hover { background:#3e3e7e; }
+.action-buttons button.add-btn { background:#1a5e3a; color:var(--green); }
+.action-buttons button.rem-btn { background:#5e1a1a; color:var(--red); }
+.action-buttons button.add-btn:hover { background:#256b44; }
+.action-buttons button.rem-btn:hover { background:#6b2525; }
+.action-buttons button.del-btn { background:#3a1a1a; color:#c0392b; font-size:.75rem; }
+.action-buttons button.del-btn:hover { background:#5a2020; color:var(--red); }
 
-/* ══ GRID ══ */
-#team, #pool {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    align-items: start;
-}
-/* Expanded card takes full row width so it never squishes neighbors */
-.pokemon.is-expanded {
-    grid-column: 1 / -1;
-}
+/* EXPANDED */
+.pokemon-expanded { margin-top:12px; padding:16px; background:var(--bg4); border-top:1px solid var(--border); border-radius:0 0 10px 10px; }
+.exp-header { display:grid; grid-template-columns:130px 1fr; gap:12px; margin-bottom:14px; }
+.exp-sprite-box { display:flex; align-items:center; justify-content:center; background:var(--bg2); border:1px solid var(--border); border-radius:10px; flex-direction:column; gap:4px; padding:8px; }
+.exp-sprite-box img { width:110px; height:110px; image-rendering:pixelated; }
+.exp-sprite-box .shiny-toggle { display:flex; align-items:center; gap:6px; }
+.exp-sprite-box .shiny-toggle label { font-size:.72rem; color:var(--muted); cursor:pointer; }
+.exp-controls-rows { display:flex; flex-direction:column; gap:8px; justify-content:center; }
+.exp-controls-row { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.ctrl-group { display:flex; flex-direction:column; gap:3px; }
+.ctrl-group label { font-size:.66rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+.ctrl-group select,.ctrl-group input[type="text"],.ctrl-group input[type="number"] { background:var(--bg2); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:.78rem; padding:5px 7px; width:100%; outline:none; transition:border-color .15s; }
+.ctrl-group select:focus,.ctrl-group input[type="text"]:focus,.ctrl-group input[type="number"]:focus { border-color:var(--accent)!important; }
+.iv-spinner input:focus,.ev-num-input:focus { border-color:var(--accent)!important; outline:none!important; box-shadow:none!important; }
 
-/* ══ POKEMON CARD ══ */
-.pokemon {
-    background: var(--bg3); border: 1px solid var(--border2);
-    border-radius: 10px; padding: 10px; overflow: visible;
-    transition: border-color .2s;
-}
-.pokemon.active { background: #0d3b2e; border-color: var(--green); }
-.pokemon:hover  { border-color: var(--accent); }
-/* prevent any child focus from flashing the card border */
-.pokemon *:focus { outline: none !important; box-shadow: none !important; }
+/* ability info icon */
+.ability-info-wrap { display:flex; align-items:center; gap:4px; }
+.ability-info-wrap select { flex:1; }
+.ability-info-icon { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#2e2e5e; color:var(--accent); font-size:.6rem; cursor:pointer; font-style:normal; font-weight:700; border:1px solid var(--border); transition:background .15s; flex-shrink:0; position:relative; line-height:1; }
+.ability-info-icon:hover { background:#3e3e7e; }
+.ability-tooltip { display:none; position:fixed; width:240px; background:#1a1a3e; border:1px solid var(--accent); border-radius:8px; padding:10px 12px; font-size:.72rem; color:var(--muted2); line-height:1.5; z-index:9999; pointer-events:none; box-shadow:0 4px 20px rgba(0,0,0,.7); white-space:normal; word-wrap:break-word; }
+.ability-info-icon:hover .ability-tooltip { display:block; }
 
-.pokemon-summary {
-    display: grid;
-    grid-template-columns: 72px 1fr 1fr 1fr 60px;
-    align-items: center; gap: 8px;
-}
-.poke-img { width: 64px; height: 64px; image-rendering: pixelated; }
-.summary-info .poke-name { font-weight: 700; font-size: .88rem; color: #fff; }
-.summary-info .poke-type { color: var(--accent); font-size: .75rem; }
-.summary-info div { font-size: .75rem; line-height: 1.55; }
-.summary-meta div { font-size: .72rem; line-height: 1.6; color: var(--muted2); }
-.summary-moves div { font-size: .7rem; line-height: 1.55; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* MOVES */
+.exp-moves { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+.move-slot { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; position:relative; }
+.move-slot label { display:block; font-size:.63rem; color:#666; margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
+.move-search-wrap { position:relative; display:flex; align-items:center; gap:4px; }
+.move-search-wrap input { background:transparent; border:none; color:var(--text); font-size:.8rem; flex:1; outline:none; padding:2px 0; }
+.move-clear { background:none; border:none; color:var(--muted); font-size:.75rem; cursor:pointer; padding:0 2px; transition:color .15s; flex-shrink:0; }
+.move-clear:hover { color:var(--red); }
+.move-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:200; background:var(--bg2); border:1px solid var(--border); border-radius:6px; max-height:170px; overflow-y:auto; box-shadow:0 4px 16px rgba(0,0,0,.5); }
+.move-dropdown div { padding:6px 10px; font-size:.78rem; cursor:pointer; border-bottom:1px solid var(--bg4); display:flex; justify-content:space-between; align-items:center; }
+.move-dropdown div:last-child { border-bottom:none; }
+.move-dropdown div:hover { background:#2e2e5e; }
+.move-dd-meta { display:flex; align-items:center; gap:5px; flex-shrink:0; margin-left:8px; }
+.move-dd-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.move-dd-type { font-size:.63rem; color:var(--accent); font-weight:600; white-space:nowrap; }
+.move-dd-stat { font-size:.62rem; color:var(--muted); white-space:nowrap; }
+.move-info-bar { font-size:.63rem; color:var(--muted); margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.move-info-bar span { white-space:nowrap; }
+.cat-physical { color:#e67e22; } .cat-special { color:#3498db; } .cat-status { color:var(--muted); }
+.move-info-icon { display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border-radius:50%; background:#2e2e5e; color:var(--accent); font-size:.6rem; cursor:pointer; font-style:normal; font-weight:700; border:1px solid var(--border); transition:background .15s; flex-shrink:0; position:relative; line-height:1; }
+.move-info-icon:hover { background:#3e3e7e; }
+.move-tooltip { display:none; position:fixed; width:220px; background:#1a1a3e; border:1px solid var(--accent); border-radius:8px; padding:10px 12px; font-size:.72rem; color:var(--muted2); line-height:1.5; z-index:9999; pointer-events:none; box-shadow:0 4px 20px rgba(0,0,0,.7); white-space:normal; word-wrap:break-word; }
+.move-info-icon:hover .move-tooltip { display:block; }
 
-.action-buttons { display: flex; flex-direction: column; gap: 4px; align-items: center; }
-.action-buttons button {
-    width: 26px; height: 26px; border: none; border-radius: 6px;
-    background: #2e2e5e; color: var(--accent); font-size: .85rem;
-    cursor: pointer; transition: background .15s;
-    display: flex; align-items: center; justify-content: center;
-}
-.action-buttons button:hover { background: #3e3e7e; }
-.action-buttons button.add-btn { background: #1a5e3a; color: var(--green); }
-.action-buttons button.rem-btn { background: #5e1a1a; color: var(--red); }
-.action-buttons button.add-btn:hover { background: #256b44; }
-.action-buttons button.rem-btn:hover { background: #6b2525; }
-.action-buttons button.del-btn { background: #3a1a1a; color: #c0392b; font-size: .75rem; }
-.action-buttons button.del-btn:hover { background: #5a2020; color: var(--red); }
+/* IVs */
+.exp-ivs { display:grid; grid-template-columns:auto repeat(6,1fr); align-items:center; gap:8px; margin-bottom:14px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; }
+.ivs-label { font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:700; white-space:nowrap; }
+.iv-group { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.iv-group label { font-size:.63rem; color:var(--muted); text-transform:uppercase; }
+.iv-spinner { display:flex; align-items:center; gap:2px; }
+.iv-spinner button { width:18px; height:18px; background:#2e2e5e; border:none; border-radius:4px; color:var(--accent); font-size:.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; flex-shrink:0; }
+.iv-spinner button:hover { background:#3e3e7e; }
+.iv-spinner input { width:44px; background:var(--bg4); border:1px solid var(--border); border-radius:4px; color:var(--text); font-size:.8rem; text-align:center; padding:3px 2px; outline:none; }
 
-/* ══ EXPANDED — full width single col ══ */
-.pokemon-expanded {
-    margin-top: 12px; padding: 16px;
-    background: var(--bg4); border-top: 1px solid var(--border);
-    border-radius: 0 0 10px 10px;
-}
-.exp-header { display: grid; grid-template-columns: 130px 1fr; gap: 12px; margin-bottom: 14px; }
-.exp-sprite-box {
-    display: flex; align-items: center; justify-content: center;
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
-    flex-direction: column; gap: 4px; padding: 8px;
-}
-.exp-sprite-box img { width: 110px; height: 110px; image-rendering: pixelated; }
-.exp-sprite-box .shiny-toggle { display: flex; align-items: center; gap: 6px; }
-.exp-sprite-box .shiny-toggle label { font-size: .72rem; color: var(--muted); cursor: pointer; }
-.exp-sprite-box .shiny-toggle input { cursor: pointer; }
-.exp-controls-rows { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
-.exp-controls-row  { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
-.ctrl-group { display: flex; flex-direction: column; gap: 3px; }
-.ctrl-group label { font-size: .66rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-.ctrl-group select,
-.ctrl-group input[type="text"],
-.ctrl-group input[type="number"] {
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-    color: var(--text); font-size: .78rem; padding: 5px 7px; width: 100%;
-    outline: none; transition: border-color .15s;
-}
-.ctrl-group select:focus,
-.ctrl-group input[type="text"]:focus,
-.ctrl-group input[type="number"]:focus { border-color: var(--accent) !important; outline: none !important; box-shadow: none !important; }
-.iv-spinner input:focus { border-color: var(--accent) !important; outline: none !important; box-shadow: none !important; }
-.ev-num-input:focus { border-color: var(--accent) !important; outline: none !important; box-shadow: none !important; }
+/* STATS TABLE */
+.exp-stats-grid { display:grid; grid-template-columns:85px 80px 90px 1fr 190px; gap:0; border:1px solid var(--border); border-radius:8px; overflow:hidden; font-size:.77rem; }
+.stats-col { display:flex; flex-direction:column; }
+.stats-col-header { background:#1a1a3e; padding:6px 10px; font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
+.stats-col:not(:last-child) { border-right:1px solid var(--border); }
+.stat-cell { padding:6px 10px; display:flex; align-items:center; border-bottom:1px solid #13132e; min-height:40px; }
+.stat-cell:last-child { border-bottom:none; }
+.stat-label { color:var(--muted); font-size:.7rem; width:32px; flex-shrink:0; }
+.base-val { color:#aaa; }
+.live-val { font-weight:700; }
+.live-val.boosted { color:#f39c12; } .live-val.dropped { color:var(--red); } .live-val.neutral { color:var(--text); }
+.ev-combo-cell { display:flex; flex-direction:column; justify-content:center; padding:6px 10px; border-bottom:1px solid #13132e; min-height:40px; gap:3px; }
+.ev-combo-cell:last-child { border-bottom:none; }
+.ev-num-input { width:64px; background:var(--bg4); border:1px solid var(--border); border-radius:4px; color:var(--text); font-size:.88rem; text-align:center; padding:5px 4px; outline:none; min-height:30px; }
+.bst-row { padding:6px 10px; font-size:.68rem; color:var(--accent); border-top:1px solid var(--border); font-weight:700; display:flex; align-items:center; }
+.ev-total-row { padding:6px 10px; font-size:.68rem; color:var(--muted); border-top:1px solid var(--border); text-align:center; }
 
-/* ══ MOVES ══ */
-.exp-moves { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 12px; }
-.move-slot {
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 10px; position: relative;
-}
-.move-slot label { display: block; font-size: .63rem; color: #666; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .05em; }
-.move-search-wrap { position: relative; display: flex; align-items: center; gap: 4px; }
-.move-search-wrap input {
-    background: transparent; border: none; color: var(--text);
-    font-size: .8rem; flex: 1; outline: none; padding: 2px 0;
-}
-.move-clear { background: none; border: none; color: var(--muted); font-size: .75rem; cursor: pointer; padding: 0 2px; transition: color .15s; flex-shrink: 0; }
-.move-clear:hover { color: var(--red); }
-.move-dropdown {
-    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-    max-height: 170px; overflow-y: auto; box-shadow: 0 4px 16px rgba(0,0,0,.5);
-}
-.move-dropdown div {
-    padding: 6px 10px; font-size: .78rem; cursor: pointer; border-bottom: 1px solid var(--bg4);
-    display: flex; justify-content: space-between; align-items: center;
-}
-.move-dropdown div:last-child { border-bottom: none; }
-.move-dropdown div:hover { background: #2e2e5e; }
-.move-dd-type { font-size: .65rem; color: var(--muted); }
-.move-dd-meta {
-    display: flex; align-items: center; gap: 5px; flex-shrink: 0; margin-left: 8px;
-}
-.move-dd-dot {
-    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-}
-.move-dd-type {
-    font-size: .63rem; color: var(--accent); font-weight: 600; white-space: nowrap;
-}
-.move-dd-stat {
-    font-size: .62rem; color: var(--muted); white-space: nowrap;
-}
-.move-info-bar {
-    font-size: .63rem; color: var(--muted); margin-top: 4px;
-    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-}
-.move-info-bar span { white-space: nowrap; }
-.cat-physical { color: #e67e22; }
-.cat-special  { color: #3498db; }
-.cat-status   { color: var(--muted); }
-/* info icon */
-.move-info-icon {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: #2e2e5e; color: var(--accent); font-size: .6rem;
-    cursor: pointer; font-style: normal; font-weight: 700;
-    border: 1px solid var(--border); transition: background .15s; flex-shrink: 0;
-    position: relative; line-height: 1;
-}
-.move-info-icon:hover { background: #3e3e7e; }
-.move-tooltip {
-    display: none; position: fixed;
-    width: 220px;
-    background: #1a1a3e; border: 1px solid var(--accent);
-    border-radius: 8px; padding: 10px 12px; font-size: .72rem; color: var(--muted2);
-    line-height: 1.5; z-index: 9999; pointer-events: none;
-    box-shadow: 0 4px 20px rgba(0,0,0,.7);
-    white-space: normal; word-wrap: break-word;
-}
-.move-info-icon:hover .move-tooltip { display: block; }
+/* SLIDER */
+input[type="range"].ev-slider { -webkit-appearance:none; appearance:none; width:100%; height:5px; border-radius:3px; background:#2e2e5e; outline:none!important; box-shadow:none!important; cursor:pointer; padding:0; margin:0; border:none!important; }
+input[type="range"].ev-slider:focus { outline:none!important; box-shadow:none!important; }
+input[type="range"].ev-slider::-webkit-slider-runnable-track { height:5px; border-radius:3px; background:#2e2e5e; cursor:pointer; }
+input[type="range"].ev-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:grab; margin-top:-5.5px; box-shadow:0 0 4px rgba(0,0,0,.5); transition:background .15s,transform .1s; border:none; }
+input[type="range"].ev-slider::-webkit-slider-thumb:active { cursor:grabbing; transform:scale(1.25); background:#fff; }
+input[type="range"].ev-slider::-moz-range-track { height:5px; border-radius:3px; background:#2e2e5e; }
+input[type="range"].ev-slider::-moz-range-thumb { width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:grab; border:none; box-shadow:0 0 4px rgba(0,0,0,.5); }
+input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
+.ev-slider-cell { padding:6px 12px; display:flex; align-items:center; border-bottom:1px solid #13132e; min-height:40px; }
+.ev-slider-cell:last-child { border-bottom:none; }
+.bar-cell { padding:6px 10px; display:flex; align-items:center; gap:6px; border-bottom:1px solid #13132e; min-height:40px; }
+.bar-cell:last-child { border-bottom:none; }
+.stat-bar-track { flex:1; height:9px; background:#1a1a3e; border-radius:5px; overflow:hidden; }
+.stat-bar-fill { height:100%; border-radius:5px; transition:width .25s ease; }
+.bar-num { font-size:.7rem; color:#aaa; width:28px; text-align:right; flex-shrink:0; }
+.bar-hp { background:linear-gradient(90deg,#e74c3c,#ff6b6b); }
+.bar-atk { background:linear-gradient(90deg,#e67e22,#f39c12); }
+.bar-def { background:linear-gradient(90deg,#f1c40f,#f4d03f); }
+.bar-spa { background:linear-gradient(90deg,#3498db,#5dade2); }
+.bar-spd { background:linear-gradient(90deg,#27ae60,#2ecc71); }
+.bar-spe { background:linear-gradient(90deg,#e91e8c,#ff69b4); }
 
-/* ══ IVs ══ */
-.exp-ivs {
-    display: grid; grid-template-columns: auto repeat(6,1fr);
-    align-items: center; gap: 8px; margin-bottom: 14px;
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 12px;
-}
-.ivs-label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; white-space: nowrap; }
-.iv-group  { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-.iv-group label { font-size: .63rem; color: var(--muted); text-transform: uppercase; }
-.iv-spinner { display: flex; align-items: center; gap: 2px; }
-.iv-spinner button {
-    width: 18px; height: 18px; background: #2e2e5e; border: none;
-    border-radius: 4px; color: var(--accent); font-size: .7rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: background .15s; flex-shrink: 0;
-}
-.iv-spinner button:hover { background: #3e3e7e; }
-.iv-spinner input {
-    width: 44px; background: var(--bg4); border: 1px solid var(--border);
-    border-radius: 4px; color: var(--text); font-size: .8rem;
-    text-align: center; padding: 3px 2px; outline: none;
-}
-.iv-spinner input:focus { border-color: var(--accent); }
+/* ITEM SEARCH */
+.item-search-wrap { position:relative; }
+.item-dropdown { position:absolute; top:100%; left:0; right:0; z-index:300; background:var(--bg2); border:1px solid var(--border); border-radius:6px; max-height:160px; overflow-y:auto; box-shadow:0 4px 16px rgba(0,0,0,.5); }
+.item-dropdown div { padding:5px 10px; font-size:.78rem; cursor:pointer; border-bottom:1px solid var(--bg4); }
+.item-dropdown div:last-child { border-bottom:none; }
+.item-dropdown div:hover { background:#2e2e5e; }
 
-/* ══ STATS TABLE ══ */
-.exp-stats-grid {
-    display: grid; grid-template-columns: 85px 75px 90px 1fr 170px;
-    gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: .77rem;
-}
-.stats-col { display: flex; flex-direction: column; }
-.stats-col-header {
-    background: #1a1a3e; padding: 6px 10px; font-size: .63rem;
-    font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
-    color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap;
-}
-.stats-col:not(:last-child) { border-right: 1px solid var(--border); }
-.stat-cell {
-    padding: 5px 10px; display: flex; align-items: center;
-    border-bottom: 1px solid #13132e; min-height: 36px;
-}
-.stat-cell:last-child { border-bottom: none; }
-.stat-label { color: var(--muted); font-size: .7rem; width: 32px; flex-shrink: 0; }
-.base-val   { color: #aaa; }
-.live-val   { font-weight: 700; }
-.live-val.boosted { color: #f39c12; }
-.live-val.dropped { color: var(--red); }
-.live-val.neutral { color: var(--text); }
+/* POKEMON AUTOCOMPLETE */
+.poke-search-bar { display:flex; gap:8px; margin-bottom:8px; align-items:center; position:relative; }
+.poke-search-wrap { flex:1; position:relative; }
+.poke-search-wrap input { width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-size:.85rem; padding:9px 14px; outline:none; transition:border-color .15s; }
+.poke-search-wrap input:focus { border-color:var(--accent); }
+.poke-autocomplete { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:400; background:var(--bg2); border:1px solid var(--border); border-radius:8px; max-height:220px; overflow-y:auto; box-shadow:0 6px 24px rgba(0,0,0,.6); }
+.poke-autocomplete .poke-ac-item { padding:8px 14px; font-size:.82rem; cursor:pointer; border-bottom:1px solid var(--bg4); display:flex; align-items:center; gap:10px; }
+.poke-autocomplete .poke-ac-item:last-child { border-bottom:none; }
+.poke-autocomplete .poke-ac-item:hover { background:#2e2e5e; }
+.poke-autocomplete .poke-ac-item img { width:28px; height:28px; image-rendering:pixelated; }
+.poke-autocomplete .poke-ac-item .poke-ac-name { font-weight:600; color:#fff; }
+.poke-autocomplete .poke-ac-item .poke-ac-type { font-size:.68rem; color:var(--muted); margin-left:auto; }
+.poke-search-bar button { background:#1a4a7a; border:1px solid var(--border2); border-radius:8px; color:var(--accent); font-size:.85rem; padding:9px 16px; cursor:pointer; transition:background .15s; white-space:nowrap; }
+.poke-search-bar button:hover { background:#256b9a; }
+.search-status { font-size:.73rem; color:var(--muted); margin-bottom:10px; min-height:16px; }
 
-/* EV cell with input + slider stacked */
-.ev-combo-cell {
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 5px 10px; border-bottom: 1px solid #13132e; min-height: 40px; gap: 3px;
-}
-.ev-combo-cell:last-child { border-bottom: none; }
-.ev-input-row { display: flex; align-items: center; gap: 4px; }
-.ev-num-input {
-    width: 64px; background: var(--bg4); border: 1px solid var(--border);
-    border-radius: 4px; color: var(--text); font-size: .88rem;
-    text-align: center; padding: 5px 4px; outline: none;
-    min-height: 30px;
-}
-.ev-num-input:focus { border-color: var(--accent); }
-.ev-total-row {
-    padding: 5px 10px; font-size: .68rem; color: var(--muted);
-    border-top: 1px solid var(--border); text-align: center;
-}
+/* ANALYSIS PANEL */
+.analysis-section { margin-bottom:20px; }
+.analysis-section h3 { font-size:.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
+.weakness-panels { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.weakness-section h3 { font-size:.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; }
+.weakness-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.weakness-chip { padding:4px 10px; border-radius:20px; font-size:.73rem; font-weight:700; border:1px solid transparent; }
+.weakness-high { background:#3d0000; border-color:var(--red); color:#ff6b6b; }
+.weakness-mid { background:#3d1f00; border-color:var(--orange); color:#f39c12; }
+.weakness-low { background:#3d3000; border-color:#f1c40f; color:#f4d03f; }
 
-/* ══ SLIDER ══ */
-input[type="range"].ev-slider {
-    -webkit-appearance: none; appearance: none;
-    width: 100%; height: 5px; border-radius: 3px;
-    background: #2e2e5e; outline: none !important;
-    box-shadow: none !important;
-    cursor: pointer; padding: 0; margin: 0;
-    border: none !important;
-}
-input[type="range"].ev-slider:focus { outline: none !important; box-shadow: none !important; }
-input[type="range"].ev-slider::-webkit-slider-runnable-track {
-    height: 5px; border-radius: 3px; background: #2e2e5e; cursor: pointer;
-}
-input[type="range"].ev-slider::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none;
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--accent); cursor: grab; margin-top: -5.5px;
-    box-shadow: 0 0 4px rgba(0,0,0,.5); transition: background .15s, transform .1s;
-    border: none;
-}
-input[type="range"].ev-slider::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.25); background: #fff; }
-input[type="range"].ev-slider::-moz-range-track { height: 5px; border-radius: 3px; background: #2e2e5e; }
-input[type="range"].ev-slider::-moz-range-thumb {
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--accent); cursor: grab; border: none; box-shadow: 0 0 4px rgba(0,0,0,.5);
-}
-input[type="range"].ev-slider:disabled { opacity: .35; cursor: not-allowed; }
+/* individual weakness */
+.individual-weakness-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.indiv-card { background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:10px; }
+.indiv-card-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.indiv-card-header img { width:36px; height:36px; image-rendering:pixelated; }
+.indiv-name { font-weight:700; font-size:.8rem; color:#fff; }
+.indiv-type { font-size:.68rem; color:var(--accent); }
+.indiv-chips { display:flex; flex-wrap:wrap; gap:4px; }
+.indiv-chip { padding:2px 7px; border-radius:12px; font-size:.66rem; font-weight:700; border:1px solid transparent; }
+.indiv-4x { background:#5d0000; border-color:#ff0000; color:#ff6b6b; }
+.indiv-2x { background:#3d0000; border-color:var(--red); color:#ff6b6b; }
+.indiv-half { background:#003d1a; border-color:var(--green); color:var(--green); }
+.indiv-quarter { background:#004d22; border-color:#00ff88; color:#00ff88; }
+.indiv-immune { background:#1a003d; border-color:var(--accent); color:var(--accent); }
 
-.ev-slider-cell {
-    padding: 4px 12px; display: flex; align-items: center;
-    border-bottom: 1px solid #13132e; min-height: 36px;
-}
-.ev-slider-cell:last-child { border-bottom: none; }
+/* recommended typings */
+.rec-type-chips { display:flex; flex-wrap:wrap; gap:6px; }
+.rec-chip { padding:4px 12px; border-radius:20px; font-size:.73rem; font-weight:700; border:1px solid var(--border2); background:var(--bg3); color:var(--accent); }
 
-.bar-cell {
-    padding: 5px 10px; display: flex; align-items: center; gap: 6px;
-    border-bottom: 1px solid #13132e; min-height: 36px;
-}
-.bar-cell:last-child { border-bottom: none; }
-.stat-bar-track { flex: 1; height: 9px; background: #1a1a3e; border-radius: 5px; overflow: hidden; }
-.stat-bar-fill  { height: 100%; border-radius: 5px; transition: width .25s ease; }
-.bar-num { font-size: .7rem; color: #aaa; width: 28px; text-align: right; flex-shrink: 0; }
-.bar-hp  { background: linear-gradient(90deg,#e74c3c,#ff6b6b); }
-.bar-atk { background: linear-gradient(90deg,#e67e22,#f39c12); }
-.bar-def { background: linear-gradient(90deg,#f1c40f,#f4d03f); }
-.bar-spa { background: linear-gradient(90deg,#3498db,#5dade2); }
-.bar-spd { background: linear-gradient(90deg,#27ae60,#2ecc71); }
-.bar-spe { background: linear-gradient(90deg,#e91e8c,#ff69b4); }
+/* raw weakness / resistance rows */
+.type-grid { display:flex; flex-wrap:wrap; gap:5px; }
+.type-count-chip { padding:3px 9px; border-radius:14px; font-size:.7rem; font-weight:700; border:1px solid transparent; display:flex; align-items:center; gap:4px; }
+.tc-weak { background:#2d0000; border-color:#c0392b; color:#ff6b6b; }
+.tc-resist { background:#003020; border-color:#27ae60; color:#2ecc71; }
+.tc-count { font-size:.65rem; opacity:.8; }
 
-/* ══ ITEM SEARCH ══ */
-.item-search-wrap { position: relative; }
-.item-dropdown {
-    position: absolute; top: 100%; left: 0; right: 0; z-index: 300;
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-    max-height: 160px; overflow-y: auto; box-shadow: 0 4px 16px rgba(0,0,0,.5);
-}
-.item-dropdown div { padding: 5px 10px; font-size: .78rem; cursor: pointer; border-bottom: 1px solid var(--bg4); }
-.item-dropdown div:last-child { border-bottom: none; }
-.item-dropdown div:hover { background: #2e2e5e; }
+/* offensive coverage */
+.coverage-grid { display:flex; flex-wrap:wrap; gap:5px; }
+.cov-chip { padding:3px 9px; border-radius:14px; font-size:.7rem; font-weight:700; border:1px solid transparent; display:flex; align-items:center; gap:4px; }
+.cov-hit { background:#002d3d; border-color:#3498db; color:#5dade2; }
+.cov-none { background:#1a1a1a; border-color:#444; color:#666; }
 
-/* ══ POKEMON SEARCH DROPDOWN ══ */
-.poke-search-bar { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; position: relative; }
-.poke-search-wrap { flex: 1; position: relative; }
-.poke-search-wrap input {
-    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
-    border-radius: 8px; color: var(--text); font-size: .85rem;
-    padding: 9px 14px; outline: none; transition: border-color .15s;
-}
-.poke-search-wrap input:focus { border-color: var(--accent); }
-.poke-autocomplete {
-    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 400;
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
-    max-height: 220px; overflow-y: auto; box-shadow: 0 6px 24px rgba(0,0,0,.6);
-}
-.poke-autocomplete .poke-ac-item {
-    padding: 8px 14px; font-size: .82rem; cursor: pointer;
-    border-bottom: 1px solid var(--bg4); display: flex; align-items: center; gap: 10px;
-}
-.poke-autocomplete .poke-ac-item:last-child { border-bottom: none; }
-.poke-autocomplete .poke-ac-item:hover { background: #2e2e5e; }
-.poke-autocomplete .poke-ac-item img { width: 28px; height: 28px; image-rendering: pixelated; }
-.poke-autocomplete .poke-ac-item .poke-ac-name { font-weight: 600; color: #fff; }
-.poke-autocomplete .poke-ac-item .poke-ac-type { font-size: .68rem; color: var(--muted); margin-left: auto; }
-.poke-search-bar button {
-    background: #1a4a7a; border: 1px solid var(--border2); border-radius: 8px;
-    color: var(--accent); font-size: .85rem; padding: 9px 16px;
-    cursor: pointer; transition: background .15s; white-space: nowrap;
-}
-.poke-search-bar button:hover { background: #256b9a; }
-.search-status { font-size: .73rem; color: var(--muted); margin-bottom: 10px; min-height: 16px; }
+/* MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); display:flex; align-items:center; justify-content:center; z-index:1000; }
+.modal-box { background:var(--bg2); border:1px solid var(--border2); border-radius:12px; padding:24px; width:380px; max-width:95vw; }
+.modal-box h3 { color:var(--accent); margin-bottom:8px; font-size:1rem; }
+.modal-box p { font-size:.83rem; color:var(--muted2); margin-bottom:14px; }
+.modal-list { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; max-height:280px; overflow-y:auto; }
+.modal-pokemon-btn { background:var(--bg3); border:1px solid var(--border2); border-radius:8px; padding:8px 12px; color:var(--text); font-size:.83rem; cursor:pointer; text-align:left; display:flex; align-items:center; gap:10px; transition:background .15s; }
+.modal-pokemon-btn:hover { background:#1a4a7a; border-color:var(--accent); }
+.modal-pokemon-btn img { width:36px; height:36px; image-rendering:pixelated; }
+.modal-cancel { width:100%; background:#2e2e5e; border:none; border-radius:8px; padding:9px; color:#aaa; font-size:.83rem; cursor:pointer; transition:background .15s; }
+.modal-cancel:hover { background:#3e3e7e; }
 
-/* ══ WEAKNESSES ══ */
-.weakness-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.weakness-section h3 { font-size: .78rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 10px; }
-.weakness-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.weakness-chip {
-    padding: 4px 10px; border-radius: 20px; font-size: .73rem;
-    font-weight: 700; border: 1px solid transparent;
-}
-.weakness-high { background: #3d0000; border-color: var(--red); color: #ff6b6b; }
-.weakness-mid  { background: #3d1f00; border-color: var(--orange); color: #f39c12; }
-.weakness-low  { background: #3d3000; border-color: #f1c40f; color: #f4d03f; }
-.individual-weakness-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-.indiv-card { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 10px; }
-.indiv-card-header {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-    padding-bottom: 6px; border-bottom: 1px solid var(--border);
-}
-.indiv-card-header img { width: 36px; height: 36px; image-rendering: pixelated; }
-.indiv-name { font-weight: 700; font-size: .8rem; color: #fff; }
-.indiv-type { font-size: .68rem; color: var(--accent); }
-.indiv-chips { display: flex; flex-wrap: wrap; gap: 4px; }
-.indiv-chip { padding: 2px 7px; border-radius: 12px; font-size: .66rem; font-weight: 700; border: 1px solid transparent; }
-.indiv-weak   { background: #3d0000; border-color: var(--red); color: #ff6b6b; }
-.indiv-resist { background: #003d1a; border-color: var(--green); color: var(--green); }
-.indiv-immune { background: #1a003d; border-color: var(--accent); color: var(--accent); }
+/* TOAST */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1a5e3a; border:1px solid var(--green); border-radius:10px; color:var(--green); font-size:.85rem; font-weight:700; padding:10px 22px; z-index:2000; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; }
+.toast.show { opacity:1; }
 
-/* ══ MODAL ══ */
-.modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.75);
-    display: flex; align-items: center; justify-content: center; z-index: 1000;
-}
-.modal-box {
-    background: var(--bg2); border: 1px solid var(--border2);
-    border-radius: 12px; padding: 24px; width: 380px; max-width: 95vw;
-}
-.modal-box h3 { color: var(--accent); margin-bottom: 8px; font-size: 1rem; }
-.modal-box p  { font-size: .83rem; color: var(--muted2); margin-bottom: 14px; }
-.modal-list   { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 280px; overflow-y: auto; }
-.modal-pokemon-btn {
-    background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px;
-    padding: 8px 12px; color: var(--text); font-size: .83rem; cursor: pointer;
-    text-align: left; display: flex; align-items: center; gap: 10px; transition: background .15s;
-}
-.modal-pokemon-btn:hover { background: #1a4a7a; border-color: var(--accent); }
-.modal-pokemon-btn img  { width: 36px; height: 36px; image-rendering: pixelated; }
-.modal-cancel {
-    width: 100%; background: #2e2e5e; border: none; border-radius: 8px;
-    padding: 9px; color: #aaa; font-size: .83rem; cursor: pointer; transition: background .15s;
-}
-.modal-cancel:hover { background: #3e3e7e; }
-
-/* ══ SAVE TOAST ══ */
-.toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #1a5e3a; border: 1px solid var(--green); border-radius: 10px;
-    color: var(--green); font-size: .85rem; font-weight: 700; padding: 10px 22px;
-    z-index: 2000; opacity: 0; transition: opacity .3s;
-    pointer-events: none; white-space: nowrap;
-}
-.toast.show { opacity: 1; }
-
-/* ══ CONFIRM MODAL ══ */
-.confirm-box {
-    background: var(--bg2); border: 1px solid var(--border2);
-    border-radius: 12px; padding: 24px; width: 320px; max-width: 95vw; text-align: center;
-}
-.confirm-box h3 { color: var(--red); margin-bottom: 8px; }
-.confirm-box p  { font-size: .83rem; color: var(--muted2); margin-bottom: 18px; }
-.confirm-btns { display: flex; gap: 10px; }
-.confirm-btns button { flex: 1; padding: 9px; border-radius: 8px; border: none; font-size: .85rem; font-weight: 700; cursor: pointer; }
-.confirm-yes { background: #5e1a1a; color: var(--red); }
-.confirm-yes:hover { background: #7a2222; }
-.confirm-no  { background: #2e2e5e; color: #aaa; }
-.confirm-no:hover  { background: #3e3e7e; }
+/* CONFIRM */
+.confirm-box { background:var(--bg2); border:1px solid var(--border2); border-radius:12px; padding:24px; width:320px; max-width:95vw; text-align:center; }
+.confirm-box h3 { color:var(--red); margin-bottom:8px; }
+.confirm-box p { font-size:.83rem; color:var(--muted2); margin-bottom:18px; }
+.confirm-btns { display:flex; gap:10px; }
+.confirm-btns button { flex:1; padding:9px; border-radius:8px; border:none; font-size:.85rem; font-weight:700; cursor:pointer; }
+.confirm-yes { background:#5e1a1a; color:var(--red); }
+.confirm-yes:hover { background:#7a2222; }
+.confirm-no { background:#2e2e5e; color:#aaa; }
+.confirm-no:hover { background:#3e3e7e; }
 </style>
 </head>
 <body>
 
-<!-- ═══ HOME SCREEN ═══ -->
+<!-- HOME SCREEN -->
 <div id="homeScreen" class="screen active">
     <div class="home-logo">Bean's<br><span>PokéBuilder</span></div>
     <div class="home-subtitle">Build your team, craft your strategy</div>
@@ -549,7 +310,7 @@ input[type="range"].ev-slider:disabled { opacity: .35; cursor: not-allowed; }
     </div>
 </div>
 
-<!-- ═══ BUILDER SCREEN ═══ -->
+<!-- BUILDER SCREEN -->
 <div id="builderScreen" class="screen">
     <div class="builder-header">
         <button class="builder-back" onclick="goHome()">← Home</button>
@@ -562,7 +323,6 @@ input[type="range"].ev-slider:disabled { opacity: .35; cursor: not-allowed; }
             <button class="btn btn-new" onclick="startMode(currentMode)">+ New Team</button>
         </div>
     </div>
-
     <div id="builderContent" style="padding:0 16px 16px">
         <div class="panel">
             <h2>⚔️ Active Team <span class="pool-count" id="teamCount">(0/6)</span></h2>
@@ -585,15 +345,35 @@ input[type="range"].ev-slider:disabled { opacity: .35; cursor: not-allowed; }
         </div>
         <div class="panel">
             <h2>🛡️ Team Analysis</h2>
+            <!-- Row 1: overall weaknesses + individual -->
             <div class="weakness-panels">
                 <div class="weakness-section">
                     <h3>Overall Team Weaknesses</h3>
                     <div class="weakness-chips" id="weakness"></div>
+                    <div style="margin-top:14px">
+                        <h3>Recommended Typings to Add</h3>
+                        <div class="rec-type-chips" id="recTypings"></div>
+                    </div>
                 </div>
                 <div class="weakness-section">
                     <h3>Individual Pokémon Weaknesses</h3>
                     <div class="individual-weakness-grid" id="individualWeakness"></div>
                 </div>
+            </div>
+            <!-- Row 2: raw totals -->
+            <div class="analysis-section">
+                <h3>Raw Type Weakness Totals (all weaknesses, ignoring resistances)</h3>
+                <div class="type-grid" id="rawWeakness"></div>
+            </div>
+            <!-- Row 3: team resistances -->
+            <div class="analysis-section">
+                <h3>Team Resistances</h3>
+                <div class="type-grid" id="teamResistances"></div>
+            </div>
+            <!-- Row 4: offensive coverage -->
+            <div class="analysis-section">
+                <h3>Offensive Coverage (Super Effective hits from active team moves)</h3>
+                <div class="coverage-grid" id="offensiveCoverage"></div>
             </div>
         </div>
     </div>
@@ -629,6 +409,176 @@ const typeChart = {
 };
 const ALL_TYPES = Object.keys(typeChart);
 
+/* offensive coverage table: for each attacking type, which defending types it hits super-effectively */
+const offenseChart = {};
+ALL_TYPES.forEach(atkType => {
+    offenseChart[atkType] = ALL_TYPES.filter(defType => {
+        const td = typeChart[defType];
+        return td && td.weakTo.includes(atkType);
+    });
+});
+
+/* ══════════════════════════════════════════
+   ABILITY IMMUNITY MAP
+   Maps ability name (lowercase) -> {immune:[types], halfDmg:[types]}
+══════════════════════════════════════════ */
+const abilityImmunityMap = {
+    'levitate':           {immune:['Ground'], halfDmg:[]},
+    'volt absorb':        {immune:['Electric'], halfDmg:[]},
+    'lightning rod':      {immune:['Electric'], halfDmg:[]},
+    'motor drive':        {immune:['Electric'], halfDmg:[]},
+    'water absorb':       {immune:['Water'], halfDmg:[]},
+    'dry skin':           {immune:['Water'], halfDmg:[]},
+    'storm drain':        {immune:['Water'], halfDmg:[]},
+    'flash fire':         {immune:['Fire'], halfDmg:[]},
+    'sap sipper':         {immune:['Grass'], halfDmg:[]},
+    'earth eater':        {immune:['Ground'], halfDmg:[]},
+    'well-baked body':    {immune:['Fire'], halfDmg:[]},
+    'wind rider':         {immune:['Flying'], halfDmg:[]},
+    'purifying salt':     {immune:['Ghost'], halfDmg:[]},
+    'soundproof':         {immune:[], halfDmg:[]},
+    'wonder guard':       {immune:[], halfDmg:[]},
+    'thick fat':          {immune:[], halfDmg:['Fire','Ice']},
+    'heatproof':          {immune:[], halfDmg:['Fire']},
+    'water bubble':       {immune:[], halfDmg:['Fire']},
+    'fluffy':             {immune:[], halfDmg:['Fire']}, // actually takes 2x from fire but halves contact; simplified here
+    'solid rock':         {immune:[], halfDmg:[]},
+    'filter':             {immune:[], halfDmg:[]},
+    'prism armor':        {immune:[], halfDmg:[]},
+    'poison heal':        {immune:[], halfDmg:[]},
+    'magic guard':        {immune:[], halfDmg:[]},
+    'wonder skin':        {immune:[], halfDmg:[]},
+    'telepathy':          {immune:[], halfDmg:[]},
+    'suction cups':       {immune:[], halfDmg:[]},
+    'electric surge':     {immune:[], halfDmg:[]},
+    'misty surge':        {immune:[], halfDmg:[]},
+    'grassy surge':       {immune:[], halfDmg:[]},
+    'psychic surge':      {immune:[], halfDmg:[]},
+};
+
+/* ══════════════════════════════════════════
+   ABILITY DESCRIPTIONS
+══════════════════════════════════════════ */
+const abilityDescriptions = {
+    'levitate': 'Gives immunity to Ground-type moves. The Pokémon hovers above ground.',
+    'volt absorb': 'Restores HP if hit by an Electric-type move, instead of taking damage.',
+    'lightning rod': 'Draws Electric-type moves to this Pokémon. Electric moves do no damage.',
+    'motor drive': 'Boosts Speed if hit by an Electric-type move. Electric moves do no damage.',
+    'water absorb': 'Restores HP if hit by a Water-type move, instead of taking damage.',
+    'dry skin': 'Restores HP in rain or if hit by Water. Loses HP in harsh sunlight or from Fire moves.',
+    'storm drain': 'Draws Water-type moves. Raises Sp. Atk when hit by Water; no damage.',
+    'flash fire': 'Activates when hit by a Fire-type move, boosting the power of the Pokémon\'s own Fire moves.',
+    'sap sipper': 'Absorbs Grass-type moves, boosting Attack instead of taking damage.',
+    'earth eater': 'Absorbs Ground-type moves, restoring HP instead of taking damage.',
+    'thick fat': 'Halves damage from Fire-type and Ice-type moves.',
+    'heatproof': 'Halves damage from Fire-type moves and burns.',
+    'wonder guard': 'Only supereffective moves and certain other moves will work on the Pokémon.',
+    'intimidate': 'Lowers the foe\'s Attack stat by one stage upon entering battle.',
+    'multiscale': 'Reduces damage taken when at full HP.',
+    'magic bounce': 'Reflects status and entry hazard moves back at the user.',
+    'regenerator': 'Restores 1/3 of max HP when withdrawn from battle.',
+    'protean': 'Changes the Pokémon\'s type to match the move it\'s about to use.',
+    'libero': 'Changes the Pokémon\'s type to the type of the move it uses (once per switch-in).',
+    'speed boost': 'Boosts Speed by one stage at the end of each turn.',
+    'moody': 'Sharply raises one random stat and lowers another each turn.',
+    'huge power': 'Doubles the Pokémon\'s Attack stat.',
+    'pure power': 'Doubles the Pokémon\'s Attack stat.',
+    'unburden': 'Doubles Speed when the held item is used or lost.',
+    'moxie': 'Raises Attack by one stage when the Pokémon knocks out a foe.',
+    'guts': 'Boosts Attack by 1.5× if the Pokémon has a status condition.',
+    'adaptability': 'STAB bonus increases from 1.5× to 2×.',
+    'technician': 'Boosts the power of moves with base power 60 or less by 1.5×.',
+    'sheer force': 'Removes additional effects of moves, but boosts their power by 1.3×.',
+    'tough claws': 'Boosts the power of contact moves by 1.3×.',
+    'iron fist': 'Boosts the power of punch-based moves by 1.2×.',
+    'reckless': 'Boosts the power of recoil moves by 1.2×.',
+    'sand rush': 'Doubles Speed in a sandstorm.',
+    'sand force': 'Boosts Rock, Ground, and Steel moves by 1.3× in a sandstorm.',
+    'mold breaker': 'Moves can be used on the target regardless of its Abilities.',
+    'magic guard': 'Only takes damage from direct attacks; no residual damage.',
+    'sturdy': 'Cannot be knocked out in one hit if at full HP. Also protects from OHKO moves.',
+    'natural cure': 'Status conditions are cured when the Pokémon is withdrawn.',
+    'regenerator': 'Restores 1/3 of max HP upon switching out.',
+    'pressure': 'When hit by a foe\'s move, that move loses 2 PP instead of 1.',
+    'inner focus': 'The Pokémon will not flinch. Also protects from Intimidate.',
+    'steadfast': 'Raises Speed by 1 stage if the Pokémon flinches.',
+    'multiscale': 'Halves damage taken when at full HP.',
+    'intimidate': 'Lowers foe\'s Attack by 1 stage on entry.',
+    'snow warning': 'Summons hail / snow when the Pokémon enters battle.',
+    'drought': 'Summons harsh sunlight when the Pokémon enters battle.',
+    'drizzle': 'Summons rain when the Pokémon enters battle.',
+    'sand stream': 'Summons a sandstorm when the Pokémon enters battle.',
+    'electric surge': 'Creates Electric Terrain upon entering battle.',
+    'misty surge': 'Creates Misty Terrain upon entering battle.',
+    'grassy surge': 'Creates Grassy Terrain upon entering battle.',
+    'psychic surge': 'Creates Psychic Terrain upon entering battle.',
+    'berserk': 'Raises Sp. Atk by 1 stage when HP drops to half or below.',
+    'fairy aura': 'Powers up Fairy-type moves for all Pokémon in battle.',
+    'dark aura': 'Powers up Dark-type moves for all Pokémon in battle.',
+    'soul-heart': 'Raises Sp. Atk by 1 stage when any Pokémon faints.',
+    'bulletproof': 'Protects from Ball and Bomb moves.',
+    'soundproof': 'Protects from sound-based moves.',
+    'infiltrator': 'Ignores effects of Reflect, Light Screen, Safeguard, Mist, and Aurora Veil.',
+    'unseen fist': 'Contact moves bypass Protect and similar moves.',
+    'mold breaker': 'Ignores opponent\'s ability when using moves.',
+    'no guard': 'All moves by and against this Pokémon always hit.',
+    'stalwart': 'Ignores the effects of moves and abilities that draw in moves.',
+    'spicy spray': 'When this Pokémon uses a move that makes contact, the foe may become confused.',
+    'innards out': 'When knocked out, deals damage equal to the last HP lost to the foe.',
+    'piercing drill': 'Drill and biting moves ignore type immunities.',
+    'dragonize': 'Turns Normal-type moves into Dragon-type moves with a power boost.',
+    'mega sol': 'Boosts Grass-type moves in strong sunlight.',
+    'adaptability': 'Raises STAB bonus from 1.5× to 2×.',
+    'chlorophyll': 'Doubles Speed in harsh sunlight.',
+    'blaze': 'Powers up Fire-type moves when HP is low (below 1/3).',
+    'overgrow': 'Powers up Grass-type moves when HP is low.',
+    'torrent': 'Powers up Water-type moves when HP is low.',
+    'swarm': 'Powers up Bug-type moves when HP is low.',
+    'keen eye': 'Prevents accuracy from being lowered.',
+    'weak armor': 'When hit by a physical move, Defense drops 1 stage, Speed rises 2 stages.',
+    'shed skin': '1/3 chance of curing status condition each turn.',
+    'justified': 'Raises Attack by 1 stage when hit by a Dark-type move.',
+    'cloud nine': 'Eliminates the effects of weather for all Pokémon.',
+    'corrosion': 'Can inflict Poison on Steel- and Poison-type Pokémon.',
+    'toxic debris': 'Scatters poison spikes on the opposing side when hit by a physical move.',
+    'emergency exit': 'Switches out when HP drops to half or below.',
+    'anticipation': 'Shudders if the foe has a supereffective or one-hit-KO move.',
+    'commander': 'When allied with Dondozo, goes inside its mouth and powers it up.',
+    'battle armor': 'Protects the Pokémon from critical hits.',
+    'defiant': 'Raises Attack by 2 stages when its stats are lowered.',
+    'anger point': 'Maxes out Attack after taking a critical hit.',
+    'hyper cutter': 'Prevents Attack from being lowered.',
+    'unaware': 'Ignores the foe\'s stat changes when attacking or being attacked.',
+    'thermal exchange': 'Raises Attack when hit by a Fire-type move; cannot be burned.',
+    'ice body': 'Restores HP in hail/snow.',
+    'aura break': 'Reverses the effects of Fairy Aura and Dark Aura.',
+    'power construct': 'Changes to Complete Forme when HP drops to half or below.',
+    'rough skin': 'Deals damage to the attacker when hit by a contact move.',
+    'sand veil': 'Boosts evasion in a sandstorm.',
+    'magician': 'Steals the held item of a Pokémon it hits with a move.',
+    'flower veil': 'Protects ally Grass-type Pokémon from status and stat reduction.',
+    'symbiosis': 'Passes its held item to an ally that uses its item.',
+    'poison point': 'May poison the attacker when hit by a contact move.',
+    'poison touch': 'May poison the target when using a contact move.',
+    'static': 'May paralyze the attacker when hit by a contact move.',
+    'flame body': 'May burn the attacker when hit by a contact move.',
+    'cursed body': 'May disable the move used against this Pokémon.',
+    'snow cloak': 'Boosts evasion in hail/snow.',
+    'illuminate': 'No competitive effect; raises the encounter rate of wild Pokémon.',
+    'natural cure': 'Status conditions are healed upon switching out.',
+    'analytic': 'Boosts move power when moving last.',
+    'limber': 'Prevents paralysis.',
+    'quick feet': 'Boosts Speed when afflicted with a status condition.',
+    'klutz': 'Cannot use held items.',
+    'speed boost': 'Raises Speed by 1 stage at the end of each turn.',
+    'gluttony': 'Uses Berries earlier (at 50% HP instead of 25%).',
+    'leaf guard': 'Prevents status conditions in harsh sunlight.',
+    'bad dreams': 'Reduces HP of sleeping foes by 1/8 each turn.',
+    'volt absorb': 'Restores HP instead of taking damage from Electric-type moves.',
+    'moxie': 'Attack is raised by 1 stage after knocking out a foe.',
+    'insomnia': 'Prevents sleep.',
+};
+
 /* ══════════════════════════════════════════
    NATURES
 ══════════════════════════════════════════ */
@@ -645,7 +595,6 @@ const natureData = {
    Z-A MEGA DB
 ══════════════════════════════════════════ */
 const zaMegaDB = {
-    // ── Abilities known ──
     "Raichu-Mega-X":          {id:26,  zaSprite:true, type:["Electric"],          gender:"mf",  abilities:["Electric Surge"],  baseAbilities:["Static","Lightning Rod"],                   baseStats:{hp:60, atk:135,def:95, spa:90, spd:95, spe:110}},
     "Raichu-Mega-Y":          {id:26,  zaSprite:true, type:["Electric"],          gender:"mf",  abilities:["No Guard"],         baseAbilities:["Static","Lightning Rod"],                   baseStats:{hp:60, atk:100,def:55, spa:160,spd:80, spe:130}},
     "Victreebel-Mega":        {id:71,  zaSprite:true, type:["Grass","Poison"],    gender:"mf",  abilities:["Innards Out"],      baseAbilities:["Chlorophyll","Gluttony"],                   baseStats:{hp:80, atk:125,def:85, spa:135,spd:95, spe:70}},
@@ -681,7 +630,6 @@ const zaMegaDB = {
     "Tatsugiri-Mega-Curly":   {id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
     "Tatsugiri-Mega-Droopy":  {id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
     "Tatsugiri-Mega-Stretchy":{id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
-    // ── Z-form (ability not revealed yet) ──
     "Garchomp-Mega-Z":        {id:445, zaSprite:true, type:["Dragon"],            gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Sand Veil","Rough Skin"],            baseStats:{hp:108,atk:130,def:85, spa:141,spd:85, spe:151}},
     "Lucario-Mega-Z":         {id:448, zaSprite:true, type:["Fighting","Steel"],  gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Steadfast","Inner Focus","Justified"],baseStats:{hp:70, atk:100,def:70, spa:164,spd:70, spe:151}},
     "Heatran-Mega":           {id:485, zaSprite:true, type:["Fire","Steel"],      gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Flash Fire","Flame Body"],           baseStats:{hp:91, atk:120,def:106,spa:175,spd:141,spe:67}},
@@ -693,38 +641,34 @@ const zaMegaDB = {
 /* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
-let pokemonList   = [];
-let itemCache     = [];
-let moveCache     = {};
-let allPokemonNames = []; // for autocomplete
-let savedTeams    = JSON.parse(localStorage.getItem('pokeTeams') || '[]');
-let currentMode   = 'draft';
+let pokemonList = [];
+let itemCache = [];
+let moveCache = {};
+let allPokemonNames = [];
+let savedTeams = JSON.parse(localStorage.getItem('pokeTeams') || '[]');
+let currentMode = 'draft';
 let currentTeamName = 'My Team';
-let currentTeamId = null; // null = new unsaved team
-
+let currentTeamId = null;
 const MAX_POOL = { regular: 6, draft: 30 };
+const pokemonIdMap = {};
 
 /* ══════════════════════════════════════════
-   POKEMON NAME LIST (for autocomplete)
+   POKEMON NAME LIST
 ══════════════════════════════════════════ */
-const pokemonIdMap = {}; // lowercase name -> numeric id, built at load time
-
 async function loadAllPokemonNames() {
     try {
         const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1500');
         if (!r.ok) return;
         const d = await r.json();
         allPokemonNames = d.results.map(p => {
-            // Parse ID from URL: ".../pokemon/25/"
             const idMatch = p.url.match(/\/(\d+)\/?$/);
             const id = idMatch ? Number(idMatch[1]) : 0;
-            const formatted = p.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-');
-            pokemonIdMap[p.name.toLowerCase()] = id;          // original slug
-            pokemonIdMap[formatted.toLowerCase()] = id;       // formatted
+            const formatted = p.name.split('-').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join('-');
+            pokemonIdMap[p.name.toLowerCase()] = id;
+            pokemonIdMap[formatted.toLowerCase()] = id;
             return formatted;
         });
-        // Add Z-A megas with their IDs
-        Object.entries(zaMegaDB).forEach(([k, v]) => {
+        Object.entries(zaMegaDB).forEach(([k,v]) => {
             if (!allPokemonNames.includes(k)) allPokemonNames.push(k);
             if (v.id) pokemonIdMap[k.toLowerCase()] = v.id;
         });
@@ -747,12 +691,12 @@ function onPokeSearchInput(input) {
     const q = input.value.trim();
     const drop = document.getElementById('pokeAutocomplete');
     if (!drop) return;
-    if (!q) { drop.style.display = 'none'; return; }
+    if (!q) { drop.style.display='none'; return; }
     const matches = filterPokemonNames(q);
-    if (matches.length === 0) { drop.style.display = 'none'; return; }
+    if (matches.length === 0) { drop.style.display='none'; return; }
     drop.innerHTML = matches.map(name => {
         const exists = pokemonList.find(p => p.name.toLowerCase() === name.toLowerCase());
-        const faded  = exists ? 'opacity:.45;' : '';
+        const faded = exists ? 'opacity:.45;' : '';
         return `<div class="poke-ac-item" style="${faded}" onmousedown="selectPokemonFromAC('${name}')">
             <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${getPokemonIdForAC(name)}.png"
                  onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'" alt="">
@@ -764,10 +708,8 @@ function onPokeSearchInput(input) {
 }
 
 function getPokemonIdForAC(name) {
-    // Check name->id map built from the API (covers all ~1500 pokemon)
     const id = pokemonIdMap[name.toLowerCase()];
     if (id) return id;
-    // Fallback: check if already in pool (previously fetched)
     const cached = pokemonList.find(p => p.name.toLowerCase() === name.toLowerCase());
     if (cached && cached._data && cached._data.id) return cached._data.id;
     return 0;
@@ -787,57 +729,39 @@ document.addEventListener('click', e => {
 });
 
 /* ══════════════════════════════════════════
-   SCREEN NAVIGATION
+   SCREEN NAV
 ══════════════════════════════════════════ */
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
-
-function goHome() {
-    showScreen('homeScreen');
-    renderSavedTeams();
-}
-
+function goHome() { showScreen('homeScreen'); renderSavedTeams(); }
 function startMode(mode) {
-    currentMode = mode;
-    currentTeamId = null;
-    currentTeamName = 'My Team';
-    pokemonList = [];
+    currentMode = mode; currentTeamId = null; currentTeamName = 'My Team'; pokemonList = [];
     document.getElementById('teamNameInput').value = currentTeamName;
     document.getElementById('modeBadge').textContent = mode === 'regular' ? '6-MON' : '30-MON DRAFT';
     document.getElementById('poolLabel').textContent = mode === 'draft' ? 'Draft Pool' : 'Pokémon';
-    showScreen('builderScreen');
-    render();
+    showScreen('builderScreen'); render();
 }
-
 function loadTeamById(id) {
-    const team = savedTeams.find(t => t.id === id);
-    if (!team) return;
-    currentMode = team.mode;
-    currentTeamName = team.name;
-    currentTeamId = team.id;
-    pokemonList = JSON.parse(JSON.stringify(team.pokemonList)); // deep copy
+    const team = savedTeams.find(t => t.id === id); if (!team) return;
+    currentMode = team.mode; currentTeamName = team.name; currentTeamId = team.id;
+    pokemonList = JSON.parse(JSON.stringify(team.pokemonList));
     document.getElementById('teamNameInput').value = currentTeamName;
     document.getElementById('modeBadge').textContent = currentMode === 'regular' ? '6-MON' : '30-MON DRAFT';
     document.getElementById('poolLabel').textContent = currentMode === 'draft' ? 'Draft Pool' : 'Pokémon';
-    showScreen('builderScreen');
-    render();
+    showScreen('builderScreen'); render();
 }
 
 /* ══════════════════════════════════════════
-   SAVE / LOAD / DELETE TEAMS
+   SAVE / LOAD / DELETE
 ══════════════════════════════════════════ */
 function saveCurrentTeam() {
     currentTeamName = document.getElementById('teamNameInput').value.trim() || 'Unnamed Team';
     document.getElementById('teamNameInput').value = currentTeamName;
-
     if (currentTeamId) {
-        // Update existing
         const idx = savedTeams.findIndex(t => t.id === currentTeamId);
-        if (idx !== -1) {
-            savedTeams[idx] = buildSaveObj();
-        }
+        if (idx !== -1) savedTeams[idx] = buildSaveObj();
     } else {
         currentTeamId = Date.now();
         savedTeams.push(buildSaveObj());
@@ -845,149 +769,158 @@ function saveCurrentTeam() {
     localStorage.setItem('pokeTeams', JSON.stringify(savedTeams));
     showToast('Team saved! 💾');
 }
-
 function buildSaveObj() {
-    return {
-        id: currentTeamId,
-        name: currentTeamName,
-        mode: currentMode,
-        savedAt: Date.now(),
-        pokemonList: JSON.parse(JSON.stringify(pokemonList))
-    };
+    return { id:currentTeamId, name:currentTeamName, mode:currentMode, savedAt:Date.now(), pokemonList:JSON.parse(JSON.stringify(pokemonList)) };
 }
-
 function deleteTeam(id, e) {
     e.stopPropagation();
-    const team = savedTeams.find(t => t.id === id);
-    if (!team) return;
+    const team = savedTeams.find(t => t.id === id); if (!team) return;
     showConfirm(`Delete "${team.name}"?`, 'This cannot be undone.', () => {
         savedTeams = savedTeams.filter(t => t.id !== id);
         localStorage.setItem('pokeTeams', JSON.stringify(savedTeams));
         renderSavedTeams();
     });
 }
-
 function renderSavedTeams() {
-    const container = document.getElementById('savedTeamList');
-    if (!container) return;
-    if (savedTeams.length === 0) {
-        container.innerHTML = '<div class="home-no-teams">No saved teams yet — build your first one!</div>';
-        return;
-    }
+    const container = document.getElementById('savedTeamList'); if (!container) return;
+    if (savedTeams.length === 0) { container.innerHTML='<div class="home-no-teams">No saved teams yet — build your first one!</div>'; return; }
     container.innerHTML = savedTeams.slice().reverse().map(t => {
-        const active = t.pokemonList ? t.pokemonList.filter(p => p.active).length : 0;
-        const total  = t.pokemonList ? t.pokemonList.length : 0;
-        const date   = new Date(t.savedAt).toLocaleDateString();
+        const active = t.pokemonList ? t.pokemonList.filter(p=>p.active).length : 0;
+        const total = t.pokemonList ? t.pokemonList.length : 0;
+        const date = new Date(t.savedAt).toLocaleDateString();
         return `<div class="saved-team-btn" onclick="loadTeamById(${t.id})">
-            <div class="stb-info">
-                <div class="stb-name">${t.name}</div>
-                <div class="stb-meta">${active}/6 active · ${total} Pokémon · ${date}</div>
-            </div>
-            <span class="stb-mode">${t.mode === 'draft' ? 'DRAFT' : 'REGULAR'}</span>
-            <button class="stb-del" onclick="deleteTeam(${t.id},event)" title="Delete team">🗑</button>
+            <div class="stb-info"><div class="stb-name">${t.name}</div><div class="stb-meta">${active}/6 active · ${total} Pokémon · ${date}</div></div>
+            <span class="stb-mode">${t.mode==='draft'?'DRAFT':'REGULAR'}</span>
+            <button class="stb-del" onclick="deleteTeam(${t.id},event)" title="Delete">🗑</button>
         </div>`;
     }).join('');
 }
 
-/* ══════════════════════════════════════════
-   TOAST & CONFIRM
-══════════════════════════════════════════ */
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2400);
-}
-
+/* TOAST & CONFIRM */
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
 function showConfirm(title, body, onYes) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `<div class="confirm-box">
-        <h3>${title}</h3><p>${body}</p>
-        <div class="confirm-btns">
-            <button class="confirm-yes" id="confirmYes">Delete</button>
-            <button class="confirm-no"  id="confirmNo">Cancel</button>
-        </div></div>`;
+    const overlay=document.createElement('div'); overlay.className='modal-overlay';
+    overlay.innerHTML=`<div class="confirm-box"><h3>${title}</h3><p>${body}</p><div class="confirm-btns"><button class="confirm-yes" id="cY">Delete</button><button class="confirm-no" id="cN">Cancel</button></div></div>`;
     document.body.appendChild(overlay);
-    overlay.querySelector('#confirmYes').onclick = () => { onYes(); overlay.remove(); };
-    overlay.querySelector('#confirmNo').onclick  = () => overlay.remove();
-    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.querySelector('#cY').onclick=()=>{onYes();overlay.remove();};
+    overlay.querySelector('#cN').onclick=()=>overlay.remove();
+    overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
 }
 
 /* ══════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════ */
-function getNatureData(n)  { return natureData[n] || natureData.Hardy; }
-function getTotalEVs(p)    { return Object.values(p.evs).reduce((a,b) => a+b, 0); }
-function find(name)         { return pokemonList.find(p => p.name === name); }
-
+function getNatureData(n) { return natureData[n]||natureData.Hardy; }
+function getTotalEVs(p) { return Object.values(p.evs).reduce((a,b)=>a+b,0); }
+function find(name) { return pokemonList.find(p=>p.name===name); }
 function sprite(p) {
-    const id = p._data.id;
-    if (id) {
-        return p.shiny
-            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`
-            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
-    }
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png`;
+    const id=p._data.id;
+    if (id) return p.shiny
+        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`
+        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png';
 }
-
-function spriteForAC(name, id) {
-    if (id) return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png`;
-}
-
 function calcHP(base,iv,ev,lv)   { return Math.floor((((2*base+iv+Math.floor(ev/4))*lv)/100))+lv+10; }
 function calcStat(base,iv,ev,lv) { return Math.floor((((2*base+iv+Math.floor(ev/4))*lv)/100))+5; }
-
 function getFinalStats(p) {
-    const b = p._data.baseStats, n = getNatureData(p.nature);
-    const s = {
-        hp:  calcHP  (b.hp,  p.ivs.hp,  p.evs.hp,  p.level),
-        atk: calcStat(b.atk, p.ivs.atk, p.evs.atk, p.level),
-        def: calcStat(b.def, p.ivs.def, p.evs.def, p.level),
-        spa: calcStat(b.spa, p.ivs.spa, p.evs.spa, p.level),
-        spd: calcStat(b.spd, p.ivs.spd, p.evs.spd, p.level),
-        spe: calcStat(b.spe, p.ivs.spe, p.evs.spe, p.level)
-    };
-    if (n.up)   s[n.up]   = Math.floor(s[n.up]   * 1.1);
-    if (n.down) s[n.down] = Math.floor(s[n.down]  * 0.9);
+    const b=p._data.baseStats, n=getNatureData(p.nature);
+    const s={hp:calcHP(b.hp,p.ivs.hp,p.evs.hp,p.level),atk:calcStat(b.atk,p.ivs.atk,p.evs.atk,p.level),def:calcStat(b.def,p.ivs.def,p.evs.def,p.level),spa:calcStat(b.spa,p.ivs.spa,p.evs.spa,p.level),spd:calcStat(b.spd,p.ivs.spd,p.evs.spd,p.level),spe:calcStat(b.spe,p.ivs.spe,p.evs.spe,p.level)};
+    if(n.up) s[n.up]=Math.floor(s[n.up]*1.1);
+    if(n.down) s[n.down]=Math.floor(s[n.down]*0.9);
     return s;
 }
-
-function getActiveTeam() { return pokemonList.filter(p => p.active); }
-function getPool()        { return pokemonList.filter(p => !p.active); }
+function getActiveTeam() { return pokemonList.filter(p=>p.active); }
+function getPool() { return pokemonList.filter(p=>!p.active); }
 
 function makePokemon(name, data) {
-    const defaultAbility = (data.abilities[0] && data.abilities[0].startsWith('Unknown'))
-        ? (data.baseAbilities && data.baseAbilities[0]) || 'Unknown (Mega)'
-        : (data.abilities[0] || '');
-    return {
-        name, nickname: '', teraType: data.type[0],
-        active: false, expanded: false,
-        ability: defaultAbility,
-        item: '', nature: 'Hardy', level: 50,
-        gender: data.gender === 'none' ? 'none' : 'male',
-        shiny: false, moves: ['','','',''],
-        evs: {hp:0,atk:0,def:0,spa:0,spd:0,spe:0},
-        ivs: {hp:31,atk:31,def:31,spa:31,spd:31,spe:31},
-        _data: data, _learnset: []
-    };
+    const defaultAbility = (data.abilities[0]&&data.abilities[0].startsWith('Unknown'))
+        ? (data.baseAbilities&&data.baseAbilities[0])||'Unknown (Mega)'
+        : (data.abilities[0]||'');
+    return { name, nickname:'', teraType:data.type[0], active:false, expanded:false,
+        ability:defaultAbility, item:'', nature:'Hardy', level:50,
+        gender:data.gender==='none'?'none':'male', shiny:false, moves:['','','',''],
+        evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, ivs:{hp:31,atk:31,def:31,spa:31,spd:31,spe:31},
+        _data:data, _learnset:[] };
 }
 
 /* ══════════════════════════════════════════
-   POKEAPI FETCH
+   ABILITY HELPERS
 ══════════════════════════════════════════ */
+function getAbilityImmunities(abilityName) {
+    if (!abilityName) return {immune:[], halfDmg:[]};
+    const key = abilityName.toLowerCase().trim();
+    return abilityImmunityMap[key] || {immune:[], halfDmg:[]};
+}
+
+function getAbilityDesc(abilityName) {
+    if (!abilityName) return '';
+    const key = abilityName.toLowerCase().trim();
+    return abilityDescriptions[key] || '';
+}
+
+/* ══════════════════════════════════════════
+   POKEAPI FETCH — with full evo chain learnset
+══════════════════════════════════════════ */
+const learnsetCache = {}; // slug -> array of move names
+
+async function fetchLearnsetForSlug(slug) {
+    if (learnsetCache[slug]) return learnsetCache[slug];
+    try {
+        const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${slug}`);
+        if (!r.ok) return [];
+        const d = await r.json();
+        const ls = d.moves.map(m => m.move.name);
+        learnsetCache[slug] = ls;
+        return ls;
+    } catch(e) { return []; }
+}
+
+async function fetchFullEvoLearnset(speciesUrl) {
+    // Get evolution chain and collect all forms
+    try {
+        const sr = await fetch(speciesUrl);
+        if (!sr.ok) return null;
+        const sd = await sr.json();
+        const ecUrl = sd.evolution_chain.url;
+        const ecr = await fetch(ecUrl);
+        if (!ecr.ok) return null;
+        const ecd = await ecr.json();
+        // Walk evo chain and collect all species names
+        const slugs = [];
+        function walk(node) {
+            slugs.push(node.species.name);
+            node.evolves_to.forEach(walk);
+        }
+        walk(ecd.chain);
+        // Fetch learnsets for all forms in chain
+        const allMoves = new Set();
+        await Promise.all(slugs.map(async s => {
+            const ls = await fetchLearnsetForSlug(s);
+            ls.forEach(m => allMoves.add(m));
+        }));
+        return Array.from(allMoves);
+    } catch(e) { return null; }
+}
+
 async function fetchPokemonFromAPI(rawName) {
     const slug = rawName.toLowerCase().trim().replace(/\s+/g,'-');
     const status = document.getElementById('searchStatus');
     if (status) status.textContent = `Searching for "${rawName}"…`;
 
+    // Z-A Mega check
     const zaKey = Object.keys(zaMegaDB).find(k => k.toLowerCase() === slug);
     if (zaKey) {
         const zaData = zaMegaDB[zaKey];
+        // fetch base form + all pre-evos learnset
         let learnset = [];
         try {
-            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${zaKey.split('-')[0].toLowerCase()}`);
-            if (r.ok) { const d = await r.json(); learnset = d.moves.map(m => m.move.name); }
+            const baseSlug = zaKey.split('-')[0].toLowerCase();
+            const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${baseSlug}`);
+            if (r.ok) {
+                const d = await r.json();
+                const evoLearnset = await fetchFullEvoLearnset(d.species.url);
+                learnset = evoLearnset || d.moves.map(m => m.move.name);
+            }
         } catch(e) {}
         const p = makePokemon(zaKey, zaData);
         p._learnset = learnset;
@@ -997,202 +930,347 @@ async function fetchPokemonFromAPI(rawName) {
 
     try {
         const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${slug}`);
-        if (!r.ok) { if (status) status.textContent = `"${rawName}" not found.`; return null; }
+        if (!r.ok) { if(status) status.textContent=`"${rawName}" not found.`; return null; }
         const d = await r.json();
 
         let genderRate = -1;
-        try { const sr = await fetch(d.species.url); if (sr.ok) { const sd = await sr.json(); genderRate = sd.gender_rate; } } catch(e){}
+        try { const sr=await fetch(d.species.url); if(sr.ok){const sd=await sr.json(); genderRate=sd.gender_rate;} } catch(e){}
 
-        let gender = 'mf';
-        if (genderRate === -1) gender = 'none';
-        else if (genderRate === 8) gender = 'f';
+        let gender='mf';
+        if (genderRate===-1) gender='none';
+        else if (genderRate===8) gender='f';
 
-        const types     = d.types.map(t => t.type.name.charAt(0).toUpperCase()+t.type.name.slice(1));
-        const abilities = d.abilities.map(a => a.ability.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
-        const learnset  = d.moves.map(m => m.move.name);
+        const types = d.types.map(t=>t.type.name.charAt(0).toUpperCase()+t.type.name.slice(1));
+        const abilities = d.abilities.map(a=>a.ability.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
         const baseStats = {};
         d.stats.forEach(s => {
-            const map = {hp:'hp',attack:'atk',defense:'def','special-attack':'spa','special-defense':'spd',speed:'spe'};
-            if (map[s.stat.name]) baseStats[map[s.stat.name]] = s.base_stat;
+            const map={hp:'hp',attack:'atk',defense:'def','special-attack':'spa','special-defense':'spd',speed:'spe'};
+            if(map[s.stat.name]) baseStats[map[s.stat.name]]=s.base_stat;
         });
-
-        const data = { id: d.id, type: types, gender, abilities, baseStats, zaSprite: false };
-        const name = d.name.charAt(0).toUpperCase()+d.name.slice(1).replace(/-./g, s => '-'+s[1].toUpperCase());
+        const data = {id:d.id, type:types, gender, abilities, baseStats, zaSprite:false};
+        const name = d.name.charAt(0).toUpperCase()+d.name.slice(1).replace(/-./g,s=>'-'+s[1].toUpperCase());
         const p = makePokemon(name, data);
-        p._learnset = learnset;
-        if (status) status.textContent = `Added ${p.name}!`;
+
+        // Fetch full evo chain learnset
+        const evoLearnset = await fetchFullEvoLearnset(d.species.url);
+        p._learnset = evoLearnset || d.moves.map(m=>m.move.name);
+
+        if(status) status.textContent=`Added ${p.name}!`;
         return p;
     } catch(e) {
-        if (status) status.textContent = `Error fetching "${rawName}".`;
+        if(status) status.textContent=`Error fetching "${rawName}".`;
         return null;
     }
 }
 
 async function searchAndAddPokemon() {
-    const input = document.getElementById('pokeSearchInput');
-    const name  = input.value.trim();
-    if (!name) return;
-
-    const maxPool = MAX_POOL[currentMode];
-    if (pokemonList.length >= maxPool) {
-        document.getElementById('searchStatus').textContent = `Pool is full (max ${maxPool} Pokémon for ${currentMode} mode).`;
-        return;
-    }
-
-    const existing = pokemonList.find(p => p.name.toLowerCase() === name.toLowerCase());
-    if (existing) { document.getElementById('searchStatus').textContent = `${name} is already in your pool.`; return; }
-
-    const p = await fetchPokemonFromAPI(name);
-    if (p) { pokemonList.push(p); input.value = ''; render(); }
+    const input=document.getElementById('pokeSearchInput');
+    const name=input.value.trim(); if(!name) return;
+    const maxPool=MAX_POOL[currentMode];
+    if(pokemonList.length>=maxPool){document.getElementById('searchStatus').textContent=`Pool is full (max ${maxPool}).`;return;}
+    const existing=pokemonList.find(p=>p.name.toLowerCase()===name.toLowerCase());
+    if(existing){document.getElementById('searchStatus').textContent=`${name} is already in your pool.`;return;}
+    const p=await fetchPokemonFromAPI(name);
+    if(p){pokemonList.push(p);input.value='';render();}
 }
 
-/* ══════════════════════════════════════════
-   ITEMS
-══════════════════════════════════════════ */
-// Custom ZA Mega stones not in PokéAPI
-const ZA_MEGA_STONES = [
-    "Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone",
-    "Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite",
-    "Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite",
-    "Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate",
-    "Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone",
-    "Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite"
-].map(s => s); // stored as-is for display
-
+/* ITEMS */
+const ZA_MEGA_STONES=["Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite"];
 async function loadItems() {
-    if (itemCache.length > 0) return;
+    if(itemCache.length>0)return;
     try {
-        const r = await fetch('https://pokeapi.co/api/v2/item?limit=2000');
-        const d = await r.json();
-        itemCache = d.results.map(i => i.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
-        // Inject ZA mega stones
-        ZA_MEGA_STONES.forEach(s => { if (!itemCache.includes(s)) itemCache.push(s); });
+        const r=await fetch('https://pokeapi.co/api/v2/item?limit=2000');
+        const d=await r.json();
+        itemCache=d.results.map(i=>i.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
+        ZA_MEGA_STONES.forEach(s=>{if(!itemCache.includes(s))itemCache.push(s);});
         itemCache.sort((a,b)=>a.localeCompare(b));
-    } catch(e) {
-        itemCache = [...ZA_MEGA_STONES];
-    }
+    } catch(e){itemCache=[...ZA_MEGA_STONES];}
 }
 function filterItems(q) {
-    if (!q || q.length < 1) return [];
-    return itemCache.filter(i => i.toLowerCase().includes(q.toLowerCase())).slice(0,30);
+    if(!q||q.length<1)return[];
+    return itemCache.filter(i=>i.toLowerCase().includes(q.toLowerCase())).slice(0,30);
 }
 
-/* ══════════════════════════════════════════
-   MOVES
-══════════════════════════════════════════ */
+/* MOVES */
 async function fetchMoveData(moveName) {
-    const slug = moveName.toLowerCase().replace(/\s+/g,'-');
-    if (moveCache[slug]) return moveCache[slug];
+    const slug=moveName.toLowerCase().replace(/\s+/g,'-');
+    if(moveCache[slug])return moveCache[slug];
     try {
-        const r = await fetch(`https://pokeapi.co/api/v2/move/${slug}`);
-        if (!r.ok) return null;
-        const d = await r.json();
-        const desc = (d.effect_entries.find(e => e.language.name === 'en')?.short_effect || '').replace(/\$effect_chance/g, d.effect_chance || '?');
-        const data = {
-            name: d.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '),
-            power: d.power || '—', accuracy: d.accuracy || '—', pp: d.pp,
-            type: d.type.name.charAt(0).toUpperCase()+d.type.name.slice(1),
-            category: d.damage_class.name, description: desc
-        };
-        moveCache[slug] = data;
-        return data;
-    } catch(e) { return null; }
+        const r=await fetch(`https://pokeapi.co/api/v2/move/${slug}`);
+        if(!r.ok)return null;
+        const d=await r.json();
+        const desc=(d.effect_entries.find(e=>e.language.name==='en')?.short_effect||'').replace(/\$effect_chance/g,d.effect_chance||'?');
+        const data={name:d.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '),power:d.power||'—',accuracy:d.accuracy||'—',pp:d.pp,type:d.type.name.charAt(0).toUpperCase()+d.type.name.slice(1),category:d.damage_class.name,description:desc};
+        moveCache[slug]=data; return data;
+    } catch(e){return null;}
 }
-
 function filterMoves(learnset, query) {
-    if (!learnset || learnset.length === 0) return [];
-    const format = m => m.split('-').map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
-    if (!query) {
-        // No query — show full learnset alphabetically
-        return learnset.slice().sort().slice(0, 40).map(format);
-    }
-    const q = query.toLowerCase();
-    const starts   = learnset.filter(m => m.toLowerCase().startsWith(q));
-    const contains = learnset.filter(m => !m.toLowerCase().startsWith(q) && m.toLowerCase().includes(q));
-    return [...starts, ...contains].slice(0, 25).map(format);
+    if(!learnset||learnset.length===0)return[];
+    const format=m=>m.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+    if(!query) return learnset.slice().sort().slice(0,40).map(format);
+    const q=query.toLowerCase();
+    const starts=learnset.filter(m=>m.toLowerCase().startsWith(q));
+    const contains=learnset.filter(m=>!m.toLowerCase().startsWith(q)&&m.toLowerCase().includes(q));
+    return [...starts,...contains].slice(0,25).map(format);
 }
 
 /* ══════════════════════════════════════════
-   WEAKNESS
+   WEAKNESS — with ability immunity support
 ══════════════════════════════════════════ */
-function getTypeDefense(types) {
-    const mult = {}; ALL_TYPES.forEach(t => mult[t] = 1);
+function getTypeDefenseWithAbility(types, abilityName) {
+    const mult = {};
+    ALL_TYPES.forEach(t => mult[t] = 1);
     types.forEach(typeName => {
         const td = typeChart[typeName]; if (!td) return;
         td.weakTo.forEach(t  => mult[t] = (mult[t]||1) * 2);
         td.resists.forEach(t => mult[t] = (mult[t]||1) * 0.5);
-        td.immuneTo.forEach(t=> mult[t] = 0);
+        td.immuneTo.forEach(t => mult[t] = 0);
     });
+    // Apply ability modifiers
+    const ab = getAbilityImmunities(abilityName);
+    ab.immune.forEach(t => { if (mult[t] !== undefined) mult[t] = 0; });
+    ab.halfDmg.forEach(t => { if (mult[t] !== undefined) mult[t] = mult[t] * 0.5; });
     return mult;
 }
-function getTeamPressure(team) {
-    const pressure = {};
-    team.forEach(pokemon => {
-        const types = pokemon._data.type || [];
-        types.forEach(type => {
-            const data = typeChart[type]; if (!data) return;
-            data.weakTo.forEach(t  => { pressure[t]=pressure[t]||{weak:0,resist:0,immune:0}; pressure[t].weak++; });
-            data.resists.forEach(t => { pressure[t]=pressure[t]||{weak:0,resist:0,immune:0}; pressure[t].resist++; });
-            data.immuneTo.forEach(t=> { pressure[t]=pressure[t]||{weak:0,resist:0,immune:0}; pressure[t].immune++; });
-        });
-    });
-    return pressure;
-}
+
+/* ══════════════════════════════════════════
+   ANALYSIS RENDER
+══════════════════════════════════════════ */
 function renderWeaknesses() {
-    const teamContainer  = document.getElementById('weakness');
-    const indivContainer = document.getElementById('individualWeakness');
-    if (!teamContainer || !indivContainer) return;
     const team = getActiveTeam();
-    teamContainer.innerHTML = '';
-    if (team.length === 0) { teamContainer.innerHTML='<em style="color:#666;font-size:.8rem">Add Pokémon to your active team</em>'; }
-    else {
-        const pressure = getTeamPressure(team);
-        const results = Object.entries(pressure).map(([type,data]) => ({type, net: data.weak-data.resist-data.immune})).filter(e=>e.net>0).sort((a,b)=>b.net-a.net);
-        if (results.length === 0) teamContainer.innerHTML='<em style="color:#2ecc71;font-size:.8rem">No significant weaknesses!</em>';
-        else results.forEach(entry => {
-            const chip = document.createElement('div');
-            chip.className = 'weakness-chip '+(entry.net>=3?'weakness-high':entry.net===2?'weakness-mid':'weakness-low');
-            chip.textContent = `${entry.type} ×${entry.net}`;
-            teamContainer.appendChild(chip);
-        });
+
+    // ── Overall team weaknesses (net, ability-aware) ──
+    const teamWkEl = document.getElementById('weakness');
+    if (teamWkEl) {
+        teamWkEl.innerHTML = '';
+        if (team.length === 0) {
+            teamWkEl.innerHTML = '<em style="color:#666;font-size:.8rem">Add Pokémon to your active team</em>';
+        } else {
+            // Count actual weak/resist/immune per attacking type across team
+            const netCount = {}; // type -> net (weak - resist - immune)
+            ALL_TYPES.forEach(t => netCount[t] = 0);
+            team.forEach(p => {
+                const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
+                ALL_TYPES.forEach(t => {
+                    if (mult[t] > 1) netCount[t]++;
+                    else if (mult[t] === 0) netCount[t]--;
+                    else if (mult[t] < 1) netCount[t]--;
+                });
+            });
+            const results = Object.entries(netCount).filter(([,n])=>n>0).sort((a,b)=>b[1]-a[1]);
+            if (results.length === 0) {
+                teamWkEl.innerHTML = '<em style="color:#2ecc71;font-size:.8rem">No significant weaknesses!</em>';
+            } else {
+                results.forEach(([type, net]) => {
+                    const chip = document.createElement('div');
+                    chip.className = 'weakness-chip '+(net>=3?'weakness-high':net===2?'weakness-mid':'weakness-low');
+                    chip.textContent = `${type} ×${net}`;
+                    teamWkEl.appendChild(chip);
+                });
+            }
+        }
     }
-    indivContainer.innerHTML = '';
-    if (team.length === 0) { indivContainer.innerHTML='<em style="color:#666;font-size:.8rem">No active Pokémon</em>'; return; }
-    team.forEach(p => {
-        const mult = getTypeDefense(p._data.type);
-        const weakTo=[], resists=[], immune=[];
-        Object.entries(mult).forEach(([t,m]) => {
-            if (m===0) immune.push(t); else if (m<1) resists.push(t); else if (m>1) weakTo.push(t);
-        });
-        const card = document.createElement('div'); card.className = 'indiv-card';
-        card.innerHTML = `<div class="indiv-card-header">
-            <img src="${sprite(p)}" alt="${p.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
-            <div><div class="indiv-name">${p.nickname||p.name}</div><div class="indiv-type">${p._data.type.join(' / ')}</div></div>
-        </div>
-        <div class="indiv-chips">
-            ${weakTo.map(t=>`<span class="indiv-chip indiv-weak">⚠ ${t}</span>`).join('')}
-            ${resists.map(t=>`<span class="indiv-chip indiv-resist">↓ ${t}</span>`).join('')}
-            ${immune.map(t=>`<span class="indiv-chip indiv-immune">✕ ${t}</span>`).join('')}
-        </div>`;
-        indivContainer.appendChild(card);
-    });
+
+    // ── Recommended typings ──
+    const recEl = document.getElementById('recTypings');
+    if (recEl) {
+        recEl.innerHTML = '';
+        if (team.length === 0) {
+            recEl.innerHTML = '<em style="color:#666;font-size:.8rem">—</em>';
+        } else {
+            // Score each type by how many team weaknesses it resists/is immune to, minus how many it adds
+            const teamWeakTypes = new Set();
+            ALL_TYPES.forEach(atkT => {
+                let weakCount = 0;
+                team.forEach(p => {
+                    const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
+                    if (mult[atkT] > 1) weakCount++;
+                });
+                if (weakCount > 0) teamWeakTypes.add(atkT);
+            });
+            const scores = ALL_TYPES.map(candidateType => {
+                const td = typeChart[candidateType]; if (!td) return {type:candidateType, score:0};
+                // How many of the team's weak types does this candidate resist or immune?
+                let helps = 0;
+                td.resists.forEach(t => { if (teamWeakTypes.has(t)) helps++; });
+                td.immuneTo.forEach(t => { if (teamWeakTypes.has(t)) helps += 2; });
+                // How many new weaknesses does it introduce (that the team doesn't already cover)?
+                let hurts = 0;
+                td.weakTo.forEach(wkT => {
+                    // Check if team has something that resists this
+                    const alreadyCovered = team.some(p => {
+                        const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
+                        return mult[wkT] < 1;
+                    });
+                    if (!alreadyCovered) hurts++;
+                });
+                return {type:candidateType, score: helps * 2 - hurts};
+            });
+            scores.sort((a,b) => b.score - a.score);
+            const top = scores.filter(s => s.score > 0).slice(0, 7);
+            if (top.length === 0) {
+                recEl.innerHTML = '<em style="color:#2ecc71;font-size:.8rem">Team looks well-covered!</em>';
+            } else {
+                top.forEach(({type}) => {
+                    const chip = document.createElement('span');
+                    chip.className = 'rec-chip';
+                    chip.textContent = type;
+                    recEl.appendChild(chip);
+                });
+            }
+        }
+    }
+
+    // ── Individual Pokémon weaknesses (ability-aware, 4x/2x/.5x/.25x/immune) ──
+    const indivEl = document.getElementById('individualWeakness');
+    if (indivEl) {
+        indivEl.innerHTML = '';
+        if (team.length === 0) {
+            indivEl.innerHTML = '<em style="color:#666;font-size:.8rem">No active Pokémon</em>';
+        } else {
+            team.forEach(p => {
+                const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
+                const quad=[], dbl=[], half=[], quarter=[], immune=[];
+                Object.entries(mult).forEach(([t,m]) => {
+                    if (m === 0) immune.push(t);
+                    else if (m >= 4) quad.push(t);
+                    else if (m > 1) dbl.push(t);
+                    else if (m <= 0.25) quarter.push(t);
+                    else if (m < 1) half.push(t);
+                });
+                const card = document.createElement('div'); card.className = 'indiv-card';
+                card.innerHTML = `<div class="indiv-card-header">
+                    <img src="${sprite(p)}" alt="${p.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
+                    <div><div class="indiv-name">${p.nickname||p.name}</div><div class="indiv-type">${p._data.type.join(' / ')}</div></div>
+                </div>
+                <div class="indiv-chips">
+                    ${quad.map(t=>`<span class="indiv-chip indiv-4x">💀 ${t} 4×</span>`).join('')}
+                    ${dbl.map(t=>`<span class="indiv-chip indiv-2x">⚠ ${t} 2×</span>`).join('')}
+                    ${half.map(t=>`<span class="indiv-chip indiv-half">↓ ${t} ½</span>`).join('')}
+                    ${quarter.map(t=>`<span class="indiv-chip indiv-quarter">↓↓ ${t} ¼</span>`).join('')}
+                    ${immune.map(t=>`<span class="indiv-chip indiv-immune">✕ ${t}</span>`).join('')}
+                </div>`;
+                indivEl.appendChild(card);
+            });
+        }
+    }
+
+    // ── Raw type weakness totals (just count weaknesses, no offset) ──
+    const rawEl = document.getElementById('rawWeakness');
+    if (rawEl) {
+        rawEl.innerHTML = '';
+        if (team.length === 0) {
+            rawEl.innerHTML = '<em style="color:#666;font-size:.8rem">—</em>';
+        } else {
+            const rawCounts = {};
+            ALL_TYPES.forEach(t => rawCounts[t] = 0);
+            team.forEach(p => {
+                const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
+                ALL_TYPES.forEach(t => { if (mult[t] > 1) rawCounts[t]++; });
+            });
+            const entries = Object.entries(rawCounts).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+            if (entries.length === 0) {
+                rawEl.innerHTML = '<em style="color:#2ecc71;font-size:.8rem">No weaknesses!</em>';
+            } else {
+                entries.forEach(([type, count]) => {
+                    const chip = document.createElement('div');
+                    chip.className = 'type-count-chip tc-weak';
+                    chip.innerHTML = `${type} <span class="tc-count">×${count}</span>`;
+                    rawEl.appendChild(chip);
+                });
+            }
+        }
+    }
+
+    // ── Team resistances ──
+    const resEl = document.getElementById('teamResistances');
+    if (resEl) {
+        resEl.innerHTML = '';
+        if (team.length === 0) {
+            resEl.innerHTML = '<em style="color:#666;font-size:.8rem">—</em>';
+        } else {
+            const resCounts = {};
+            ALL_TYPES.forEach(t => resCounts[t] = 0);
+            team.forEach(p => {
+                const mult = getTypeDefenseWithAbility(p._data.type, p.ability);
+                ALL_TYPES.forEach(t => { if (mult[t] < 1) resCounts[t]++; });
+            });
+            const entries = Object.entries(resCounts).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+            if (entries.length === 0) {
+                resEl.innerHTML = '<em style="color:#666;font-size:.8rem">No resistances.</em>';
+            } else {
+                entries.forEach(([type, count]) => {
+                    const chip = document.createElement('div');
+                    chip.className = 'type-count-chip tc-resist';
+                    chip.innerHTML = `${type} <span class="tc-count">×${count}</span>`;
+                    resEl.appendChild(chip);
+                });
+            }
+        }
+    }
+
+    // ── Offensive coverage ──
+    const covEl = document.getElementById('offensiveCoverage');
+    if (covEl) {
+        covEl.innerHTML = '';
+        if (team.length === 0) {
+            covEl.innerHTML = '<em style="color:#666;font-size:.8rem">—</em>';
+        } else {
+            // For each active pokemon, look at their 4 moves, find damaging ones, see what types they hit SE
+            const seHits = {}; // defending type -> count of SE hits
+            ALL_TYPES.forEach(t => seHits[t] = 0);
+            team.forEach(p => {
+                p.moves.forEach(moveName => {
+                    if (!moveName) return;
+                    const slug = moveName.toLowerCase().replace(/\s+/g, '-');
+                    const md = moveCache[slug];
+                    if (!md) return;
+                    if (md.category === 'status') return; // skip status moves
+                    if (!md.power || md.power === '—' || md.power === 0) return; // skip 0 power
+                    const atkType = md.type;
+                    // Find all types this move hits super effectively
+                    ALL_TYPES.forEach(defType => {
+                        const td = typeChart[defType];
+                        if (td && td.weakTo.includes(atkType)) {
+                            seHits[defType]++;
+                        }
+                    });
+                });
+            });
+            const covered = Object.entries(seHits).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]);
+            const uncovered = ALL_TYPES.filter(t => seHits[t] === 0);
+            covered.forEach(([type, count]) => {
+                const chip = document.createElement('div');
+                chip.className = 'cov-chip cov-hit';
+                chip.innerHTML = `${type} <span class="tc-count">×${count}</span>`;
+                covEl.appendChild(chip);
+            });
+            if (uncovered.length > 0) {
+                const sep = document.createElement('div');
+                sep.style.cssText = 'width:100%;font-size:.68rem;color:var(--muted);margin-top:6px;';
+                sep.textContent = 'No coverage: ' + uncovered.join(', ');
+                covEl.appendChild(sep);
+            }
+            if (covered.length === 0) {
+                covEl.innerHTML = '<em style="color:#666;font-size:.8rem">No damaging moves assigned yet.</em>';
+            }
+        }
+    }
 }
 
 /* ══════════════════════════════════════════
    RENDER
 ══════════════════════════════════════════ */
 function render() {
-    const teamEl = document.getElementById('team');
-    const poolEl = document.getElementById('pool');
-    const teamCount = document.getElementById('teamCount');
-    const poolCount = document.getElementById('poolCount');
-    if (!teamEl || !poolEl) return;
-    teamEl.innerHTML = ''; poolEl.innerHTML = '';
-    const active = getActiveTeam(), pool = getPool();
-    active.forEach(p => teamEl.appendChild(buildCard(p)));
-    pool.forEach(p  => poolEl.appendChild(buildCard(p)));
-    if (teamCount) teamCount.textContent = `(${active.length}/6)`;
-    if (poolCount) poolCount.textContent = `(${pool.length}${currentMode==='draft'?' / 30':''})`;
+    const teamEl=document.getElementById('team'), poolEl=document.getElementById('pool');
+    const teamCount=document.getElementById('teamCount'), poolCount=document.getElementById('poolCount');
+    if(!teamEl||!poolEl)return;
+    teamEl.innerHTML=''; poolEl.innerHTML='';
+    const active=getActiveTeam(), pool=getPool();
+    active.forEach(p=>teamEl.appendChild(buildCard(p)));
+    pool.forEach(p=>poolEl.appendChild(buildCard(p)));
+    if(teamCount) teamCount.textContent=`(${active.length}/6)`;
+    if(poolCount) poolCount.textContent=`(${pool.length}${currentMode==='draft'?' / 30':''})`;
     renderWeaknesses();
 }
 
@@ -1200,11 +1278,10 @@ function render() {
    BUILD CARD
 ══════════════════════════════════════════ */
 function buildCard(p) {
-    const wrap = document.createElement('div');
-    wrap.className = 'pokemon'+(p.active?' active':'')+(p.expanded?' is-expanded':'');
-    const stats  = getFinalStats(p);
-
-    wrap.innerHTML = `
+    const wrap=document.createElement('div');
+    wrap.className='pokemon'+(p.active?' active':'')+(p.expanded?' is-expanded':'');
+    const stats=getFinalStats(p);
+    wrap.innerHTML=`
 <div class="pokemon-summary">
     <img src="${sprite(p)}" class="poke-img" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
     <div class="summary-info">
@@ -1217,22 +1294,14 @@ function buildCard(p) {
         <div>${p.nature}</div><div>${p.ability||'—'}</div>
         <div>${p.item||'No Item'}</div><div>Lv.${p.level}</div>
     </div>
-    <div class="summary-moves">
-        ${p.moves.map(m=>`<div>${m||'—'}</div>`).join('')}
-    </div>
+    <div class="summary-moves">${p.moves.map(m=>`<div>${m||'—'}</div>`).join('')}</div>
     <div class="action-buttons">
         <button class="${p.active?'rem-btn':'add-btn'}" onclick="handleToggleTeam('${p.name}')" title="${p.active?'Remove from team':'Add to team'}">${p.active?'−':'+'}</button>
         <button onclick="toggleExpand('${p.name}')" title="${p.expanded?'Collapse':'Expand'}">${p.expanded?'▲':'▼'}</button>
-        <button class="del-btn" onclick="confirmRemovePokemon('${p.name}')" title="Remove from pool">✕</button>
+        <button class="del-btn" onclick="confirmRemovePokemon('${p.name}')" title="Remove">✕</button>
     </div>
 </div>`;
-
-    if (p.expanded) {
-        const exp = document.createElement('div');
-        exp.className = 'pokemon-expanded';
-        exp.innerHTML = buildExpanded(p, stats);
-        wrap.appendChild(exp);
-    }
+    if(p.expanded){const exp=document.createElement('div');exp.className='pokemon-expanded';exp.innerHTML=buildExpanded(p,stats);wrap.appendChild(exp);}
     return wrap;
 }
 
@@ -1240,34 +1309,38 @@ function buildCard(p) {
    BUILD EXPANDED
 ══════════════════════════════════════════ */
 function buildExpanded(p, stats) {
-    const statKeys  = ['hp','atk','def','spa','spd','spe'];
-    const statNames = {hp:'HP',atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};
-    const barClass  = {hp:'bar-hp',atk:'bar-atk',def:'bar-def',spa:'bar-spa',spd:'bar-spd',spe:'bar-spe'};
-    const totalEVs  = getTotalEVs(p);
-    // Fixed scale: max possible live stat at Lv50, 252 EVs, 31 IVs, boosting nature ≈ 397
-    // Use 400 as ceiling so bars are meaningful and reflect EV investment
-    const BAR_MAX   = 400;
-    const pData     = p._data;
-    const nature    = getNatureData(p.nature);
+    const statKeys=['hp','atk','def','spa','spd','spe'];
+    const statNames={hp:'HP',atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};
+    const barClass={hp:'bar-hp',atk:'bar-atk',def:'bar-def',spa:'bar-spa',spd:'bar-spd',spe:'bar-spe'};
+    const totalEVs=getTotalEVs(p);
+    const pData=p._data;
+    const nature=getNatureData(p.nature);
+    const lv=p.level;
 
     function liveClass(k) {
-        if (nature.up===k)   return 'boosted';
-        if (nature.down===k) return 'dropped';
+        if(nature.up===k) return 'boosted';
+        if(nature.down===k) return 'dropped';
         return 'neutral';
     }
 
-    let genderOptions = '';
-    if (pData.gender === 'none') genderOptions = `<option value="none" selected>—</option>`;
-    else if (pData.gender === 'f') genderOptions = `<option value="female" selected>♀ Female</option>`;
-    else genderOptions = `<option value="male" ${p.gender==='male'?'selected':''}>♂ Male</option><option value="female" ${p.gender==='female'?'selected':''}>♀ Female</option>`;
+    // bar max: max possible stat at this pokemon's CURRENT level
+    function barMax(k) {
+        return k==='hp'
+            ? calcHP(pData.baseStats[k], 31, 252, lv)
+            : Math.floor(calcStat(pData.baseStats[k], 31, 252, lv) * 1.1);
+    }
 
-    const ivSpinners = statKeys.map(k=>`
+    let genderOptions='';
+    if(pData.gender==='none') genderOptions=`<option value="none" selected>—</option>`;
+    else if(pData.gender==='f') genderOptions=`<option value="female" selected>♀ Female</option>`;
+    else genderOptions=`<option value="male" ${p.gender==='male'?'selected':''}>♂ Male</option><option value="female" ${p.gender==='female'?'selected':''}>♀ Female</option>`;
+
+    const ivSpinners=statKeys.map(k=>`
         <div class="iv-group">
             <label>${statNames[k]}</label>
             <div class="iv-spinner">
                 <button onclick="adjustIV('${p.name}','${k}',-1)">−</button>
-                <input type="text" inputmode="numeric" pattern="[0-9]*"
-                    value="${p.ivs[k]}"
+                <input type="text" inputmode="numeric" pattern="[0-9]*" value="${p.ivs[k]}"
                     data-iv-name="${p.name}" data-iv-stat="${k}"
                     oninput="liveIVInput(this,'${p.name}','${k}')"
                     onblur="commitIV('${p.name}','${k}',this.value)"
@@ -1276,20 +1349,17 @@ function buildExpanded(p, stats) {
             </div>
         </div>`).join('');
 
-    const moveSlots = [0,1,2,3].map(i => {
-        const mv     = p.moves[i] || '';
-        const slug   = mv.toLowerCase().replace(/\s+/g,'-');
-        const mvData = mv && moveCache[slug];
-        const infoBar = mvData
-            ? `<div class="move-info-bar">
+    const moveSlots=[0,1,2,3].map(i=>{
+        const mv=p.moves[i]||'';
+        const slug=mv.toLowerCase().replace(/\s+/g,'-');
+        const mvData=mv&&moveCache[slug];
+        const infoBar=mvData
+            ?`<div class="move-info-bar">
                 <span class="cat-${mvData.category}">${mvData.category.charAt(0).toUpperCase()+mvData.category.slice(1)}</span>
-                <span>Pwr: ${mvData.power}</span>
-                <span>Acc: ${mvData.accuracy}</span>
-                <span>${mvData.type}</span>
-                ${mvData.description ? `<span class="move-info-icon">ℹ<div class="move-tooltip">${mvData.description}</div></span>` : ''}
+                <span>Pwr: ${mvData.power}</span><span>Acc: ${mvData.accuracy}</span><span>${mvData.type}</span>
+                ${mvData.description?`<span class="move-info-icon">ℹ<div class="move-tooltip">${mvData.description}</div></span>`:''}
                </div>`
-            : `<div class="move-info-bar"></div>`;
-
+            :`<div class="move-info-bar"></div>`;
         return `<div class="move-slot">
             <label>Move ${i+1}</label>
             <div class="move-search-wrap">
@@ -1299,41 +1369,35 @@ function buildExpanded(p, stats) {
                     onfocus="onMoveFocus(this,'${p.name}',${i})"
                     onblur="closeMoveDropdown('${p.name}',${i})"
                     autocomplete="off">
-                ${mv ? `<button class="move-clear" onmousedown="clearMove('${p.name}',${i})" title="Clear move">✕</button>` : ''}
+                ${mv?`<button class="move-clear" onmousedown="clearMove('${p.name}',${i})" title="Clear">✕</button>`:''}
                 <div class="move-dropdown" id="movedrop-${p.name}-${i}" style="display:none"></div>
             </div>
             ${infoBar}
         </div>`;
     }).join('');
 
-    const statRows = statKeys.map(k => {
-        // Dynamic bar max: the highest possible live stat for this pokemon at lv50 (252ev, 31iv, boosting nature)
-        // This way the bar always has room to grow when EVs are added, even for high-base-stat mons
-        const maxLive = k === 'hp'
-            ? calcHP(pData.baseStats[k], 31, 252, 50)
-            : Math.floor(calcStat(pData.baseStats[k], 31, 252, 50) * 1.1);
-        const pct = Math.min(100, Math.round((stats[k] / maxLive) * 100));
-        const dis = (totalEVs >= 510 && p.evs[k] === 0) ? 'disabled' : '';
-        return `
-        <div class="stat-cell"><span class="stat-label">${statNames[k]}</span><span class="base-val">${pData.baseStats[k]}</span></div>
-        <div class="stat-cell"><span class="stat-label">${statNames[k]}</span><span class="live-val ${liveClass(k)}">${stats[k]}</span></div>
-        <div class="ev-combo-cell">
-            <div class="ev-input-row">
-                <input type="number" class="ev-num-input" min="0" max="252" value="${p.evs[k]}"
-                    oninput="updateEV('${p.name}','${k}',this.value)"
-                    onblur="syncEVSlider('${p.name}','${k}')">
-            </div>
-        </div>
-        <div class="ev-slider-cell">
-            <input type="range" class="ev-slider" min="0" max="252" value="${p.evs[k]}" step="4" ${dis}
-                id="evslider-${p.name}-${k}"
-                oninput="updateEVFromSlider('${p.name}','${k}',this.value)">
-        </div>
-        <div class="bar-cell">
-            <div class="stat-bar-track"><div class="stat-bar-fill ${barClass[k]}" style="width:${pct}%"></div></div>
-            <span class="bar-num">${stats[k]}</span>
-        </div>`;
-    }).join('');
+    // ability info icon
+    const abilityDesc = getAbilityDesc(p.ability);
+    const abilityInfoIcon = abilityDesc
+        ? `<span class="ability-info-icon">ℹ<div class="ability-tooltip">${abilityDesc}</div></span>`
+        : '';
+
+    const bstBase = Object.values(pData.baseStats).reduce((a,b)=>a+b,0);
+    const bstLive = Object.values(stats).reduce((a,b)=>a+b,0);
+
+    // Ability select HTML
+    const abilitySelectHTML = (() => {
+        const mainAbility = pData.abilities[0]||'';
+        const isUnknown = mainAbility.startsWith('Unknown');
+        if (isUnknown) {
+            const baseAbs = pData.baseAbilities||[];
+            return [
+                `<option value="Unknown (Mega)" ${p.ability==='Unknown (Mega)'||p.ability===mainAbility?'selected':''} style="color:var(--muted)">⚠ Mega Ability Unknown</option>`,
+                ...baseAbs.map(a=>`<option value="${a}" ${p.ability===a?'selected':''}>${a} (base form)</option>`)
+            ].join('');
+        }
+        return pData.abilities.map(a=>`<option value="${a}" ${p.ability===a?'selected':''}>${a}</option>`).join('');
+    })();
 
     return `
 <div class="exp-header">
@@ -1348,43 +1412,23 @@ function buildExpanded(p, stats) {
         <div class="exp-controls-row">
             <div class="ctrl-group">
                 <label>Ability</label>
-                <select onchange="updateField('${p.name}','ability',this.value)">
-                    ${(() => {
-                        const mainAbility = pData.abilities[0] || '';
-                        const isUnknown = mainAbility.startsWith('Unknown');
-                        if (isUnknown) {
-                            const baseAbs = pData.baseAbilities || [];
-                            const opts = [
-                                `<option value="Unknown (Mega)" ${p.ability==='Unknown (Mega)'||p.ability===mainAbility?'selected':''} style="color:var(--muted)">⚠ Mega Ability Unknown</option>`,
-                                ...baseAbs.map(a => `<option value="${a}" ${p.ability===a?'selected':''}>${a} (base form)</option>`)
-                            ];
-                            return opts.join('');
-                        }
-                        return pData.abilities.map(a=>`<option value="${a}" ${p.ability===a?'selected':''}>${a}</option>`).join('');
-                    })()}
-                </select>
+                <div class="ability-info-wrap">
+                    <select onchange="updateField('${p.name}','ability',this.value)">${abilitySelectHTML}</select>
+                    ${abilityInfoIcon}
+                </div>
             </div>
             <div class="ctrl-group">
                 <label>Item</label>
                 <div class="item-search-wrap">
                     <input type="text" id="itemInput-${p.name}" value="${p.item}" placeholder="Search item…"
-                        oninput="onItemInput(this,'${p.name}')"
-                        onblur="closeItemDropdown('${p.name}')"
-                        autocomplete="off">
+                        oninput="onItemInput(this,'${p.name}')" onblur="closeItemDropdown('${p.name}')" autocomplete="off">
                     <div class="item-dropdown" id="itemDrop-${p.name}" style="display:none"></div>
                 </div>
             </div>
             <div class="ctrl-group">
                 <label>Nature</label>
                 <select onchange="updateField('${p.name}','nature',this.value)">
-                    ${Object.keys(natureData).map(n => {
-                        const nd = natureData[n];
-                        const statLabel = { atk:'Atk', def:'Def', spa:'SpA', spd:'SpD', spe:'Spe' };
-                        const hint = nd.up
-                            ? ` (+${statLabel[nd.up]} −${statLabel[nd.down]})`
-                            : ' (neutral)';
-                        return `<option value="${n}" ${p.nature===n?'selected':''}>${n}${hint}</option>`;
-                    }).join('')}
+                    ${Object.keys(natureData).map(n=>{const nd=natureData[n];const sl={atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};const hint=nd.up?` (+${sl[nd.up]} −${sl[nd.down]})`:' (neutral)';return`<option value="${n}" ${p.nature===n?'selected':''}>${n}${hint}</option>`;}).join('')}
                 </select>
             </div>
             <div class="ctrl-group">
@@ -1429,15 +1473,17 @@ function buildExpanded(p, stats) {
     <div class="stats-col">
         <div class="stats-col-header">Base</div>
         ${statKeys.map(k=>`<div class="stat-cell"><span class="stat-label">${statNames[k]}</span><span class="base-val">${pData.baseStats[k]}</span></div>`).join('')}
+        <div class="bst-row">BST: ${bstBase}</div>
     </div>
     <div class="stats-col">
         <div class="stats-col-header">Live</div>
         ${statKeys.map(k=>`<div class="stat-cell"><span class="stat-label">${statNames[k]}</span><span class="live-val ${liveClass(k)}">${stats[k]}</span></div>`).join('')}
+        <div class="bst-row">Live: ${bstLive}</div>
     </div>
     <div class="stats-col">
         <div class="stats-col-header">EVs</div>
-        ${statKeys.map(k => {
-            const dis = (totalEVs>=510&&p.evs[k]===0)?'disabled':'';
+        ${statKeys.map(k=>{
+            const dis=(totalEVs>=510&&p.evs[k]===0)?'disabled':'';
             return `<div class="ev-combo-cell">
                 <input type="number" class="ev-num-input" min="0" max="252" value="${p.evs[k]}"
                     data-name="${p.name}" data-stat="${k}"
@@ -1451,8 +1497,8 @@ function buildExpanded(p, stats) {
     </div>
     <div class="stats-col">
         <div class="stats-col-header">EV Slider</div>
-        ${statKeys.map(k => {
-            const dis = (totalEVs>=510&&p.evs[k]===0)?'disabled':'';
+        ${statKeys.map(k=>{
+            const dis=(totalEVs>=510&&p.evs[k]===0)?'disabled':'';
             return `<div class="ev-slider-cell">
                 <input type="range" class="ev-slider" min="0" max="252" value="${p.evs[k]}" step="4" ${dis}
                     id="evslider-${p.name}-${k}"
@@ -1464,11 +1510,9 @@ function buildExpanded(p, stats) {
     </div>
     <div class="stats-col">
         <div class="stats-col-header">Stat Graph</div>
-        ${statKeys.map(k => {
-            const maxLive = k === 'hp'
-                ? calcHP(pData.baseStats[k], 31, 252, 50)
-                : Math.floor(calcStat(pData.baseStats[k], 31, 252, 50) * 1.1);
-            const pct = Math.min(100, Math.round((stats[k] / maxLive) * 100));
+        ${statKeys.map(k=>{
+            const mx=barMax(k);
+            const pct=Math.min(100,Math.round((stats[k]/mx)*100));
             return `<div class="bar-cell">
                 <div class="stat-bar-track"><div class="stat-bar-fill ${barClass[k]}" style="width:${pct}%"></div></div>
                 <span class="bar-num">${stats[k]}</span>
@@ -1484,272 +1528,164 @@ function buildExpanded(p, stats) {
 ══════════════════════════════════════════ */
 async function onItemInput(input, pokeName) {
     await loadItems();
-    const q = input.value.trim();
-    const drop = document.getElementById(`itemDrop-${pokeName}`);
-    if (!drop) return;
-    const matches = filterItems(q);
-    if (matches.length === 0 || q.length < 1) { drop.style.display='none'; return; }
-    drop.innerHTML = matches.map(i=>`<div onmousedown="selectItem('${pokeName}','${i}')">${i}</div>`).join('');
-    drop.style.display = 'block';
+    const q=input.value.trim();
+    const drop=document.getElementById(`itemDrop-${pokeName}`); if(!drop) return;
+    const matches=filterItems(q);
+    if(matches.length===0||q.length<1){drop.style.display='none';return;}
+    drop.innerHTML=matches.map(i=>`<div onmousedown="selectItem('${pokeName}','${i}')">${i}</div>`).join('');
+    drop.style.display='block';
 }
 function selectItem(pokeName, item) {
-    const p = find(pokeName); if (!p) return;
-    p.item = item;
-    const inp = document.getElementById(`itemInput-${pokeName}`);
-    if (inp) inp.value = item;
-    closeItemDropdown(pokeName);
-    render();
+    const p=find(pokeName); if(!p)return;
+    p.item=item;
+    const inp=document.getElementById(`itemInput-${pokeName}`);
+    if(inp) inp.value=item;
+    closeItemDropdown(pokeName); render();
 }
-function closeItemDropdown(pokeName) {
-    setTimeout(() => { const d=document.getElementById(`itemDrop-${pokeName}`); if(d) d.style.display='none'; }, 150);
-}
+function closeItemDropdown(pokeName) { setTimeout(()=>{const d=document.getElementById(`itemDrop-${pokeName}`);if(d)d.style.display='none';},150); }
 
 /* ══════════════════════════════════════════
-   MOVE SEARCH  (shows full learnset on focus, filters as you type)
+   MOVE SEARCH
 ══════════════════════════════════════════ */
 function showMoveDropdown(input, pokeName, slot, query) {
-    const p = find(pokeName); if (!p) return;
-    const drop = document.getElementById(`movedrop-${pokeName}-${slot}`);
-    if (!drop) return;
-    const matches = filterMoves(p._learnset, query);
-    if (matches.length === 0) { drop.style.display='none'; return; }
-
+    const p=find(pokeName); if(!p) return;
+    const drop=document.getElementById(`movedrop-${pokeName}-${slot}`); if(!drop) return;
+    const matches=filterMoves(p._learnset, query);
+    if(matches.length===0){drop.style.display='none';return;}
     function renderRows() {
-        drop.innerHTML = matches.map(m => {
-            const slug = m.toLowerCase().replace(/\s+/g,'-');
-            const cached = moveCache[slug];
-            let meta = '';
-            if (cached) {
-                const catColor = cached.category === 'physical' ? '#e67e22' : cached.category === 'special' ? '#3498db' : '#888';
-                meta = `<span class="move-dd-meta">
-                    <span class="move-dd-dot" style="background:${catColor}"></span>
-                    <span class="move-dd-type">${cached.type}</span>
-                    <span class="move-dd-stat">Pwr&nbsp;${cached.power}</span>
-                    <span class="move-dd-stat">Acc&nbsp;${cached.accuracy}</span>
-                </span>`;
+        drop.innerHTML=matches.map(m=>{
+            const slug=m.toLowerCase().replace(/\s+/g,'-');
+            const cached=moveCache[slug];
+            let meta='';
+            if(cached){
+                const catColor=cached.category==='physical'?'#e67e22':cached.category==='special'?'#3498db':'#888';
+                meta=`<span class="move-dd-meta"><span class="move-dd-dot" style="background:${catColor}"></span><span class="move-dd-type">${cached.type}</span><span class="move-dd-stat">Pwr&nbsp;${cached.power}</span><span class="move-dd-stat">Acc&nbsp;${cached.accuracy}</span></span>`;
             }
             return `<div onmousedown="selectMove('${pokeName}',${slot},'${m}')">${m}${meta}</div>`;
         }).join('');
-        drop.style.display = 'block';
+        drop.style.display='block';
     }
-
-    renderRows(); // show immediately, even without cache
-
-    // Background-fetch any uncached moves and re-render once they come back
-    const uncached = matches.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g,'-')]);
-    if (uncached.length > 0) {
-        // Batch into groups of 8 to avoid hammering the API, but fetch ALL visible moves
-        const batchSize = 8;
-        const batches = [];
-        for (let i = 0; i < uncached.length; i += batchSize) {
-            batches.push(uncached.slice(i, i + batchSize));
-        }
-        // Fire batches sequentially, re-rendering after each one so info fills in progressively
-        (async () => {
-            for (const batch of batches) {
-                await Promise.all(batch.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g,'-'))));
-                if (drop.style.display !== 'none') renderRows();
-            }
-        })();
+    renderRows();
+    const uncached=matches.filter(m=>!moveCache[m.toLowerCase().replace(/\s+/g,'-')]);
+    if(uncached.length>0){
+        const batchSize=8; const batches=[];
+        for(let i=0;i<uncached.length;i+=batchSize) batches.push(uncached.slice(i,i+batchSize));
+        (async()=>{for(const batch of batches){await Promise.all(batch.map(m=>fetchMoveData(m.toLowerCase().replace(/\s+/g,'-'))));if(drop.style.display!=='none')renderRows();}})();
     }
 }
-
-function onMoveFocus(input, pokeName, slot) {
-    // Show full learnset immediately on focus, using current input value as initial filter
-    showMoveDropdown(input, pokeName, slot, input.value.trim());
-    // Also select all text so user can immediately type to replace
-    input.select();
-}
-
-function onMoveInput(input, pokeName, slot) {
-    showMoveDropdown(input, pokeName, slot, input.value.trim());
-}
-
+function onMoveFocus(input, pokeName, slot) { showMoveDropdown(input,pokeName,slot,input.value.trim()); input.select(); }
+function onMoveInput(input, pokeName, slot) { showMoveDropdown(input,pokeName,slot,input.value.trim()); }
 async function selectMove(pokeName, slot, moveName) {
-    const p = find(pokeName); if (!p) return;
-    p.moves[slot] = moveName;
-    const slug = moveName.toLowerCase().replace(/\s+/g,'-');
-    if (!moveCache[slug]) await fetchMoveData(slug);
-    closeMoveDropdown(pokeName, slot);
-    render();
+    const p=find(pokeName); if(!p)return;
+    p.moves[slot]=moveName;
+    const slug=moveName.toLowerCase().replace(/\s+/g,'-');
+    if(!moveCache[slug]) await fetchMoveData(slug);
+    closeMoveDropdown(pokeName,slot); render();
 }
+function clearMove(pokeName, slot) { const p=find(pokeName);if(!p)return;p.moves[slot]='';render(); }
+function closeMoveDropdown(pokeName, slot) { setTimeout(()=>{const d=document.getElementById(`movedrop-${pokeName}-${slot}`);if(d)d.style.display='none';},150); }
 
-function clearMove(pokeName, slot) {
-    const p = find(pokeName); if (!p) return;
-    p.moves[slot] = '';
-    render();
-}
-
-function closeMoveDropdown(pokeName, slot) {
-    setTimeout(() => { const d=document.getElementById(`movedrop-${pokeName}-${slot}`); if(d) d.style.display='none'; }, 150);
-}
-
-/* ══════════════════════════════════════════
-   EV — type + slider both work, no re-render on slider drag
-══════════════════════════════════════════ */
+/* EV */
 function updateEVFromSlider(name, stat, rawVal) {
-    const p = find(name); if (!p) return;
-    let v = Math.max(0, Math.min(252, Number(rawVal)));
-    const totalWithout = getTotalEVs(p) - p.evs[stat];
-    v = Math.min(v, 510 - totalWithout);
-    p.evs[stat] = v;
-    // Update ONLY the number input in the EV column live — no full re-render while dragging
-    const numInputs = document.querySelectorAll(`.ev-num-input[data-name="${name}"][data-stat="${stat}"]`);
-    numInputs.forEach(el => { el.value = v; });
-    // Update EV total display live
-    const totalEls = document.querySelectorAll(`.ev-total-live[data-name="${name}"]`);
-    const newTotal = getTotalEVs(p);
-    totalEls.forEach(el => {
-        el.textContent = newTotal + ' / 510';
-        el.style.color = newTotal >= 510 ? 'var(--green)' : 'var(--muted)';
-    });
+    const p=find(name); if(!p)return;
+    let v=Math.max(0,Math.min(252,Number(rawVal)));
+    const tot=getTotalEVs(p)-p.evs[stat];
+    v=Math.min(v,510-tot); p.evs[stat]=v;
+    document.querySelectorAll(`.ev-num-input[data-name="${name}"][data-stat="${stat}"]`).forEach(el=>el.value=v);
+    const newTotal=getTotalEVs(p);
+    document.querySelectorAll(`.ev-total-live[data-name="${name}"]`).forEach(el=>{el.textContent=newTotal+' / 510';el.style.color=newTotal>=510?'var(--green)':'var(--muted)';});
 }
-
 function updateEVFromInput(name, stat, rawVal) {
-    const p = find(name); if (!p) return;
-    let v = Math.max(0, Math.min(252, Number(rawVal)));
-    const totalWithout = getTotalEVs(p) - p.evs[stat];
-    v = Math.min(v, 510 - totalWithout);
-    p.evs[stat] = v;
-    // sync slider live
-    const slider = document.getElementById(`evslider-${name}-${stat}`);
-    if (slider) slider.value = v;
+    const p=find(name); if(!p)return;
+    let v=Math.max(0,Math.min(252,Number(rawVal)));
+    const tot=getTotalEVs(p)-p.evs[stat];
+    v=Math.min(v,510-tot); p.evs[stat]=v;
+    const slider=document.getElementById(`evslider-${name}-${stat}`);
+    if(slider) slider.value=v;
 }
-
 function syncEVSlider(name, stat) { render(); }
+function updateEV(name, stat, rawVal) { updateEVFromInput(name,stat,rawVal); }
 
-function updateEV(name, stat, rawVal) { updateEVFromInput(name, stat, rawVal); }
-
-/* ══════════════════════════════════════════
-   IV
-══════════════════════════════════════════ */
-// Called on every keystroke — update model silently, NO render whatsoever
+/* IV */
 function liveIVInput(el, name, stat) {
-    const raw = el.value.replace(/[^0-9]/g, ''); // strip non-numeric chars
-    el.value = raw; // keep input clean
-    if (raw === '') return; // allow empty while typing
-    let v = parseInt(raw, 10);
-    if (isNaN(v)) return;
-    // If they've typed something clearly over 31, clamp display immediately
-    if (v > 31) { el.value = '31'; v = 31; }
-    // Update data model silently — no render
-    const p = find(name); if (!p) return;
-    p.ivs[stat] = v;
+    const raw=el.value.replace(/[^0-9]/g,''); el.value=raw;
+    if(raw==='')return;
+    let v=parseInt(raw,10); if(isNaN(v))return;
+    if(v>31){el.value='31';v=31;}
+    const p=find(name); if(!p)return; p.ivs[stat]=v;
 }
-
-// Called on blur or Enter — clamp, commit, re-render once
 function commitIV(name, stat, rawVal) {
-    const p = find(name); if (!p) return;
-    let v = parseInt(rawVal, 10);
-    if (isNaN(v)) v = 31;
-    v = Math.max(0, Math.min(31, v));
-    p.ivs[stat] = v;
-    render();
+    const p=find(name); if(!p)return;
+    let v=parseInt(rawVal,10); if(isNaN(v))v=31;
+    v=Math.max(0,Math.min(31,v)); p.ivs[stat]=v; render();
 }
-
-function updateIV(name, stat, rawVal) {
-    commitIV(name, stat, rawVal);
-}
-
+function updateIV(name, stat, rawVal) { commitIV(name,stat,rawVal); }
 function adjustIV(name, stat, delta) {
-    const p = find(name); if (!p) return;
-    p.ivs[stat] = Math.max(0, Math.min(31, p.ivs[stat] + delta));
-    // Update the visible input without re-render
-    const inputs = document.querySelectorAll(`[data-iv-name="${name}"][data-iv-stat="${stat}"]`);
-    inputs.forEach(el => { el.value = p.ivs[stat]; });
+    const p=find(name); if(!p)return;
+    p.ivs[stat]=Math.max(0,Math.min(31,p.ivs[stat]+delta));
+    document.querySelectorAll(`[data-iv-name="${name}"][data-iv-stat="${stat}"]`).forEach(el=>el.value=p.ivs[stat]);
     render();
 }
 
-function updateLiveStatDisplay(name) { /* intentionally left empty — commits trigger render */ }
+/* FIELD */
+function updateField(name, field, value) { const p=find(name);if(!p)return;p[field]=value;render(); }
 
-/* ══════════════════════════════════════════
-   FIELD UPDATE
-══════════════════════════════════════════ */
-function updateField(name, field, value) {
-    const p = find(name); if (!p) return;
-    p[field] = value; render();
-}
-
-/* ══════════════════════════════════════════
-   REMOVE POKEMON
-══════════════════════════════════════════ */
+/* REMOVE */
 function confirmRemovePokemon(name) {
     showConfirm(`Remove ${name}?`, 'This will remove them from the pool entirely.', () => {
-        pokemonList = pokemonList.filter(p => p.name !== name);
-        render();
+        pokemonList=pokemonList.filter(p=>p.name!==name); render();
     });
 }
 
-/* ══════════════════════════════════════════
-   TEAM TOGGLE + REPLACE MODAL
-══════════════════════════════════════════ */
+/* TEAM TOGGLE */
 function handleToggleTeam(name) {
-    const p = find(name); if (!p) return;
-    if (p.active) { p.active=false; render(); return; }
-    if (getActiveTeam().length < 6) { p.active=true; render(); return; }
+    const p=find(name); if(!p)return;
+    if(p.active){p.active=false;render();return;}
+    if(getActiveTeam().length<6){p.active=true;render();return;}
     showReplaceModal(name);
 }
 function showReplaceModal(incomingName) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    const team = getActiveTeam();
-    overlay.innerHTML = `<div class="modal-box">
-        <h3>Team is Full</h3>
-        <p>Choose a Pokémon to replace with <strong>${incomingName}</strong>:</p>
-        <div class="modal-list">
-            ${team.map(tp=>`<button class="modal-pokemon-btn" onclick="replaceWith('${tp.name}','${incomingName}')">
-                <img src="${sprite(tp)}" alt="${tp.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
-                <span>${tp.nickname||tp.name}${tp.nickname?` (${tp.name})`:''}</span>
-            </button>`).join('')}
-        </div>
-        <button class="modal-cancel" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
-    </div>`;
+    const overlay=document.createElement('div'); overlay.className='modal-overlay';
+    const team=getActiveTeam();
+    overlay.innerHTML=`<div class="modal-box"><h3>Team is Full</h3><p>Choose a Pokémon to replace with <strong>${incomingName}</strong>:</p><div class="modal-list">${team.map(tp=>`<button class="modal-pokemon-btn" onclick="replaceWith('${tp.name}','${incomingName}')"><img src="${sprite(tp)}" alt="${tp.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'"><span>${tp.nickname||tp.name}${tp.nickname?` (${tp.name})`:''}</span></button>`).join('')}</div><button class="modal-cancel" onclick="this.closest('.modal-overlay').remove()">Cancel</button></div>`;
     document.body.appendChild(overlay);
-    overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+    overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
 }
 function replaceWith(outName, inName) {
-    const out=find(outName), inn=find(inName);
-    if (out) out.active=false; if (inn) inn.active=true;
-    document.querySelector('.modal-overlay')?.remove();
-    render();
+    const out=find(outName),inn=find(inName);
+    if(out)out.active=false; if(inn)inn.active=true;
+    document.querySelector('.modal-overlay')?.remove(); render();
 }
 async function toggleExpand(name) {
-    const p=find(name); if (!p) return;
+    const p=find(name); if(!p)return;
     p.expanded=!p.expanded;
-    if (p.expanded) {
-        // Pre-fetch all move data so ℹ icons show immediately
-        const fetches = p.moves.filter(m=>m).map(m => {
-            const slug = m.toLowerCase().replace(/\s+/g,'-');
-            return moveCache[slug] ? Promise.resolve() : fetchMoveData(slug);
-        });
+    if(p.expanded){
+        const fetches=p.moves.filter(m=>m).map(m=>{const slug=m.toLowerCase().replace(/\s+/g,'-');return moveCache[slug]?Promise.resolve():fetchMoveData(slug);});
         await Promise.all(fetches);
     }
     render();
 }
 
-/* ══════════════════════════════════════════
-   TOOLTIP POSITIONING (fixed, follows cursor)
-══════════════════════════════════════════ */
+/* TOOLTIP POSITIONING */
 document.addEventListener('mousemove', e => {
-    const tooltips = document.querySelectorAll('.move-tooltip');
-    tooltips.forEach(t => {
-        if (t.style.display === 'block' || t.parentElement.matches(':hover')) {
-            let x = e.clientX + 12;
-            let y = e.clientY - 10;
-            // Keep inside viewport
-            if (x + 220 > window.innerWidth)  x = e.clientX - 232;
-            if (y + 120 > window.innerHeight)  y = e.clientY - 130;
-            t.style.left = x + 'px';
-            t.style.top  = y + 'px';
+    document.querySelectorAll('.move-tooltip, .ability-tooltip').forEach(t => {
+        if(t.parentElement.matches(':hover')){
+            let x=e.clientX+12, y=e.clientY-10;
+            if(x+240>window.innerWidth) x=e.clientX-252;
+            if(y+120>window.innerHeight) y=e.clientY-130;
+            t.style.left=x+'px'; t.style.top=y+'px';
         }
     });
 });
-async function init() {
-    renderSavedTeams();
-    // pre-load pokemon names for autocomplete in background
-    loadAllPokemonNames();
-}
+
+async function init() { renderSavedTeams(); loadAllPokemonNames(); }
 init();
+</script>
+</body>
+</html>
+ENDOFFILE
+echo "Done. Lines: $(wc -l < /home/claude/pokemon-v2.html)"
+
 </script>
 </body>
 </html>
