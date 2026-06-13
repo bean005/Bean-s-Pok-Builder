@@ -137,7 +137,7 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .move-search-wrap input { background:transparent; border:none; color:var(--text); font-size:.8rem; flex:1; outline:none; padding:2px 0; }
 .move-clear { background:none; border:none; color:var(--muted); font-size:.75rem; cursor:pointer; padding:0 2px; transition:color .15s; flex-shrink:0; }
 .move-clear:hover { color:var(--red); }
-.move-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:200; background:var(--bg2); border:1px solid var(--border); border-radius:6px; max-height:170px; overflow-y:auto; box-shadow:0 4px 16px rgba(0,0,0,.5); }
+.move-dropdown { position:absolute; top:calc(100% + 10px); left:0; right:0; z-index:200; background:var(--bg2); border:1px solid var(--border); border-radius:6px; max-height:220px; overflow-y:auto; box-shadow:0 4px 16px rgba(0,0,0,.5); }
 .move-dropdown div { padding:6px 10px; font-size:.78rem; cursor:pointer; border-bottom:1px solid var(--bg4); display:flex; justify-content:space-between; align-items:center; }
 .move-dropdown div:last-child { border-bottom:none; }
 .move-dropdown div:hover { background:#2e2e5e; }
@@ -521,26 +521,26 @@ const abilityDescriptions = {
     'heatproof': 'Halves damage from Fire-type moves and burn damage (burn deals 1/16 HP instead of 1/8).',
     'wonder guard': 'Only supereffective moves can deal damage. Blocks all moves that are not super effective, except for indirect damage (weather, hazards, status).',
     'intimidate': 'On entry, lowers all opponents\' Attack stat by 1 stage (−33% damage output). In doubles, hits both foes. Can be blocked by abilities like Inner Focus or Own Tempo.',
-    'multiscale': 'Halves all damage received (×0.5) when the Pokémon is at full HP. Highly effective on bulky Pokémon; broken by chip damage.',
+    'multiscale': 'Halves all damage received (×0.5) when the Pokémon is at full HP.',
     'magic bounce': 'Reflects most non-damaging moves back at the user: Stealth Rock, Spikes, Taunt, Will-O-Wisp, Thunder Wave, status moves, and more.',
-    'regenerator': 'Restores exactly 1/3 of max HP upon switching out. Excellent on pivot Pokémon that switch frequently.',
+    'regenerator': 'Restores exactly 1/3 of max HP upon switching out.',
     'protean': 'Changes the Pokémon\'s type to match the move it\'s about to use, before the move hits. Grants STAB on every move (×1.5 boost). Activates once per switch-in in Gen 9.',
     'libero': 'Identical to Protean: changes the Pokémon\'s type to match each move used, granting STAB (×1.5). Activates once per switch-in in Gen 9.',
-    'speed boost': 'Raises Speed by 1 stage (+50%) at the end of every turn. After 2 turns, Speed is ×2.0; after 3 turns, ×2.5. Devastating in games that last more than 2 turns.',
-    'moody': 'At end of each turn, sharply raises one random stat by 2 stages and lowers another by 1 stage. Chaotic but extremely powerful over time.',
-    'huge power': 'Doubles the Pokémon\'s effective Attack stat in damage calculations. Equivalent to permanently holding a Choice Band AND having another full Attack investment on top.',
+    'speed boost': 'Raises Speed by 1 stage (+50%) at the end of every turn. After 2 turns, Speed is ×2.0; after 3 turns, ×2.5.',
+    'moody': 'At end of each turn, sharply raises one random stat by 2 stages and lowers another by 1 stage.',
+    'huge power': 'Doubles the Pokémon\'s effective Attack stat in damage calculations.',
     'pure power': 'Doubles the Pokémon\'s effective Attack stat. Identical to Huge Power in all competitive respects.',
-    'unburden': 'Doubles Speed when the held item is consumed or knocked off. Pairs with Sitrus Berry, Petaya Berry, or Acrobatics strats. Very difficult to outspeed once activated.',
-    'moxie': 'Raises Attack by 1 stage every time this Pokémon knocks out a foe. Snowballs rapidly in sweeper scenarios.',
+    'unburden': 'Doubles Speed when the held item is consumed or knocked off.',
+    'moxie': 'Raises Attack by 1 stage every time this Pokémon knocks out a foe.',
     'guts': 'Boosts Attack by ×1.5 when the Pokémon has a status condition (burn, poison, paralysis, sleep, freeze). Burn\'s Attack drop is negated, so burn + Guts is net positive.',
     'adaptability': 'Raises the STAB multiplier from ×1.5 to ×2.0. Effectively a 33% damage bonus on same-type moves compared to normal Pokémon with STAB.',
-    'technician': 'Boosts moves with base power ≤60 by ×1.5. Bullet Punch becomes 90 effective BP, Mach Punch 60, Scald 80 (if counted). Combos powerfully with multi-hit moves and priority.',
-    'sheer force': 'Removes secondary effects (burn chance, flinch, stat drop) of moves and boosts their power by ×1.3. E.g. Flamethrower goes from 90 to 117 BP with no burn chance. Also blocks recoil on Earth Power, etc.',
-    'tough claws': 'Boosts the power of contact moves (most physical moves + U-turn, Leafage, etc.) by ×1.3. Check Bulbapedia\'s contact move list — it\'s broader than expected.',
+    'technician': 'Boosts moves with base power ≤60 by ×1.5 (e.g. Bullet Punch 40→60, Mach Punch 40→60, Rock Blast 25→37.5 per hit).',
+    'sheer force': 'Removes secondary effects (burn chance, flinch, stat drop, recoil) of moves that have them and boosts their power by ×1.3. E.g. Flamethrower goes from 90 to 117 BP with no burn chance.',
+    'tough claws': 'Boosts the power of contact moves (most physical moves, plus some like U-turn and Leafage) by ×1.3.',
     'iron fist': 'Boosts punch-based moves by ×1.2: Thunder Punch, Ice Punch, Fire Punch, Drain Punch, Focus Punch, Mach Punch, Bullet Punch, Shadow Punch, Mega Punch, Comet Punch, and more.',
     'reckless': 'Boosts recoil moves by ×1.2: Brave Bird (120→144 BP), Double-Edge (120→144), Flare Blitz (120→144), Head Smash (150→180), Wild Charge (90→108), Volt Tackle (120→144).',
-    'sand rush': 'Doubles Speed in a sandstorm. Extremely fast under sand — typically faster than everything not using Tailwind or Trick Room.',
-    'sand force': 'Boosts Rock-, Ground-, and Steel-type moves by ×1.3 during a sandstorm. Strong in sand-team compositions.',
+    'sand rush': 'Doubles Speed during a sandstorm.',
+    'sand force': 'Boosts Rock-, Ground-, and Steel-type moves by ×1.3 during a sandstorm.',
     'mold breaker': 'Ignores the effects of the opponent\'s ability when using moves. Bypasses Levitate, Wonder Guard, Sturdy, Multiscale, Unaware, Magic Bounce, and more.',
     'sturdy': 'The Pokémon cannot be KO\'d in one hit if it starts at full HP (survives with 1 HP). Also blocks OHKO moves. Negated by chip damage or abilities like Mold Breaker.',
     'natural cure': 'All status conditions (burn, poison, paralysis, sleep, freeze) are fully healed when the Pokémon switches out. No Berry or move needed.',
@@ -558,7 +558,7 @@ const abilityDescriptions = {
     'berserk': 'Raises Sp. Atk by 1 stage the first time HP drops to 50% or below in a battle. Can only activate once per battle.',
     'fairy aura': 'Increases the power of all Fairy-type moves by ×4/3 (≈×1.33) for all Pokémon in battle, including foes.',
     'dark aura': 'Increases the power of all Dark-type moves by ×4/3 (≈×1.33) for all Pokémon in battle, including foes. Pairs with Aura Break to flip the effect.',
-    'soul-heart': 'Raises Sp. Atk by 1 stage every time any Pokémon on the field faints (ally or foe). In doubles, can rack up multiple boosts rapidly.',
+    'soul-heart': 'Raises Sp. Atk by 1 stage every time any Pokémon on the field faints (ally or foe).',
     'bulletproof': 'Grants immunity to Ball and Bomb moves: Shadow Ball, Sludge Bomb, Focus Blast, Energy Ball, Weather Ball, Gyro Ball, Aura Sphere, and others.',
     'soundproof': 'Grants immunity to all sound-based moves: Hyper Voice, Boomburst, Bug Buzz, Disarming Voice, Heal Bell, Perish Song, Screech, and others.',
     'infiltrator': 'Bypasses Reflect, Light Screen, Safeguard, Mist, and Aurora Veil. Attacks hit through screens for full damage. Also bypasses Substitute.',
@@ -570,32 +570,32 @@ const abilityDescriptions = {
     'piercing drill': 'Drill and biting moves ignore type immunities. Effectively extends type coverage.',
     'dragonize': 'Converts Normal-type moves into Dragon-type moves and boosts their power by ×1.2. Turns STAB Normal moves into STAB Dragon moves.',
     'mega sol': 'Boosts Grass-type move power during harsh sunlight.',
-    'chlorophyll': 'Doubles Speed in harsh sunlight. Typically makes the Pokémon faster than almost anything in sun team compositions.',
+    'chlorophyll': 'Doubles Speed in harsh sunlight.',
     'blaze': 'When HP is below 1/3, Fire-type moves are boosted by ×1.5.',
     'overgrow': 'When HP is below 1/3, Grass-type moves are boosted by ×1.5.',
     'torrent': 'When HP is below 1/3, Water-type moves are boosted by ×1.5.',
     'swarm': 'When HP is below 1/3, Bug-type moves are boosted by ×1.5.',
     'keen eye': 'Prevents accuracy from being lowered by any move or ability.',
     'weak armor': 'When hit by a physical move, Defense drops by 1 stage and Speed rises by 2 stages. Net result: much faster but more physically fragile after each physical hit.',
-    'shed skin': '30% chance each turn to cure any status condition (burn, poison, paralysis, sleep, freeze). Entirely random — unreliable but occasionally useful.',
-    'justified': 'Raises Attack by 1 stage when hit by a Dark-type move. Great in Doubles where allies can use Beat Up or Dark Pulse.',
+    'shed skin': '30% chance each turn to cure any status condition (burn, poison, paralysis, sleep, freeze).',
+    'justified': 'Raises Attack by 1 stage when hit by a Dark-type move.',
     'cloud nine': 'Nullifies all weather effects for all Pokémon (sun, rain, sand, hail, snow) while this Pokémon is on the field. Does not remove the weather, just suppresses it.',
     'corrosion': 'Allows this Pokémon to inflict Poison and Toxic on Steel-type and Poison-type Pokémon, which normally have immunity.',
     'toxic debris': 'Scatters Toxic Spikes on the opposing side every time this Pokémon is hit by a direct physical move. Can stack two layers for bad poison.',
     'emergency exit': 'Forces the Pokémon to switch out the first time its HP drops to 50% or below in battle. Cannot be used in the last Pokémon standing.',
-    'anticipation': 'Upon entering battle, shudders if the opponent has a move that is super-effective, a self-destruct move, or a one-hit-KO move. Gives early scouting info.',
+    'anticipation': 'Upon entering battle, shudders if the opponent has a move that is super-effective, a self-destruct move, or a one-hit-KO move.',
     'commander': 'If an allied Dondozo is on the field, this Pokémon leaps into Dondozo\'s mouth, powering it up and removing itself from the field. Dondozo gets massive stat boosts.',
     'battle armor': 'The Pokémon is protected from critical hits. Identical in function to Shell Armor.',
-    'defiant': 'Raises Attack by 2 stages whenever any of its stats are lowered (by moves, abilities like Intimidate, or Sticky Web). Strongly punishes Intimidate leads in doubles.',
-    'anger point': 'Maximizes Attack (to +6 stages) the first time this Pokémon takes a critical hit. Pairs well with a partner that can guarantee crits.',
+    'defiant': 'Raises Attack by 2 stages whenever any of its stats are lowered by an opponent\'s move or ability (e.g. Intimidate, Sticky Web).',
+    'anger point': 'Maximizes Attack (to +6 stages) the first time this Pokémon takes a critical hit.',
     'hyper cutter': 'Attack cannot be lowered by any opponent\'s move or ability, including Intimidate.',
-    'unaware': 'Ignores all of the opponent\'s stat changes (positive and negative) when attacking or being attacked. Counters set-up sweepers completely.',
+    'unaware': 'Ignores all of the opponent\'s stat changes (positive and negative) when attacking or being attacked.',
     'thermal exchange': 'Raises Attack by 1 stage when hit by a Fire-type move. The Pokémon also cannot be burned under any circumstances.',
     'ice body': 'Restores 1/16 of max HP at the end of each turn during hail or snow weather.',
     'aura break': 'Reverses the Fairy Aura and Dark Aura abilities: instead of boosting those move types by ×1.33, they are weakened to ×0.75.',
     'power construct': 'When HP drops to 50% or below, Zygarde transforms into Complete Forme (dramatically increased bulk and power, different base stats).',
-    'rough skin': 'When hit by a contact move, the attacker loses 1/8 of their max HP. Punishes physical attackers that use contact moves.',
-    'sand veil': 'Raises evasion by 1.25× during a sandstorm. Opponent\'s moves have 80% of their normal accuracy. Can miss moves that would normally never miss.',
+    'rough skin': 'When hit by a contact move, the attacker loses 1/8 of their max HP.',
+    'sand veil': 'Raises evasion by 1.25× during a sandstorm (opponent\'s moves have 80% of their normal accuracy).',
     'magician': 'When this Pokémon hits a foe with a move, it steals their held item if it isn\'t holding one.',
     'flower veil': 'Protects all allied Grass-type Pokémon from status conditions and stat reductions caused by opponents.',
     'symbiosis': 'When an ally consumes their held item, this Pokémon immediately passes its own held item to that ally.',
@@ -769,6 +769,7 @@ function loadTeamById(id) {
     const team = savedTeams.find(t => t.id === id); if (!team) return;
     currentMode = team.mode; currentTeamName = team.name; currentTeamId = team.id;
     pokemonList = JSON.parse(JSON.stringify(team.pokemonList));
+    pokemonList.forEach(p=>prefetchLearnsetMoveData(p));
     document.getElementById('teamNameInput').value = currentTeamName;
     document.getElementById('modeBadge').textContent = currentMode === 'regular' ? '6-MON' : '30-MON DRAFT';
     document.getElementById('poolLabel').textContent = currentMode === 'draft' ? 'Draft Pool' : 'Pokémon';
@@ -938,6 +939,24 @@ async function fetchFullEvoLearnset(speciesUrl) {
     } catch(e) { return null; }
 }
 
+// Manual addendum for moves PokeAPI's per-Pokémon move list is missing for certain species/forms.
+// Keyed by species/form slug (lowercase, hyphenated). Merged into the learnset after fetching.
+const LEARNSET_ADDITIONS = {
+    'exploud': ['extrasensory'],
+    'loudred': ['extrasensory'],
+    'whismur': ['extrasensory'],
+    'lopunny': ['play-rough'],
+    'lopunny-mega': ['play-rough'],
+    'buneary': ['play-rough'],
+};
+function applyLearnsetAdditions(slug, learnset) {
+    const extra = LEARNSET_ADDITIONS[slug];
+    if (!extra) return learnset;
+    const set = new Set(learnset);
+    extra.forEach(m => set.add(m));
+    return Array.from(set);
+}
+
 async function fetchPokemonFromAPI(rawName) {
     const slug = rawName.toLowerCase().trim().replace(/\s+/g,'-');
     const status = document.getElementById('searchStatus');
@@ -957,7 +976,7 @@ async function fetchPokemonFromAPI(rawName) {
             }
         } catch(e) {}
         const p = makePokemon(zaKey, zaData);
-        p._learnset = learnset;
+        p._learnset = applyLearnsetAdditions(zaKey.toLowerCase(), learnset);
         if (status) status.textContent = `Added ${zaKey} (Z-A Mega)`;
         return p;
     }
@@ -985,7 +1004,7 @@ async function fetchPokemonFromAPI(rawName) {
         const name = d.name.charAt(0).toUpperCase()+d.name.slice(1).replace(/-./g,s=>'-'+s[1].toUpperCase());
         const p = makePokemon(name, data);
         const evoLearnset = await fetchFullEvoLearnset(d.species.url);
-        p._learnset = evoLearnset || d.moves.map(m=>m.move.name);
+        p._learnset = applyLearnsetAdditions(slug, evoLearnset || d.moves.map(m=>m.move.name));
         if(status) status.textContent=`Added ${p.name}!`;
         return p;
     } catch(e) {
@@ -1002,27 +1021,27 @@ async function searchAndAddPokemon() {
     const existing=pokemonList.find(p=>p.name.toLowerCase()===name.toLowerCase());
     if(existing){document.getElementById('searchStatus').textContent=`${name} is already in your pool.`;return;}
     const p=await fetchPokemonFromAPI(name);
-    if(p){pokemonList.push(p);input.value='';render();}
+    if(p){pokemonList.push(p);input.value='';render();prefetchLearnsetMoveData(p);}
 }
 
 const ZA_MEGA_STONES=["Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite"];
 
 const itemDescOverrides = {
-    'choice-band':        '+50% Attack boost, but locks the holder into the last move used until it switches out. One of the most powerful physical wallbreakers in competitive play.',
-    'choice-specs':       '+50% Sp. Atk boost, but locks the holder into the last move used until it switches out. Turns most special attackers into serious threats.',
-    'choice-scarf':       '+50% Speed boost, but locks the holder into the last move used until it switches out. Makes slow Pokémon outspeed fast ones; a premier revenge killer tool.',
-    'life-orb':           '+30% power to all moves (×1.3 multiplier), but the holder loses 10% of its max HP after each attack. No move lock — the most flexible power boost in the game.',
+    'choice-band':        '+50% Attack boost, but locks the holder into the last move used until it switches out.',
+    'choice-specs':       '+50% Sp. Atk boost, but locks the holder into the last move used until it switches out.',
+    'choice-scarf':       '+50% Speed boost, but locks the holder into the last move used until it switches out.',
+    'life-orb':           '+30% power to all moves (×1.3 multiplier), but the holder loses 10% of its max HP after each attack.',
     'focus-sash':         'If the holder is at full HP, a hit that would KO it leaves it with 1 HP instead. Works once, then consumed. Countered by Stealth Rock chip damage.',
-    'leftovers':          'Restores 1/16 of the holder\'s max HP at the end of every turn. The go-to item for bulky Pokémon — turns almost every defensive set into a stall threat.',
+    'leftovers':          'Restores 1/16 of the holder\'s max HP at the end of every turn.',
     'black-sludge':       'Poison-type Pokémon recover 1/16 max HP per turn (like Leftovers). Non-Poison types lose 1/8 max HP per turn instead — a hazard if tricked onto foes.',
-    'rocky-helmet':       'When the holder is hit by a contact move, the attacker loses 1/6 of their max HP. Punishes physical Pokémon that rely on contact moves heavily.',
-    'assault-vest':       '+50% Sp. Def (×1.5 multiplier), but the holder cannot use status moves (including Protect). Turns many Pokémon into special tanks.',
-    'eviolite':           '+50% Defense and Sp. Def for Pokémon that are not fully evolved. Makes NFE Pokémon like Chansey or Porygon2 extremely bulky.',
-    'heavy-duty-boots':   'Completely negates all entry hazard damage: Stealth Rock, Spikes (all layers), and Toxic Spikes. Lets fragile Pokémon switch in freely.',
+    'rocky-helmet':       'When the holder is hit by a contact move, the attacker loses 1/6 of their max HP.',
+    'assault-vest':       '+50% Sp. Def (×1.5 multiplier), but the holder cannot use status moves (including Protect).',
+    'eviolite':           '+50% Defense and Sp. Def for Pokémon that are not fully evolved.',
+    'heavy-duty-boots':   'Completely negates all entry hazard damage: Stealth Rock, Spikes (all layers), and Toxic Spikes.',
     'air-balloon':        'Holder gains temporary immunity to Ground-type moves (including Earthquake). The balloon pops the first time the holder takes any direct damage.',
     'flame-orb':          'Burns the holder at the end of the first turn. Burn deals 1/16 HP/turn but activates Guts (+50% Atk) while negating the Atk drop. Also pairs with Facade (doubles power when statused).',
     'toxic-orb':          'Badly poisons the holder at the end of the first turn. Bad poison damage ramps up each turn. Pairs with Poison Heal (+1/8 HP/turn instead of damage) or Facade.',
-    'weakness-policy':    'When the holder is hit by a super-effective move, Attack and Sp. Atk both rise by 2 stages (+100% each). Incredible on tanky Pokémon that can survive super-effective hits.',
+    'weakness-policy':    'When the holder is hit by a super-effective move, Attack and Sp. Atk both rise by 2 stages (+100% each).',
     'power-herb':         'Allows instant use of a normally two-turn move (Fly, Bounce, Sky Attack, Geomancy, Razor Wind, SolarBeam, etc.) one time. Consumed after use.',
     'white-herb':         'Restores any lowered stats to their original values the first time any stat is lowered. One-time use, consumed on activation.',
     'mental-herb':        'Cures attraction, Taunt, Encore, Torment, Disable, and Heal Block on the holder. One-time use.',
@@ -1074,7 +1093,7 @@ const itemDescOverrides = {
     'loaded-dice':        'Ensures multi-hit moves hit the maximum number of times (5/4 for Bullet Seed, Icicle Spear, etc.).',
     'punching-glove':     'Boosts punch moves by ×1.1 and makes them non-contact, bypassing Rocky Helmet, Rough Skin, and Flame Body.',
     'metronome-item':     'Consecutively using the same move boosts its power: +20% per consecutive use up to +100% (×2.0). Drops back to ×1.0 if a different move is used.',
-    'expert-belt':        'Boosts super-effective moves by ×1.2 (20% extra damage). No drawback — a subtle but consistent damage boost against weaknesses.',
+    'expert-belt':        'Boosts super-effective moves by ×1.2 (20% extra damage).',
     'muscle-band':        'Boosts physical moves by ×1.1. Slightly weaker than Life Orb but has no HP cost.',
     'wise-glasses':       'Boosts special moves by ×1.1. Slightly weaker than Life Orb but has no HP cost.',
     'black-belt':         'Boosts Fighting-type moves by ×1.2.',
@@ -1153,12 +1172,20 @@ async function fetchItemDetail(slug) {
     } catch(e) { return null; }
 }
 
+const NON_BATTLE_ITEM_CATEGORIES = ['loot','mulch','collectibles','unused','plot-advancement','key-items','all-mail','baking-only','event-items','dex-completion','spelunking','data-cards'];
 async function loadItems() {
     if(itemCache.length>0)return;
     try {
         const r=await fetch('https://pokeapi.co/api/v2/item?limit=2000');
         const d=await r.json();
-        itemCache=d.results.map(i=>i.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
+        let excluded=new Set();
+        try {
+            const results = await Promise.all(NON_BATTLE_ITEM_CATEGORIES.map(async cat=>{
+                try{ const cr=await fetch(`https://pokeapi.co/api/v2/item-category/${cat}`); if(!cr.ok) return []; const cd=await cr.json(); return cd.items.map(i=>i.name); }catch(e){return [];}
+            }));
+            results.forEach(arr=>arr.forEach(n=>excluded.add(n)));
+        } catch(e) {}
+        itemCache=d.results.filter(i=>!excluded.has(i.name)).map(i=>i.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
         ZA_MEGA_STONES.forEach(s=>{if(!itemCache.includes(s))itemCache.push(s);});
         itemCache.sort((a,b)=>a.localeCompare(b));
     } catch(e){itemCache=[...ZA_MEGA_STONES];}
@@ -1168,6 +1195,15 @@ function filterItems(q) {
     return itemCache.filter(i=>i.toLowerCase().includes(q.toLowerCase())).slice(0,20);
 }
 
+async function prefetchLearnsetMoveData(p) {
+    if (!p || !p._learnset) return;
+    const uncached = p._learnset.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g,'-')]);
+    const batchSize = 30;
+    for (let i = 0; i < uncached.length; i += batchSize) {
+        const batch = uncached.slice(i, i+batchSize);
+        await Promise.all(batch.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g,'-'))));
+    }
+}
 async function fetchMoveData(moveName) {
     const slug=moveName.toLowerCase().replace(/\s+/g,'-');
     if(moveCache[slug])return moveCache[slug];
@@ -1175,7 +1211,11 @@ async function fetchMoveData(moveName) {
         const r=await fetch(`https://pokeapi.co/api/v2/move/${slug}`);
         if(!r.ok)return null;
         const d=await r.json();
-        const desc=(d.effect_entries.find(e=>e.language.name==='en')?.short_effect||'').replace(/\$effect_chance/g,d.effect_chance||'?');
+        let desc=(d.effect_entries.find(e=>e.language.name==='en')?.short_effect||'');
+        if (d.effect_chance) {
+            if (desc.includes('$effect_chance')) desc = desc.replace(/\$effect_chance/g, d.effect_chance);
+            else if (!new RegExp(`${d.effect_chance}%`).test(desc)) desc = desc.replace(/\bchance\b/i, `${d.effect_chance}% chance`);
+        }
         const data={name:d.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '),power:d.power||'—',accuracy:d.accuracy||'—',pp:d.pp,type:d.type.name.charAt(0).toUpperCase()+d.type.name.slice(1),category:d.damage_class.name,description:desc};
         moveCache[slug]=data; return data;
     } catch(e){return null;}
@@ -1185,7 +1225,15 @@ const moveTypeFilters = {}; // key: `${pokeName}-${slot}` → type string or nul
 
 function formatMoveName(m) { return m.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '); }
 
-function filterMoves(learnset, query, activeType) {
+function getTypeOrderForPokemon(pokeTypes) {
+    const ALL = ['Normal','Bug','Dark','Dragon','Electric','Fairy','Fighting','Fire','Flying','Ghost','Grass','Ground','Ice','Poison','Psychic','Rock','Steel','Water'];
+    const order = ['Normal'];
+    (pokeTypes||[]).forEach(t => { if (t !== 'Normal' && !order.includes(t)) order.push(t); });
+    ALL.forEach(t => { if (!order.includes(t)) order.push(t); });
+    return order;
+}
+
+function filterMoves(learnset, query, activeType, pokeTypes) {
     if (!learnset || learnset.length === 0) return [];
     let pool = learnset.slice();
 
@@ -1206,8 +1254,8 @@ function filterMoves(learnset, query, activeType) {
         return [...starts, ...contains].slice(0, 30).map(formatMoveName);
     }
 
-    // No query: sort by type (alphabetical), then by power descending within each type
-    const TYPE_ORDER = ['Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy'];
+    // No query: sort by type (Normal first, then this Pokémon's types, then rest alphabetically), then by power descending within each type
+    const TYPE_ORDER = getTypeOrderForPokemon(pokeTypes);
     pool.sort((a, b) => {
         const ma = moveCache[a.toLowerCase().replace(/\s+/g,'-')];
         const mb = moveCache[b.toLowerCase().replace(/\s+/g,'-')];
@@ -1218,7 +1266,7 @@ function filterMoves(learnset, query, activeType) {
         const pb = (mb && mb.power && mb.power !== '—') ? Number(mb.power) : 0;
         return pa - pb; // lower power first
     });
-    return pool.slice(0, 60).map(formatMoveName);
+    return pool.map(formatMoveName);
 }
 
 function getTypeDefenseWithAbility(types, abilityName) {
@@ -1620,8 +1668,8 @@ function buildExpanded(p, stats) {
 
     function barMax(k) {
         return k==='hp'
-            ? calcHP(pData.baseStats[k], 31, 252, lv)
-            : Math.floor(calcStat(pData.baseStats[k], 31, 252, lv) * 1.1);
+            ? Math.ceil(calcHP(pData.baseStats[k], 31, 252, lv) * 1.05)
+            : Math.ceil(calcStat(pData.baseStats[k], 31, 252, lv) * 1.1 * 1.05);
     }
 
     let genderOptions='';
@@ -1813,7 +1861,7 @@ function buildExpanded(p, stats) {
                     onblur="render()">
             </div>`;
         }).join('')}
-        <div class="ev-total-row ev-total-live" data-name="${p.name}" style="color:${totalEVs>=510?'var(--green)':'var(--muted)'}">
+        <div class="ev-total-row ev-total-live" data-name="${p.name}" style="color:var(--accent)">
             ${totalEVs} / 510
         </div>
     </div>
@@ -1912,7 +1960,7 @@ function buildMoveTypeFilterBar(p, pokeName, slot) {
     const filterKey = `${pokeName}-${slot}`;
     const active = moveTypeFilters[filterKey] || null;
 
-    const TYPE_ORDER = ['Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy'];
+    const TYPE_ORDER = getTypeOrderForPokemon(p._data && p._data.type);
     const sorted = TYPE_ORDER.filter(t => typesInLearnset.has(t));
 
     filterBar.innerHTML = sorted.map(t => {
@@ -1928,6 +1976,7 @@ function buildMoveTypeFilterBar(p, pokeName, slot) {
 }
 
 function toggleMoveTypeFilter(pokeName, slot, type) {
+    cancelMoveDropdownClose(pokeName, slot);
     const key = `${pokeName}-${slot}`;
     moveTypeFilters[key] = (moveTypeFilters[key] === type) ? null : type;
     const input = document.getElementById(`moveinput-${pokeName}-${slot}`);
@@ -1940,7 +1989,7 @@ function showMoveDropdown(input, pokeName, slot, query) {
     const drop = document.getElementById(`movedrop-${pokeName}-${slot}`); if (!drop) return;
     const filterKey = `${pokeName}-${slot}`;
     const activeType = moveTypeFilters[filterKey] || null;
-    const matches = filterMoves(p._learnset, query, activeType);
+    const matches = filterMoves(p._learnset, query, activeType, p._data && p._data.type);
     if (matches.length === 0) { drop.style.display='none'; return; }
 
     function renderRows() {
@@ -1971,12 +2020,13 @@ function showMoveDropdown(input, pokeName, slot, query) {
     renderRows();
     const uncached = matches.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g,'-')]);
     if (uncached.length > 0) {
-        const batchSize = 8; const batches = [];
+        const batchSize = 30; const batches = [];
         for (let i = 0; i < uncached.length; i += batchSize) batches.push(uncached.slice(i, i+batchSize));
         (async () => { for (const batch of batches) { await Promise.all(batch.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g,'-')))); if (drop.style.display !== 'none') renderRows(); } })();
     }
 }
 function onMoveFocus(input, pokeName, slot) {
+    cancelMoveDropdownClose(pokeName, slot);
     const p = find(pokeName);
     if (p) buildMoveTypeFilterBar(p, pokeName, slot);
     showMoveDropdown(input, pokeName, slot, input.value.trim());
@@ -1991,7 +2041,15 @@ async function selectMove(pokeName, slot, moveName) {
     closeMoveDropdown(pokeName,slot); render();
 }
 function clearMove(pokeName, slot) { const p=find(pokeName);if(!p)return;p.moves[slot]='';render(); }
-function closeMoveDropdown(pokeName, slot) { setTimeout(()=>{const d=document.getElementById(`movedrop-${pokeName}-${slot}`);if(d)d.style.display='none';},150); }
+const moveDropdownCloseTimers = {};
+function closeMoveDropdown(pokeName, slot) {
+    const key = `${pokeName}-${slot}`;
+    moveDropdownCloseTimers[key] = setTimeout(()=>{const d=document.getElementById(`movedrop-${pokeName}-${slot}`);if(d)d.style.display='none';},150);
+}
+function cancelMoveDropdownClose(pokeName, slot) {
+    const key = `${pokeName}-${slot}`;
+    if (moveDropdownCloseTimers[key]) { clearTimeout(moveDropdownCloseTimers[key]); delete moveDropdownCloseTimers[key]; }
+}
 
 function updateEVFromSlider(name, stat, rawVal) {
     const p=find(name); if(!p)return;
@@ -2000,7 +2058,7 @@ function updateEVFromSlider(name, stat, rawVal) {
     v=Math.min(v,510-tot); p.evs[stat]=v;
     document.querySelectorAll(`.ev-num-input[data-name="${name}"][data-stat="${stat}"]`).forEach(el=>el.value=v);
     const newTotal=getTotalEVs(p);
-    document.querySelectorAll(`.ev-total-live[data-name="${name}"]`).forEach(el=>{el.textContent=newTotal+' / 510';el.style.color=newTotal>=510?'var(--green)':'var(--muted)';});
+    document.querySelectorAll(`.ev-total-live[data-name="${name}"]`).forEach(el=>{el.textContent=newTotal+' / 510';el.style.color='var(--accent)';});
 }
 function updateEVFromInput(name, stat, rawVal) {
     const p=find(name); if(!p)return;
@@ -2032,7 +2090,7 @@ function adjustIV(name, stat, delta) {
     render();
 }
 
-function updateField(name, field, value) { const p=find(name);if(!p)return;p[field]=value;render(); }
+function updateField(name, field, value) { const p=find(name);if(!p)return; if(field==='level'){value=Math.max(1,Math.min(100,Math.round(Number(value))||1));} p[field]=value;render(); }
 
 function confirmRemovePokemon(name) {
     showConfirm(`Remove ${name}?`, 'This will remove them from the pool entirely.', () => {
