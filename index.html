@@ -2141,7 +2141,11 @@ function showMoveDropdown(input, pokeName, slot, query) {
     const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type);
 
     function renderRows() {
-        drop.innerHTML = matches.map(m => {
+       if (matches.length === 0) {
+           drop.innerHTML = '<div style="color:var(--muted);font-style:italic;pointer-events:none;justify-content:center;">No moves found</div>';
+           return;
+       }
+       drop.innerHTML = matches.map(m => {
             const slug = m.toLowerCase().replace(/\s+/g, '-');
             const showdownSlug = m.toLowerCase().replace(/[\s-]/g, '');
             const mData = moveCache[slug] || moveCache[showdownSlug];
