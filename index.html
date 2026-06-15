@@ -964,7 +964,7 @@ function applyTeraSelectColor(selectEl) {
 document.addEventListener('change', e => {
     if (e.target && e.target.matches('.nature-select')) applyNatureSelectColor(e.target);
 });
-
+const learnsetCache = {};
 async function fetchLearnsetForSlug(slug) {
     if (learnsetCache[slug]) return learnsetCache[slug];
     try {
