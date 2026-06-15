@@ -2100,11 +2100,6 @@ function showMoveDropdown(input, pokeName, slot, query) {
     const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type);
 
     function renderRows() {
-        if (matches.length === 0) {
-            drop.innerHTML = `<div style="color:var(--muted); padding:8px; font-size:.75rem;">No moves found</div>`;
-            return;
-        }
-
         drop.innerHTML = matches.map(m => {
             const slug = m.toLowerCase().replace(/\s+/g, '-');
             const mData = moveCache[slug];
@@ -2120,6 +2115,8 @@ function showMoveDropdown(input, pokeName, slot, query) {
                     <span class="move-dd-stat">Pwr ${mData.power || '—'}</span>
                 </span>`;
             }
+            // No "Loading..." text — clean and fast
+
             const displayName = m.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             return `<div onmousedown="selectMove('${pokeName}', ${slot}, '${m}')">
                 <span>${displayName}</span>${metaHtml}
@@ -2130,6 +2127,7 @@ function showMoveDropdown(input, pokeName, slot, query) {
     renderRows();
     drop.style.display = 'block';
 
+    // Fast background loading of details
     const uncached = matches.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g, '-')]);
     if (uncached.length > 0) {
         Promise.all(uncached.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g, '-'))))
