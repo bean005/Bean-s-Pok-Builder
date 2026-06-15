@@ -680,6 +680,23 @@ let currentTeamId = null;
 const MAX_POOL = { regular: 6, draft: 30 };
 const pokemonIdMap = {};
 
+
+// --- SHOWDOWN LEARNSETS DATABASE LOADER ---
+let showdownLearnsets = null;
+
+async function loadShowdownDatabase() {
+    try {
+        const response = await fetch('learnsets.json');
+        if (!response.ok) throw new Error('HTTP error');
+        showdownLearnsets = await response.json();
+        console.log(`✅ Showdown learnsets loaded successfully!`);
+        if (typeof render === "function") render();
+    } catch (err) {
+        console.error("❌ Failed to load Showdown learnsets:", err);
+    }
+}
+loadShowdownDatabase();
+
 async function loadAllPokemonNames() {
     try {
         const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1500');
@@ -769,7 +786,7 @@ function loadTeamById(id) {
     const team = savedTeams.find(t => t.id === id); if (!team) return;
     currentMode = team.mode; currentTeamName = team.name; currentTeamId = team.id;
     pokemonList = JSON.parse(JSON.stringify(team.pokemonList));
-    pokemonList.forEach(p=>prefetchLearnsetMoveData(p));
+    pokemonList.forEach(p=>{prefetchLearnsetMoveData(p);prefetchAbilityData(p);});
     document.getElementById('teamNameInput').value = currentTeamName;
     document.getElementById('modeBadge').textContent = currentMode === 'regular' ? '6-MON' : '30-MON DRAFT';
     document.getElementById('poolLabel').textContent = currentMode === 'draft' ? 'Draft Pool' : 'Pokémon';
@@ -869,7 +886,46 @@ function getAbilityImmunities(abilityName) {
 function getAbilityDesc(abilityName) {
     if (!abilityName) return '';
     const key = abilityName.toLowerCase().trim();
-    return abilityDescriptions[key] || '';
+    if (abilityDescriptions[key]) return abilityDescriptions[key];
+    const slug = key.replace(/\s+/g, '-');
+    return abilityDetailCache[slug] || '';
+}
+
+const abilityDetailCache = {}; // slug -> description string
+
+async function fetchAbilityDetail(slug) {
+    if (abilityDetailCache[slug]) return abilityDetailCache[slug];
+    try {
+        const r = await fetch(`https://pokeapi.co/api/v2/ability/${slug}`);
+        if (!r.ok) return null;
+        const d = await r.json();
+        const entry = d.effect_entries && d.effect_entries.find(e => e.language.name === 'en');
+        let desc = entry ? entry.short_effect : '';
+        if (d.effect_chance && desc.includes('$effect_chance')) {
+            desc = desc.replace(/\$effect_chance/g, d.effect_chance);
+        }
+        desc = desc.replace(/[\n\f]+/g, ' ').trim();
+        abilityDetailCache[slug] = desc;
+        return desc;
+    } catch(e) { return null; }
+}
+
+// Prefetch descriptions for every ability this Pokémon could have (current, all options, base-form
+// options for Mega forms) so the info icon shows immediately without extra clicks.
+async function prefetchAbilityData(p) {
+    if (!p || !p._data) return;
+    const pData = p._data;
+    const names = new Set();
+    (pData.abilities||[]).forEach(a=>names.add(a));
+    (pData.baseAbilities||[]).forEach(a=>names.add(a));
+    if (p.ability) names.add(p.ability);
+    const slugs = Array.from(names)
+        .filter(a => a && !a.startsWith('Unknown'))
+        .map(a => a.toLowerCase().trim().replace(/\s+/g,'-'))
+        .filter(slug => !abilityDescriptions[slug.replace(/-/g,' ')] && !abilityDescriptions[slug] && !abilityDetailCache[slug]);
+    if (slugs.length === 0) return;
+    await Promise.all(slugs.map(s=>fetchAbilityDetail(s)));
+    render();
 }
 
 // Nature mint colors — keyed by the stat that's boosted
@@ -946,7 +1002,7 @@ const LEARNSET_ADDITIONS = {
     'loudred': ['extrasensory'],
     'whismur': ['extrasensory'],
     'lopunny': ['play-rough'],
-    'lopunny-mega': ['play-rough'],
+    'lopunny-mega': ['play-rough', 'u-turn', 'fury-cutter'],
     'buneary': ['play-rough'],
 };
 function applyLearnsetAdditions(slug, learnset) {
@@ -972,7 +1028,11 @@ async function fetchPokemonFromAPI(rawName) {
             if (r.ok) {
                 const d = await r.json();
                 const evoLearnset = await fetchFullEvoLearnset(d.species.url);
-                learnset = evoLearnset || d.moves.map(m => m.move.name);
+                const directMoves = d.moves.map(m => m.move.name);
+                // Union evolution-chain-derived moves with the base form's own move list directly,
+                // as a redundancy in case the evolution-chain walk misses anything.
+                const merged = new Set([...(evoLearnset || []), ...directMoves]);
+                learnset = Array.from(merged);
             }
         } catch(e) {}
         const p = makePokemon(zaKey, zaData);
@@ -1021,7 +1081,7 @@ async function searchAndAddPokemon() {
     const existing=pokemonList.find(p=>p.name.toLowerCase()===name.toLowerCase());
     if(existing){document.getElementById('searchStatus').textContent=`${name} is already in your pool.`;return;}
     const p=await fetchPokemonFromAPI(name);
-    if(p){pokemonList.push(p);input.value='';render();prefetchLearnsetMoveData(p);}
+    if(p){pokemonList.push(p);input.value='';render();prefetchLearnsetMoveData(p);prefetchAbilityData(p);}
 }
 
 const ZA_MEGA_STONES=["Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite"];
@@ -1031,9 +1091,9 @@ const itemDescOverrides = {
     'choice-specs':       '+50% Sp. Atk boost, but locks the holder into the last move used until it switches out.',
     'choice-scarf':       '+50% Speed boost, but locks the holder into the last move used until it switches out.',
     'life-orb':           '+30% power to all moves (×1.3 multiplier), but the holder loses 10% of its max HP after each attack.',
-    'focus-sash':         'If the holder is at full HP, a hit that would KO it leaves it with 1 HP instead. Works once, then consumed. Countered by Stealth Rock chip damage.',
+    'focus-sash':         'If the holder is at full HP, a hit that would KO it leaves it with 1 HP instead. Works once, then consumed.',
     'leftovers':          'Restores 1/16 of the holder\'s max HP at the end of every turn.',
-    'black-sludge':       'Poison-type Pokémon recover 1/16 max HP per turn (like Leftovers). Non-Poison types lose 1/8 max HP per turn instead — a hazard if tricked onto foes.',
+    'black-sludge':       'Poison-type Pokémon recover 1/16 max HP per turn (like Leftovers). Non-Poison types lose 1/8 max HP per turn instead.',
     'rocky-helmet':       'When the holder is hit by a contact move, the attacker loses 1/6 of their max HP.',
     'assault-vest':       '+50% Sp. Def (×1.5 multiplier), but the holder cannot use status moves (including Protect).',
     'eviolite':           '+50% Defense and Sp. Def for Pokémon that are not fully evolved.',
@@ -1045,9 +1105,9 @@ const itemDescOverrides = {
     'power-herb':         'Allows instant use of a normally two-turn move (Fly, Bounce, Sky Attack, Geomancy, Razor Wind, SolarBeam, etc.) one time. Consumed after use.',
     'white-herb':         'Restores any lowered stats to their original values the first time any stat is lowered. One-time use, consumed on activation.',
     'mental-herb':        'Cures attraction, Taunt, Encore, Torment, Disable, and Heal Block on the holder. One-time use.',
-    'lum-berry':          'Cures any status condition (burn, poison, paralysis, sleep, freeze) once, and also cures confusion. One-time use. Often used to shake off status moves.',
+    'lum-berry':          'Cures any status condition (burn, poison, paralysis, sleep, freeze) once, and also cures confusion.',
     'sitrus-berry':       'Restores 25% of max HP when the holder\'s HP drops to 50% or below. One-time use.',
-    'salac-berry':        'Raises Speed by 1 stage (+50%) when HP drops to 25% or below. One-time use — often combined with Endure or Belly Drum for surprise speed.',
+    'salac-berry':        'Raises Speed by 1 stage (+50%) when HP drops to 25% or below. One-time use.',
     'petaya-berry':       'Raises Sp. Atk by 1 stage when HP drops to 25% or below. One-time use.',
     'liechi-berry':       'Raises Attack by 1 stage when HP drops to 25% or below. One-time use.',
     'apicot-berry':       'Raises Sp. Def by 1 stage when HP drops to 25% or below. One-time use.',
@@ -1056,7 +1116,7 @@ const itemDescOverrides = {
     'jaboca-berry':       'When hit by a physical move, deals 1/8 of attacker\'s max HP in recoil. One-time use.',
     'rowap-berry':        'When hit by a special move, deals 1/8 of attacker\'s max HP in recoil. One-time use.',
     'enigma-berry':       'Restores 25% HP when hit by a super-effective move. One-time use.',
-    'yache-berry':        'Reduces damage from a single Ice-type hit by 50%. One-time use. Common on Dragon-types vulnerable to Ice.',
+    'yache-berry':        'Reduces damage from a single Ice-type hit by 50%. One-time use.',
     'chople-berry':       'Reduces damage from a single Fighting-type hit by 50%. One-time use.',
     'occa-berry':         'Reduces damage from a single Fire-type hit by 50%. One-time use.',
     'passho-berry':       'Reduces damage from a single Water-type hit by 50%. One-time use.',
@@ -1075,27 +1135,28 @@ const itemDescOverrides = {
     'charti-berry':       'Reduces damage from a single Rock-type hit by 50%. One-time use.',
     'chilan-berry':       'Reduces damage from a single Normal-type hit by 50%. One-time use.',
     'shed-shell':         'Holder can always switch out, even when trapped by Arena Trap, Shadow Tag, Block, or similar effects.',
-    'scope-lens':         'Raises the holder\'s critical hit ratio by 1 stage. Combined with high-crit moves, almost guarantees critical hits.',
-    'kings-rock':         'Moves have a 10% chance to cause the target to flinch. Especially effective with multi-hit moves and fast Pokémon.',
+    'scope-lens':         'Raises the holder\'s critical hit ratio by 1 stage.',
+    'kings-rock':         'Moves have a 10% chance to cause the target to flinch.',
     'razor-fang':         'Same as King\'s Rock — moves have a 10% flinch chance.',
     'wide-lens':          'Raises all of the holder\'s move accuracy by 10% (e.g. Stone Edge 80% → 88%, Thunder 70% → 77%).',
     'zoom-lens':          'Raises the holder\'s move accuracy by 20% when the holder moves after the target.',
     'bright-powder':      'Lowers the opponent\'s accuracy by 10% against the holder. The foe\'s moves have 90% of their normal accuracy.',
-    'quick-claw':         '20% chance to move first regardless of Speed (priority boost). Very luck-based but can surprise faster opponents.',
-    'blunder-policy':     'When a move misses, raises the holder\'s Speed by 2 stages. Pairs with low-accuracy moves like Dynamic Punch or Stone Edge.',
+    'quick-claw':         '20% chance to move first regardless of Speed (priority boost).',
+    'blunder-policy':     'When a move misses (and the failure is due to accuracy, not immunity/Protect), raises the holder\'s Speed by 2 stages (+100%). Consumed after use.',
     'throat-spray':       'When the holder uses a sound-based move, Sp. Atk rises by 1 stage. One-time use.',
-    'eject-button':       'When hit by a move, the holder is automatically switched out to another Pokémon. One-time use. Great for pivoting or protecting a set-up sweeper.',
-    'eject-pack':         'When any of the holder\'s stats are lowered, it is automatically switched out. One-time use. Punishes debuffs.',
-    'mirror-herb':        'When an opponent raises one of their stats, the holder copies the same stat raise once. One-time use. Very powerful in doubles.',
+    'eject-button':       'When hit by a move, the holder is automatically switched out to another Pokémon. One-time use.',
+    'eject-pack':         'When any of the holder\'s stats are lowered, it is automatically switched out. One-time use.',
+    'mirror-herb':        'When an opponent raises one of their stats, the holder copies the same stat raise once. One-time use.',
     'booster-energy':     'In Gen 9, activates Paradox Pokémon\'s Protosynthesis or Quark Drive (raises the highest stat) even without sun/Electric Terrain.',
-    'covert-cloak':       'Protects the holder from the secondary effects of moves (flinch, burn chance, confusion, etc.). Does not block damage.',
+    'covert-cloak':       'Prevents the holder from being affected by the additional secondary effects of moves used against it, such as flinch chance, stat drops, confusion, or burn chance.',
+    'ability-shield':     'Protects the holder\'s ability from being changed, suppressed, copied, or negated — blocks effects like Worry Seed, Skill Swap, Trace, Mummy, Neutralizing Gas, Mold Breaker-type ignoring, and Intimidate\'s Attack drop.',
     'clear-amulet':       'Prevents opponents from lowering the holder\'s stats using moves or abilities (Intimidate, Sticky Web, stat-lowering moves).',
     'loaded-dice':        'Ensures multi-hit moves hit the maximum number of times (5/4 for Bullet Seed, Icicle Spear, etc.).',
     'punching-glove':     'Boosts punch moves by ×1.1 and makes them non-contact, bypassing Rocky Helmet, Rough Skin, and Flame Body.',
     'metronome-item':     'Consecutively using the same move boosts its power: +20% per consecutive use up to +100% (×2.0). Drops back to ×1.0 if a different move is used.',
     'expert-belt':        'Boosts super-effective moves by ×1.2 (20% extra damage).',
-    'muscle-band':        'Boosts physical moves by ×1.1. Slightly weaker than Life Orb but has no HP cost.',
-    'wise-glasses':       'Boosts special moves by ×1.1. Slightly weaker than Life Orb but has no HP cost.',
+    'muscle-band':        'Boosts physical moves by ×1.1.',
+    'wise-glasses':       'Boosts special moves by ×1.1.',
     'black-belt':         'Boosts Fighting-type moves by ×1.2.',
     'black-glasses':      'Boosts Dark-type moves by ×1.2.',
     'charcoal':           'Boosts Fire-type moves by ×1.2.',
@@ -1131,17 +1192,17 @@ const itemDescOverrides = {
     'stone-plate':        'Boosts Rock-type moves by ×1.2.',
     'toxic-plate':        'Boosts Poison-type moves by ×1.2.',
     'zap-plate':          'Boosts Electric-type moves by ×1.2.',
-    'draco-plate':        'Boosts Dragon-type moves by ×1.2. Holds the embodiment of dragons.',
+    'draco-plate':        'Boosts Dragon-type moves by ×1.2.',
     'safety-goggles':     'Protects holder from weather damage (sandstorm, hail) and from powder/spore moves (Sleep Powder, Spore, Stun Spore, Rage Powder).',
     'utility-umbrella':   'Negates weather effects on the holder — sun, rain, sand, hail. The holder\'s moves are unaffected by weather boosts or weaknesses.',
-    'room-service':       'When Trick Room is set, lowers the holder\'s Speed by 1 stage, making it even slower (ideal for Trick Room attackers).',
+    'room-service':       'When Trick Room is set, lowers the holder\'s Speed by 1 stage.',
     'terrain-extender':   'Extends Terrain effects (Electric, Grassy, Misty, Psychic) from 5 to 8 turns when the holder sets one.',
     'light-clay':         'Extends Reflect and Light Screen from 5 to 8 turns when the holder sets them.',
     'heat-rock':          'Extends Drought\'s harsh sunlight from 5 to 8 turns.',
     'damp-rock':          'Extends Drizzle\'s rain from 5 to 8 turns.',
     'smooth-rock':        'Extends Sand Stream\'s sandstorm from 5 to 8 turns.',
     'icy-rock':           'Extends Snow Warning\'s hail/snow from 5 to 8 turns.',
-    'red-card':           'When the holder is hit by a move, the attacker is forced to switch out to a random Pokémon. One-time use. Breaks set-up sweepers.',
+    'red-card':           'When the holder is hit by a move, the attacker is forced to switch out to a random Pokémon. One-time use.',
     'adrenaline-orb':     'When the holder is affected by Intimidate, Speed rises by 1 stage. One-time use.',
     'leppa-berry':        'Restores 10 PP to a move that has run out of PP. One-time use.',
     'oran-berry':         'Restores 10 HP when HP drops to 50% or below. One-time use.',
@@ -1163,29 +1224,52 @@ async function fetchItemDetail(slug) {
         const r = await fetch(`https://pokeapi.co/api/v2/item/${slug}`);
         if (!r.ok) return null;
         const d = await r.json();
-        const sprite = d.sprites && d.sprites.default ? d.sprites.default : null;
+        // Fall back to the community sprite repo if PokeAPI's own sprite link is missing
+        // (common for newer Gen 9 items). The <img> tag has onerror handling to hide if this 404s.
+        const sprite = (d.sprites && d.sprites.default) ? d.sprites.default
+            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${slug}.png`;
         const descEntry = d.flavor_text_entries && d.flavor_text_entries.find(e => e.language.name === 'en');
-        const desc = descEntry ? descEntry.text.replace(/\n|\f/g, ' ') : '';
+        let desc = descEntry ? descEntry.text.replace(/[\n\f]+/g, ' ') : '';
+        if (!desc) {
+            // Fall back to the short effect text if no flavor text is available
+            const effEntry = d.effect_entries && d.effect_entries.find(e => e.language.name === 'en');
+            desc = effEntry ? effEntry.short_effect.replace(/[\n\f]+/g, ' ') : '';
+        }
         const detail = { sprite, desc };
         itemDetailCache[slug] = detail;
         return detail;
     } catch(e) { return null; }
 }
 
-const NON_BATTLE_ITEM_CATEGORIES = ['loot','mulch','collectibles','unused','plot-advancement','key-items','all-mail','baking-only','event-items','dex-completion','spelunking','data-cards'];
+const NON_BATTLE_ITEM_CATEGORIES = [
+    'loot','mulch','collectibles','unused','plot-advancement','key-items','all-mail','baking-only',
+    'event-items','dex-completion','spelunking','data-cards','vitamins','healing','medicine',
+    'pp-recovery','pp-increase','revival','status-cures','effort-training','effort-drop',
+    'flutes','scarves','stat-boosts','training','mints',
+    'standard-balls','special-balls','apricorn-balls'
+];
+// Items that are technically "held items" in PokeAPI's categories but have zero effect when held/used
+// in battle (Bag-use-only items like Ability Patch, Ability Capsule, EXP Candies, etc.)
+const NON_BATTLE_ITEM_NAMES = new Set([
+    'ability-patch','ability-capsule','rare-candy','dynamax-candy',
+    'exp-candy-xs','exp-candy-s','exp-candy-m','exp-candy-l','exp-candy-xl'
+]);
 async function loadItems() {
     if(itemCache.length>0)return;
     try {
         const r=await fetch('https://pokeapi.co/api/v2/item?limit=2000');
         const d=await r.json();
-        let excluded=new Set();
+        let excluded=new Set(NON_BATTLE_ITEM_NAMES);
         try {
             const results = await Promise.all(NON_BATTLE_ITEM_CATEGORIES.map(async cat=>{
                 try{ const cr=await fetch(`https://pokeapi.co/api/v2/item-category/${cat}`); if(!cr.ok) return []; const cd=await cr.json(); return cd.items.map(i=>i.name); }catch(e){return [];}
             }));
             results.forEach(arr=>arr.forEach(n=>excluded.add(n)));
         } catch(e) {}
-        itemCache=d.results.filter(i=>!excluded.has(i.name)).map(i=>i.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
+        itemCache=d.results
+            .filter(i=>!excluded.has(i.name))
+            .filter(i=>!i.name.includes('mint') && !i.name.includes('academy'))
+            .map(i=>i.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
         ZA_MEGA_STONES.forEach(s=>{if(!itemCache.includes(s))itemCache.push(s);});
         itemCache.sort((a,b)=>a.localeCompare(b));
     } catch(e){itemCache=[...ZA_MEGA_STONES];}
@@ -1728,10 +1812,10 @@ function buildExpanded(p, stats) {
     const itemSlug = p.item ? p.item.toLowerCase().replace(/\s+/g,'-') : '';
     const itemDetail = itemSlug ? itemDetailCache[itemSlug] : null;
     const itemSpriteHtml = (p.item && itemDetail && itemDetail.sprite)
-        ? `<img src="${itemDetail.sprite}" alt="${p.item}" title="${p.item}" style="width:24px;height:24px;image-rendering:pixelated;flex-shrink:0;">`
+        ? `<img src="${itemDetail.sprite}" alt="${p.item}" title="${p.item}" style="width:24px;height:24px;image-rendering:pixelated;flex-shrink:0;" onerror="this.style.display='none'">`
         : (p.item ? `<div style="width:24px;height:24px;flex-shrink:0;"></div>` : '');
-    const itemInfoIcon = (itemDetail && itemDetail.desc)
-        ? `<span class="item-info-icon">ℹ<div class="item-tooltip">${getItemDesc(itemSlug, itemDetail.desc)}</div></span>`
+    const itemInfoIcon = (itemDescOverrides[itemSlug] || (itemDetail && itemDetail.desc))
+        ? `<span class="item-info-icon">ℹ<div class="item-tooltip">${getItemDesc(itemSlug, itemDetail && itemDetail.desc)}</div></span>`
         : '';
 
     const bstBase = Object.values(pData.baseStats).reduce((a,b)=>a+b,0);
@@ -1905,7 +1989,7 @@ async function onItemInput(input, pokeName) {
             const slug = itemName.toLowerCase().replace(/\s+/g, '-');
             const detail = itemDetailCache[slug];
             const spriteHtml = detail && detail.sprite
-                ? `<img class="item-row-sprite" src="${detail.sprite}" alt="">`
+                ? `<img class="item-row-sprite" src="${detail.sprite}" alt="" onerror="this.style.display='none'">`
                 : `<div class="item-row-sprite-placeholder"></div>`;
             const descHtml = (detail && (detail.desc || itemDescOverrides[slug])) || itemDescOverrides[slug]
                 ? `<div class="item-row-desc">${getItemDesc(slug, detail ? detail.desc : '')}</div>`
@@ -1971,7 +2055,7 @@ function buildMoveTypeFilterBar(p, pokeName, slot) {
         const textCol = c ? (isActive ? '#fff' : c.text) : '#aaa';
         return `<button class="move-type-btn${isActive?' mtf-active':''}"
             style="background:${bg};border-color:${borderCol};color:${textCol}"
-            onmousedown="toggleMoveTypeFilter('${pokeName}',${slot},'${t}')">${t}</button>`;
+            onmousedown="event.preventDefault();toggleMoveTypeFilter('${pokeName}',${slot},'${t}')">${t}</button>`;
     }).join('');
 }
 
@@ -1983,46 +2067,73 @@ function toggleMoveTypeFilter(pokeName, slot, type) {
     buildMoveTypeFilterBar(find(pokeName), pokeName, slot);
     if (input) showMoveDropdown(input, pokeName, slot, input.value.trim());
 }
-
 function showMoveDropdown(input, pokeName, slot, query) {
-    const p = find(pokeName); if (!p) return;
-    const drop = document.getElementById(`movedrop-${pokeName}-${slot}`); if (!drop) return;
+    const p = find(pokeName);
+    if (!p) return;
+    const drop = document.getElementById(`movedrop-${pokeName}-${slot}`);
+    if (!drop) return;
     const filterKey = `${pokeName}-${slot}`;
     const activeType = moveTypeFilters[filterKey] || null;
-    const matches = filterMoves(p._learnset, query, activeType, p._data && p._data.type);
-    if (matches.length === 0) { drop.style.display='none'; return; }
+
+    let rawMovesArray = [];
+
+    if (showdownLearnsets) {
+        let key = p.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        key = key.replace(/^za/, '').replace(/megax/g, 'megax').replace(/megay/g, 'megay');
+
+        if (showdownLearnsets[key] && showdownLearnsets[key].learnset) {
+            rawMovesArray = Object.keys(showdownLearnsets[key].learnset);
+        } else {
+            let baseKey = key.replace(/mega.*/, '').replace(/gmax.*/, '')
+                             .replace(/alola.*/, '').replace(/galar.*/, '')
+                             .replace(/hisui.*/, '').replace(/paldea.*/, '');
+            if (showdownLearnsets[baseKey] && showdownLearnsets[baseKey].learnset) {
+                rawMovesArray = Object.keys(showdownLearnsets[baseKey].learnset);
+            }
+        }
+    }
+
+    if (rawMovesArray.length === 0) {
+        rawMovesArray = p._learnset || [];
+    }
+
+    const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type);
 
     function renderRows() {
-        let lastType = null;
+        if (matches.length === 0) {
+            drop.innerHTML = `<div style="color:var(--muted); padding:8px; font-size:.75rem;">No moves found</div>`;
+            return;
+        }
+
         drop.innerHTML = matches.map(m => {
-            const slug = m.toLowerCase().replace(/\s+/g,'-');
-            const cached = moveCache[slug];
-            let header = '';
-            // Insert type header when type group changes (only when no text query)
-            if (!query && cached && cached.type !== lastType) {
-                lastType = cached.type;
-                const c = typeColors[cached.type];
-                const col = c ? c.text : '#aaa';
-                header = `<div class="move-dd-type-header" style="color:${col}">${cached.type}</div>`;
+            const slug = m.toLowerCase().replace(/\s+/g, '-');
+            const mData = moveCache[slug];
+            let metaHtml = '';
+
+            if (mData) {
+                const cat = (mData.category || '').toLowerCase();
+                const catColor = cat === 'physical' ? '#e67e22' : 
+                                (cat === 'special' ? '#3498db' : '#888');
+                metaHtml = `<span class="move-dd-meta">
+                    <span class="move-dd-dot" style="background:${catColor}"></span>
+                    <span class="move-dd-type">${mData.type}</span>
+                    <span class="move-dd-stat">Pwr ${mData.power || '—'}</span>
+                </span>`;
             }
-            let meta = '';
-            if (cached) {
-                const catColor = cached.category==='physical'?'#e74c3c':cached.category==='special'?'#3498db':'#888';
-                meta = `<span class="move-dd-meta"><span class="move-dd-dot" style="background:${catColor}"></span><span class="move-dd-type">${cached.type}</span><span class="move-dd-stat">Pwr&nbsp;${cached.power}</span><span class="move-dd-stat">Acc&nbsp;${cached.accuracy}</span></span>`;
-            }
-            return `${header}<div onmousedown="selectMove('${pokeName}',${slot},'${m}')">${m}${meta}</div>`;
+            const displayName = m.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+            return `<div onmousedown="selectMove('${pokeName}', ${slot}, '${m}')">
+                <span>${displayName}</span>${metaHtml}
+            </div>`;
         }).join('');
-        drop.style.display = 'block';
-        // Build filter bar now that we have type info
-        buildMoveTypeFilterBar(p, pokeName, slot);
     }
 
     renderRows();
-    const uncached = matches.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g,'-')]);
+    drop.style.display = 'block';
+
+    const uncached = matches.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g, '-')]);
     if (uncached.length > 0) {
-        const batchSize = 30; const batches = [];
-        for (let i = 0; i < uncached.length; i += batchSize) batches.push(uncached.slice(i, i+batchSize));
-        (async () => { for (const batch of batches) { await Promise.all(batch.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g,'-')))); if (drop.style.display !== 'none') renderRows(); } })();
+        Promise.all(uncached.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g, '-'))))
+            .then(() => renderRows());
     }
 }
 function onMoveFocus(input, pokeName, slot) {
@@ -2090,7 +2201,7 @@ function adjustIV(name, stat, delta) {
     render();
 }
 
-function updateField(name, field, value) { const p=find(name);if(!p)return; if(field==='level'){value=Math.max(1,Math.min(100,Math.round(Number(value))||1));} p[field]=value;render(); }
+function updateField(name, field, value) { const p=find(name);if(!p)return; if(field==='level'){value=Math.max(1,Math.min(100,Math.round(Number(value))||1));} p[field]=value;render(); if(field==='ability')prefetchAbilityData(p); }
 
 function confirmRemovePokemon(name) {
     showConfirm(`Remove ${name}?`, 'This will remove them from the pool entirely.', () => {
