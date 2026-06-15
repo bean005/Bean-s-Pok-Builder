@@ -1084,7 +1084,7 @@ async function searchAndAddPokemon() {
     if(p){pokemonList.push(p);input.value='';render();prefetchLearnsetMoveData(p);prefetchAbilityData(p);}
 }
 
-const ZA_MEGA_STONES=["Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite","Lum Berry","Sitrus Berry",];
+const ZA_MEGA_STONES=["Chesto Berry","Salac Berry","Petaya Berry","Apicot Berry","Lansat Berry","Starf Berry","Liechi Berry","Ganlon Berry","Micle Berry","Custap Berry","Oran Berry","Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite","Lum Berry","Sitrus Berry",];
 
 const itemDescOverrides = {
     'choice-band':        '+50% Attack boost, but locks the holder into the last move used until it switches out.',
@@ -1283,7 +1283,7 @@ async function loadItems() {
 }
 function filterItems(q) {
     if(!q||q.length<1)return[];
-    return itemCache.filter(i=>i.toLowerCase().includes(q.toLowerCase())).slice(0,20);
+    return itemCache.filter(i=>i.toLowerCase().includes(q.toLowerCase())).slice(0,45);
 }
 
 async function prefetchLearnsetMoveData(p) {
