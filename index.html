@@ -1084,7 +1084,7 @@ async function searchAndAddPokemon() {
     if(p){pokemonList.push(p);input.value='';render();prefetchLearnsetMoveData(p);prefetchAbilityData(p);}
 }
 
-const ZA_MEGA_STONES=["Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite"];
+const ZA_MEGA_STONES=["Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite","Lum Berry","Sitrus Berry",];
 
 const itemDescOverrides = {
     'choice-band':        '+50% Attack boost, but locks the holder into the last move used until it switches out.',
@@ -1247,7 +1247,7 @@ const NON_BATTLE_ITEM_CATEGORIES = [
     'pp-recovery','pp-increase','revival','status-cures','effort-training','effort-drop',
     'flutes','scarves','stat-boosts','training','mints','picnic','apricorn-balls',
     'standard-balls','special-balls','sandwich-ingredients','curry-ingredients',
-    'dynamax-crystals','species-specific','catching-bonus','in-a-pinch'
+    'dynamax-crystals','species-specific','catching-bonus'
 ];
 const NON_BATTLE_ITEM_NAMES = new Set([
     'ability-patch','ability-capsule','rare-candy','dynamax-candy',
