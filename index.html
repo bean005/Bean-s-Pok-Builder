@@ -124,14 +124,14 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .item-info-icon:hover .item-tooltip { display:block; }
 
 /* MOVES */
-.exp-moves { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; }
+.exp-moves { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; overflow:visible; }
 /* MOVE TYPE FILTER */
 .move-type-filters { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:5px; }
 .move-type-btn { padding:2px 7px; border-radius:10px; font-size:.62rem; font-weight:700; border:1px solid transparent; cursor:pointer; opacity:.5; transition:opacity .15s,transform .1s; white-space:nowrap; background:transparent; }
 .move-type-btn:hover { opacity:.85; }
 .move-type-btn.mtf-active { opacity:1; transform:scale(1.08); }
 .move-dd-type-header { padding:3px 10px; font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); background:#13132a; border-bottom:1px solid var(--border); cursor:default; pointer-events:none; }
-.move-slot { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; position:relative; }
+.move-slot { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; position:relative; overflow:visible; }
 .move-slot label { display:block; font-size:.63rem; color:#666; margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
 .move-search-wrap { position:relative; display:flex; align-items:center; gap:4px; }
 .move-search-wrap input { background:transparent; border:none; color:var(--text); font-size:.8rem; flex:1; outline:none; padding:2px 0; }
@@ -145,7 +145,7 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .move-dd-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 .move-dd-type { font-size:.63rem; color:var(--accent); font-weight:600; white-space:nowrap; }
 .move-dd-stat { font-size:.62rem; color:var(--muted); white-space:nowrap; }
-.move-info-bar { font-size:.63rem; color:var(--muted); margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.move-info-bar { font-size:.72rem; color:var(--muted); margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .move-info-bar span { white-space:nowrap; }
 .cat-physical { color:#e67e22; } .cat-special { color:#3498db; } .cat-status { color:#a855f7; }
 .move-info-icon { display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border-radius:50%; background:#2e2e5e; color:var(--accent); font-size:.6rem; cursor:pointer; font-style:normal; font-weight:700; border:1px solid var(--border); transition:background .15s; flex-shrink:0; position:relative; line-height:1; }
@@ -2182,6 +2182,10 @@ function onMoveFocus(input, pokeName, slot) {
     if (p) buildMoveTypeFilterBar(p, pokeName, slot);
     showMoveDropdown(input, pokeName, slot, input.value.trim());
     input.select();
+}
+    function onMoveInput(input, pokeName, slot) {
+    cancelMoveDropdownClose(pokeName, slot);
+    showMoveDropdown(input, pokeName, slot, input.value.trim());
 }
 async function selectMove(pokeName, slot, moveName) {
     const p = find(pokeName);
