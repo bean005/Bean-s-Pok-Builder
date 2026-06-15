@@ -147,7 +147,7 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .move-dd-stat { font-size:.62rem; color:var(--muted); white-space:nowrap; }
 .move-info-bar { font-size:.63rem; color:var(--muted); margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .move-info-bar span { white-space:nowrap; }
-.cat-physical { color:#e67e22; } .cat-special { color:#3498db; } .cat-status { color:var(--muted); }
+.cat-physical { color:#e67e22; } .cat-special { color:#3498db; } .cat-status { color:#a855f7; }
 .move-info-icon { display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border-radius:50%; background:#2e2e5e; color:var(--accent); font-size:.6rem; cursor:pointer; font-style:normal; font-weight:700; border:1px solid var(--border); transition:background .15s; flex-shrink:0; position:relative; line-height:1; }
 .move-info-icon:hover { background:#3e3e7e; }
 .move-tooltip { display:none; position:fixed; width:220px; background:#1a1a3e; border:1px solid var(--accent); border-radius:8px; padding:10px 12px; font-size:.72rem; color:var(--muted2); line-height:1.5; z-index:9999; pointer-events:none; box-shadow:0 4px 20px rgba(0,0,0,.7); white-space:normal; word-wrap:break-word; }
@@ -1308,7 +1308,11 @@ async function fetchMoveData(rawName) {
             type: d.type.name.charAt(0).toUpperCase() + d.type.name.slice(1),
             category: d.damage_class.name,
             power: d.power || '—',
-            accuracy: d.accuracy || '—'
+            accuracy: d.accuracy || '—',
+            description: (d.effect_entries && d.effect_entries.find(e=>e.language.name==='en'))
+                ? d.effect_entries.find(e=>e.language.name==='en').short_effect
+                   .replace(/\$effect_chance/g, d.effect_chance || '?')
+                : ''
         };
         moveCache[slug] = data;
         moveCache[showdownKey] = data;
@@ -2142,10 +2146,12 @@ function showMoveDropdown(input, pokeName, slot, query) {
                 const cat = (mData.category || '').toLowerCase();
                 const catColor = cat === 'physical' ? '#e67e22' : (cat === 'special' ? '#3498db' : '#888');
                 metaHtml = `<span class="move-dd-meta">
-                    <span class="move-dd-dot" style="background:${catColor}"></span>
-                    <span class="move-dd-type">${mData.type}</span>
-                    <span class="move-dd-stat">Pwr ${mData.power || '—'}</span>
-                </span>`;
+                     <span class="move-dd-dot" style="background:${catColor}"></span>
+                     <span class="move-dd-type">${mData.type}</span>
+                     <span class="move-dd-stat">${cat === 'physical' ? 'Phys' : cat === 'special' ? 'Spec' : 'Stat'}</span>
+                     <span class="move-dd-stat">Pwr ${mData.power || '—'}</span>
+                     <span class="move-dd-stat">Acc ${mData.accuracy || '—'}</span>
+                 </span>`;
             }
             const displayName = m.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             return `<div onmousedown="selectMove('${pokeName}', ${slot}, '${m}')">
