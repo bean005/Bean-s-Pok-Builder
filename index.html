@@ -1245,14 +1245,22 @@ const NON_BATTLE_ITEM_CATEGORIES = [
     'loot','mulch','collectibles','unused','plot-advancement','key-items','all-mail','baking-only',
     'event-items','dex-completion','spelunking','data-cards','vitamins','healing','medicine',
     'pp-recovery','pp-increase','revival','status-cures','effort-training','effort-drop',
-    'flutes','scarves','stat-boosts','training','mints',
-    'standard-balls','special-balls','apricorn-balls'
+    'flutes','scarves','stat-boosts','training','mints','picnic','apricorn-balls',
+    'standard-balls','special-balls','sandwich-ingredients','curry-ingredients',
+    'dynamax-crystals','species-specific','catching-bonus','in-a-pinch'
 ];
-// Items that are technically "held items" in PokeAPI's categories but have zero effect when held/used
-// in battle (Bag-use-only items like Ability Patch, Ability Capsule, EXP Candies, etc.)
 const NON_BATTLE_ITEM_NAMES = new Set([
     'ability-patch','ability-capsule','rare-candy','dynamax-candy',
-    'exp-candy-xs','exp-candy-s','exp-candy-m','exp-candy-l','exp-candy-xl'
+    'exp-candy-xs','exp-candy-s','exp-candy-m','exp-candy-l','exp-candy-xl',
+    'fishing-rod','old-rod','good-rod','super-rod','poke-radar',
+    'repel','super-repel','max-repel','honey','town-map','vs-seeker',
+    'blue-flute','red-flute','yellow-flute','white-flute','black-flute',
+    'lava-cookie','old-gateau','ragecandybar','casteliacone',
+    'lumiose-galette','shalour-sable','big-malasada','sweet-heart',
+    'grass-mail','flame-mail','bubble-mail','bloom-mail','tunnel-mail',
+    'steel-mail','heart-mail','snow-mail','space-mail','air-mail','mosaic-mail','stone-mail',
+    'cram-o-matic','rotom-catalog','azure-flute','red-chain','prison-bottle',
+    'adamant-orb','lustrous-orb','griseous-orb'
 ]);
 async function loadItems() {
     if(itemCache.length>0)return;
@@ -1268,7 +1276,7 @@ async function loadItems() {
         } catch(e) {}
         itemCache=d.results
             .filter(i=>!excluded.has(i.name))
-            .filter(i=>!i.name.includes('mint') && !i.name.includes('academy'))
+            .filter(i=>!i.name.includes('mint') && !i.name.includes('academy') && !i.name.includes('ingredient') && !i.name.includes('crystal') && !i.name.includes('-fur') && !i.name.includes('-scale') && !i.name.includes('-fang') && !i.name.includes('-claw') && !i.name.includes('cheese') && !i.name.includes('sandwich') && !i.name.includes('juice') && !i.name.includes('butter') && !i.name.includes('vinegar') && !i.name.includes('mustard') && !i.name.includes('curry'))
             .map(i=>i.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
         ZA_MEGA_STONES.forEach(s=>{if(!itemCache.includes(s))itemCache.push(s);});
         itemCache.sort((a,b)=>a.localeCompare(b));
@@ -1723,6 +1731,18 @@ function render() {
     if(teamCount) teamCount.textContent=`(${active.length}/6)`;
     if(poolCount) poolCount.textContent=`(${pool.length}${currentMode==='draft'?' / 30':''})`;
     renderWeaknesses();
+    // Re-fetch item sprites/descriptions that aren't cached yet (e.g. after page reload)
+    pokemonList.filter(p => p.item).forEach(async p => {
+        const slug = p.item.toLowerCase().replace(/\s+/g, '-');
+        if (!itemDetailCache[slug]) {
+            await fetchItemDetail(slug);
+            const cardImg = document.getElementById(`itemSprite-${p.name}`);
+            if (cardImg && itemDetailCache[slug] && itemDetailCache[slug].sprite) {
+                cardImg.src = itemDetailCache[slug].sprite;
+                cardImg.style.display = 'block';
+            }
+        }
+    });
 }
 
 function buildCard(p) {
@@ -1830,7 +1850,7 @@ function buildExpanded(p, stats) {
     const itemSlug = p.item ? p.item.toLowerCase().replace(/\s+/g,'-') : '';
     const itemDetail = itemSlug ? itemDetailCache[itemSlug] : null;
     const itemSpriteHtml = (p.item && itemDetail && itemDetail.sprite)
-        ? `<img src="${itemDetail.sprite}" alt="${p.item}" title="${p.item}" style="width:24px;height:24px;image-rendering:pixelated;flex-shrink:0;" onerror="this.style.display='none'">`
+        ? `<img id="itemSprite-${p.name}" src="${itemDetail.sprite}" alt="${p.item}" title="${p.item}" style="width:24px;height:24px;image-rendering:pixelated;flex-shrink:0;" onerror="this.style.display='none'">`
         : (p.item ? `<div style="width:24px;height:24px;flex-shrink:0;"></div>` : '');
     const itemInfoIcon = (itemDescOverrides[itemSlug] || (itemDetail && itemDetail.desc))
         ? `<span class="item-info-icon">ℹ<div class="item-tooltip">${getItemDesc(itemSlug, itemDetail && itemDetail.desc)}</div></span>`
