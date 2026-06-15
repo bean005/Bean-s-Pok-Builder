@@ -1288,26 +1288,42 @@ async function prefetchLearnsetMoveData(p) {
         await Promise.all(batch.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g,'-'))));
     }
 }
-async function fetchMoveData(moveName) {
-    const slug=moveName.toLowerCase().replace(/\s+/g,'-');
-    if(moveCache[slug])return moveCache[slug];
+async function fetchMoveData(rawName) {
+    const showdownKey = rawName.toLowerCase().replace(/\s+/g, '');
+    const slug = rawName.toLowerCase().replace(/\s+/g, '-');
+    if (moveCache[slug]) return moveCache[slug];
     try {
-        const r=await fetch(`https://pokeapi.co/api/v2/move/${slug}`);
-        if(!r.ok)return null;
-        const d=await r.json();
-        let desc=(d.effect_entries.find(e=>e.language.name==='en')?.short_effect||'');
-        if (d.effect_chance) {
-            if (desc.includes('$effect_chance')) desc = desc.replace(/\$effect_chance/g, d.effect_chance);
-            else if (!new RegExp(`${d.effect_chance}%`).test(desc)) desc = desc.replace(/\bchance\b/i, `${d.effect_chance}% chance`);
-        }
-        const data={name:d.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '),power:d.power||'—',accuracy:d.accuracy||'—',pp:d.pp,type:d.type.name.charAt(0).toUpperCase()+d.type.name.slice(1),category:d.damage_class.name,description:desc};
-        moveCache[slug]=data; return data;
-    } catch(e){return null;}
+        const r = await fetch(`https://pokeapi.co/api/v2/move/${slug}`);
+        if (!r.ok) return null;
+        const d = await r.json();
+        const data = {
+            name: d.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+            type: d.type.name.charAt(0).toUpperCase() + d.type.name.slice(1),
+            category: d.damage_class.name,
+            power: d.power || '—',
+            accuracy: d.accuracy || '—'
+        };
+        moveCache[slug] = data;
+        moveCache[showdownKey] = data;
+        return data;
+    } catch(e) { return null; }
 }
 // Track active type filter per move slot
 const moveTypeFilters = {}; // key: `${pokeName}-${slot}` → type string or null
 
-function formatMoveName(m) { return m.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '); }
+function formatMoveName(m) {
+    // Showdown learnset keys are run-together lowercase (e.g. "fireblast")
+    // PokeAPI slugs are hyphenated (e.g. "fire-blast")
+    // Either way, convert to Title Case with spaces
+    // First try hyphen-split (PokeAPI style), then just capitalize the whole word
+    if (m.includes('-')) {
+        return m.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+    // Showdown style: look up in moveCache to get the proper name, fallback to capitalizing as-is
+    const cached = moveCache[m.toLowerCase()];
+    if (cached && cached.name) return cached.name;
+    return m.charAt(0).toUpperCase() + m.slice(1);
+}
 
 function getTypeOrderForPokemon(pokeTypes) {
     const ALL = ['Normal','Bug','Dark','Dragon','Electric','Fairy','Fighting','Fire','Flying','Ghost','Grass','Ground','Ice','Poison','Psychic','Rock','Steel','Water'];
@@ -1325,7 +1341,8 @@ function filterMoves(learnset, query, activeType, pokeTypes) {
     if (activeType) {
         pool = pool.filter(m => {
             const slug = m.toLowerCase().replace(/\s+/g, '-');
-            const md = moveCache[slug];
+            const showdownSlug = m.toLowerCase().replace(/[\s-]/g, '');
+            const md = moveCache[slug] || moveCache[showdownSlug];
             return md && md.type === activeType;
         });
     }
@@ -1641,7 +1658,8 @@ function renderWeaknesses() {
                 p.moves.forEach(moveName => {
                     if (!moveName) return;
                     const slug = moveName.toLowerCase().replace(/\s+/g, '-');
-                    const md = moveCache[slug];
+                    const showdownSlug = moveName.toLowerCase().replace(/[\s-]/g, '');
+                    const md = moveCache[slug] || moveCache[showdownSlug];
                     if (!md) return;
                     if (md.category === 'status') return;
                     if (!md.power || md.power === '—' || md.power === 0) return;
@@ -2098,7 +2116,8 @@ function showMoveDropdown(input, pokeName, slot, query) {
     function renderRows() {
         drop.innerHTML = matches.map(m => {
             const slug = m.toLowerCase().replace(/\s+/g, '-');
-            const mData = moveCache[slug];
+            const showdownSlug = m.toLowerCase().replace(/[\s-]/g, '');
+            const mData = moveCache[slug] || moveCache[showdownSlug];
             let metaHtml = '';
             if (mData) {
                 const cat = (mData.category || '').toLowerCase();
@@ -2119,10 +2138,17 @@ function showMoveDropdown(input, pokeName, slot, query) {
     renderRows();
     drop.style.display = 'block';
 
-    const uncached = matches.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g, '-')]);
+const uncached = matches.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g, '-')] && !moveCache[m.toLowerCase()]);
     if (uncached.length > 0) {
-        Promise.all(uncached.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g, '-'))))
-            .then(() => renderRows()); // <--- This triggers the stats to appear
+        Promise.all(uncached.map(m => {
+            const slug = m.toLowerCase().replace(/\s+/g, '-');
+            const showdownSlug = m.toLowerCase().replace(/[\s-]/g, '');
+            return fetchMoveData(slug);
+        })).then(() => {
+            renderRows();
+            drop.style.display = 'block';
+            buildMoveTypeFilterBar(p, pokeName, slot); // rebuild filter buttons once data arrives
+        });
     }
 }
 function onMoveFocus(input, pokeName, slot) {
