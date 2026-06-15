@@ -2076,11 +2076,10 @@ function showMoveDropdown(input, pokeName, slot, query) {
     const activeType = moveTypeFilters[filterKey] || null;
 
     let rawMovesArray = [];
-
     if (showdownLearnsets) {
         let key = p.name.toLowerCase().replace(/[^a-z0-9]/g, '');
         key = key.replace(/^za/, '').replace(/megax/g, 'megax').replace(/megay/g, 'megay');
-
+        
         if (showdownLearnsets[key] && showdownLearnsets[key].learnset) {
             rawMovesArray = Object.keys(showdownLearnsets[key].learnset);
         } else {
@@ -2092,11 +2091,8 @@ function showMoveDropdown(input, pokeName, slot, query) {
             }
         }
     }
-
-    if (rawMovesArray.length === 0) {
-        rawMovesArray = p._learnset || [];
-    }
-
+    if (rawMovesArray.length === 0) rawMovesArray = p._learnset || [];
+    
     const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type);
 
     function renderRows() {
@@ -2104,19 +2100,15 @@ function showMoveDropdown(input, pokeName, slot, query) {
             const slug = m.toLowerCase().replace(/\s+/g, '-');
             const mData = moveCache[slug];
             let metaHtml = '';
-
             if (mData) {
                 const cat = (mData.category || '').toLowerCase();
-                const catColor = cat === 'physical' ? '#e67e22' : 
-                                (cat === 'special' ? '#3498db' : '#888');
+                const catColor = cat === 'physical' ? '#e67e22' : (cat === 'special' ? '#3498db' : '#888');
                 metaHtml = `<span class="move-dd-meta">
                     <span class="move-dd-dot" style="background:${catColor}"></span>
                     <span class="move-dd-type">${mData.type}</span>
                     <span class="move-dd-stat">Pwr ${mData.power || '—'}</span>
                 </span>`;
             }
-            // No "Loading..." text — clean and fast
-
             const displayName = m.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             return `<div onmousedown="selectMove('${pokeName}', ${slot}, '${m}')">
                 <span>${displayName}</span>${metaHtml}
@@ -2127,11 +2119,10 @@ function showMoveDropdown(input, pokeName, slot, query) {
     renderRows();
     drop.style.display = 'block';
 
-    // Fast background loading of details
     const uncached = matches.filter(m => !moveCache[m.toLowerCase().replace(/\s+/g, '-')]);
     if (uncached.length > 0) {
         Promise.all(uncached.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g, '-'))))
-            .then(() => renderRows());
+            .then(() => renderRows()); // <--- This triggers the stats to appear
     }
 }
 function onMoveFocus(input, pokeName, slot) {
@@ -2141,13 +2132,26 @@ function onMoveFocus(input, pokeName, slot) {
     showMoveDropdown(input, pokeName, slot, input.value.trim());
     input.select();
 }
-function onMoveInput(input, pokeName, slot) { showMoveDropdown(input, pokeName, slot, input.value.trim()); }
 async function selectMove(pokeName, slot, moveName) {
-    const p=find(pokeName); if(!p)return;
-    p.moves[slot]=moveName;
-    const slug=moveName.toLowerCase().replace(/\s+/g,'-');
-    if(!moveCache[slug]) await fetchMoveData(slug);
-    closeMoveDropdown(pokeName,slot); render();
+    const p = find(pokeName);
+    if (!p) return;
+
+    // 1. Force the system to get full details if it's a new move
+    const slug = moveName.toLowerCase().replace(/\s+/g, '-');
+    if (!moveCache[slug]) {
+        await fetchMoveData(slug);
+    }
+
+    // 2. Add the move to the team
+    p.moves[slot] = moveName;
+
+    // 3. Close the menu and update the display
+    if (typeof closeMoveDropdown === 'function') {
+        closeMoveDropdown(pokeName, slot);
+    }
+    
+    // 4. Force a full render so your new move shows its Pwr/Type/Category
+    if (typeof render === 'function') render();
 }
 function clearMove(pokeName, slot) { const p=find(pokeName);if(!p)return;p.moves[slot]='';render(); }
 const moveDropdownCloseTimers = {};
