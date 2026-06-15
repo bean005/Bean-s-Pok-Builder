@@ -1283,7 +1283,7 @@ async function loadItems() {
 }
 function filterItems(q) {
     if(!q||q.length<1)return[];
-    return itemCache.filter(i=>i.toLowerCase().includes(q.toLowerCase())).slice(0,45);
+    return itemCache.filter(i=>i.toLowerCase().includes(q.toLowerCase())).slice(0,55);
 }
 
 async function prefetchLearnsetMoveData(p) {
