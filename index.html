@@ -2141,14 +2141,24 @@ function showMoveDropdown(input, pokeName, slot, query) {
     const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type);
 
     function renderRows() {
-       if (matches.length === 0) {
-           drop.innerHTML = '<div style="color:var(--muted);font-style:italic;pointer-events:none;justify-content:center;">No moves found</div>';
-           return;
-       }
-       drop.innerHTML = matches.map(m => {
+        if (matches.length === 0) {
+            drop.innerHTML = '<div style="color:var(--muted);font-style:italic;pointer-events:none;justify-content:center;">No moves found</div>';
+            return;
+        }
+        let lastType = null;
+        const rows = [];
+        matches.forEach(m => {
             const slug = m.toLowerCase().replace(/\s+/g, '-');
             const showdownSlug = m.toLowerCase().replace(/[\s-]/g, '');
             const mData = moveCache[slug] || moveCache[showdownSlug];
+            const moveType = mData ? mData.type : null;
+            if (moveType && moveType !== lastType) {
+                const tc = typeColors[moveType];
+                const col = tc ? tc.text : 'var(--muted)';
+                const border = tc ? tc.border : '#444';
+                rows.push(`<div style="padding:3px 10px;font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:${col};background:#0d0d1e;border-bottom:1px solid ${border};border-top:${lastType?'1px solid '+border:'none'};pointer-events:none;cursor:default;">${moveType}</div>`);
+                lastType = moveType;
+            }
             let metaHtml = '';
             if (mData) {
                 const cat = (mData.category || '').toLowerCase();
@@ -2162,10 +2172,11 @@ function showMoveDropdown(input, pokeName, slot, query) {
                  </span>`;
             }
             const displayName = m.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-            return `<div onmousedown="selectMove('${pokeName}', ${slot}, '${m}')">
+            rows.push(`<div onmousedown="selectMove('${pokeName}', ${slot}, '${m}')">
                 <span>${displayName}</span>${metaHtml}
-            </div>`;
-        }).join('');
+            </div>`);
+        });
+        drop.innerHTML = rows.join('');
     }
 
     renderRows();
