@@ -1289,7 +1289,7 @@ async function prefetchLearnsetMoveData(p) {
     }
 }
 async function fetchMoveData(rawName) {
-    const showdownKey = rawName.toLowerCase().replace(/\s+/g, '');
+    const showdownKey = rawName.toLowerCase().replace(/[\s-]/g, '');
     const slug = rawName.toLowerCase().replace(/\s+/g, '-');
     if (moveCache[slug]) return moveCache[slug];
     try {
