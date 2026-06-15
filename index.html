@@ -971,9 +971,22 @@ async function fetchLearnsetForSlug(slug) {
         const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${slug}`);
         if (!r.ok) return [];
         const d = await r.json();
+        // Include ALL moves regardless of learn method (level-up, TM, egg, tutor)
         const ls = d.moves.map(m => m.move.name);
         learnsetCache[slug] = ls;
         return ls;
+    } catch(e) { return []; }
+}
+
+async function fetchEggMovesForSlug(slug) {
+    try {
+        const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${slug}`);
+        if (!r.ok) return [];
+        const d = await r.json();
+        // Only moves learnable via egg (learn method id 2)
+        return d.moves
+            .filter(m => m.version_group_details.some(v => v.move_learn_method.name === 'egg'))
+            .map(m => m.move.name);
     } catch(e) { return []; }
 }
 
@@ -990,7 +1003,18 @@ async function fetchFullEvoLearnset(speciesUrl) {
         function walk(node) { slugs.push(node.species.name); node.evolves_to.forEach(walk); }
         walk(ecd.chain);
         const allMoves = new Set();
-        await Promise.all(slugs.map(async s => { const ls = await fetchLearnsetForSlug(s); ls.forEach(m => allMoves.add(m)); }));
+        // Collect all moves from every evo stage (level-up, TM, tutor, egg)
+        await Promise.all(slugs.map(async s => {
+            const ls = await fetchLearnsetForSlug(s);
+            ls.forEach(m => allMoves.add(m));
+        }));
+        // ALSO explicitly fetch egg moves from the FIRST (base) form in the chain
+        // because PokeAPI sometimes omits egg moves from later evolutions' entries
+        const baseSlug = slugs[0];
+        if (baseSlug) {
+            const eggMoves = await fetchEggMovesForSlug(baseSlug);
+            eggMoves.forEach(m => allMoves.add(m));
+        }
         return Array.from(allMoves);
     } catch(e) { return null; }
 }
