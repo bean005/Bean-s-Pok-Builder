@@ -2160,10 +2160,18 @@ function showMoveDropdown(input, pokeName, slot, query) {
             }
         }
     }
-    // Merge Showdown learnset with PokeAPI learnset (which includes egg moves from base form)
-    const showdownSet = new Set(rawMovesArray);
-    (p._learnset || []).forEach(m => showdownSet.add(m));
-    rawMovesArray = Array.from(showdownSet);
+    // Merge Showdown learnset with PokeAPI learnset (includes egg moves from base form)
+    // Normalize to hyphenated format to deduplicate (handles Showdown's no-hyphen format)
+    const seenMoves = new Set();
+    const mergedMoves = [];
+    [...rawMovesArray, ...(p._learnset || [])].forEach(m => {
+        const key = m.toLowerCase().replace(/[\s-]/g, '');
+        if (!seenMoves.has(key)) {
+            seenMoves.add(key);
+            mergedMoves.push(m);
+        }
+    });
+    rawMovesArray = mergedMoves;
     
     const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type);
 
