@@ -2160,7 +2160,10 @@ function showMoveDropdown(input, pokeName, slot, query) {
             }
         }
     }
-    if (rawMovesArray.length === 0) rawMovesArray = p._learnset || [];
+    // Merge Showdown learnset with PokeAPI learnset (which includes egg moves from base form)
+    const showdownSet = new Set(rawMovesArray);
+    (p._learnset || []).forEach(m => showdownSet.add(m));
+    rawMovesArray = Array.from(showdownSet);
     
     const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type);
 
