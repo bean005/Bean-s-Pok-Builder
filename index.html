@@ -1820,13 +1820,17 @@ function buildExpanded(p, stats) {
         const mv=p.moves[i]||'';
         const slug=mv.toLowerCase().replace(/\s+/g,'-');
         const mvData=mv&&moveCache[slug];
+        const typeColor=(typeColors[mvData.type]&&typeColors[mvData.type].text)||'var(--accent)';
+        const accDisplay=mvData.accuracy==='—'?'—':`${mvData.accuracy}%`;
         const infoBar=mvData
-            ?`<div class="move-info-bar">
-                <span class="cat-${mvData.category}">${mvData.category.charAt(0).toUpperCase()+mvData.category.slice(1)}</span>
-                <span>Pwr: ${mvData.power}</span><span>Acc: ${mvData.accuracy}</span><span>${mvData.type}</span>
-                ${mvData.description?`<span class="move-info-icon">ℹ<div class="move-tooltip">${mvData.description}</div></span>`:''}
-               </div>`
-            :`<div class="move-info-bar"></div>`;
+             ?`<div class="move-info-bar">
+                  <span class="cat-${mvData.category}">${mvData.category.charAt(0).toUpperCase()+mvData.category.slice(1)}</span>
+                  <span style="color:#a0c4ff">Pwr: <span style="color:#fff;font-weight:700">${mvData.power}</span></span>
+                  <span style="color:#a0c4ff">Accuracy: <span style="color:#fff;font-weight:700">${accDisplay}</span></span>
+                  <span style="color:${typeColor};font-weight:700">${mvData.type}</span>
+                  ${mvData.description?`<span class="move-info-icon">ℹ<div class="move-tooltip">${mvData.description}</div></span>`:''}
+                 </div>`
+               :`<div class="move-info-bar" style="min-height:0;padding:0;margin:0"></div>`;
         return `<div class="move-slot">
             <label>Move ${i+1}</label>
             <div class="move-type-filters" id="movefilters-${p.name}-${i}"></div>
