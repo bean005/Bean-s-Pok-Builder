@@ -126,18 +126,18 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 /* MOVES */
 .exp-moves { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; overflow:visible; }
 /* MOVE TYPE FILTER */
-.move-type-filters { display:grid; grid-template-columns:28px 1px 1fr; gap:0 6px; margin-bottom:5px; min-height:28px; }
-.move-cat-stack { display:flex; flex-direction:column; gap:3px; }
-.move-cat-divider { width:1px; background:#2e2e5e; align-self:stretch; }
-.move-cat-btn { width:26px; height:26px; border-radius:50%; border:2px solid transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; background:#1a1a3e; transition:all .15s; flex-shrink:0; overflow:hidden; }
-.move-cat-btn img { width:18px; height:18px; object-fit:contain; }
-.move-cat-btn.cat-phys { border-color:#e67e22; }
-.move-cat-btn.cat-spec { border-color:#3498db; }
-.move-cat-btn.cat-stat { border-color:#a855f7; }
-.move-cat-btn.cat-phys.cat-active { background:#e67e22; }
-.move-cat-btn.cat-spec.cat-active { background:#3498db; }
-.move-cat-btn.cat-stat.cat-active { background:#a855f7; }
-.move-type-pills { display:flex; flex-wrap:wrap; gap:3px; align-content:flex-start; }
+.move-type-filters { display:flex; flex-direction:column; gap:4px; margin-bottom:5px; }
+.move-type-pills { display:flex; flex-wrap:wrap; gap:3px; }
+.move-cat-row { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.move-cat-divider-h { height:1px; background:#2e2e5e; margin:1px 0; }
+.move-cat-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; border:2px solid transparent; cursor:pointer; background:#1a1a3e; transition:box-shadow .15s, border-width .15s; font-size:.72rem; font-weight:700; color:#ccc; white-space:nowrap; }
+.move-cat-pill img { width:16px; height:16px; object-fit:contain; flex-shrink:0; }
+.move-cat-pill.cat-phys { border-color:#e67e22; color:#e67e22; }
+.move-cat-pill.cat-spec { border-color:#3498db; color:#3498db; }
+.move-cat-pill.cat-stat { border-color:#a855f7; color:#a855f7; }
+.move-cat-pill.cat-phys.cat-active { box-shadow:0 0 7px 2px #e67e22; border-width:3px; }
+.move-cat-pill.cat-spec.cat-active { box-shadow:0 0 7px 2px #3498db; border-width:3px; }
+.move-cat-pill.cat-stat.cat-active { box-shadow:0 0 7px 2px #a855f7; border-width:3px; }
 .move-type-btn { padding:2px 7px; border-radius:10px; font-size:.62rem; font-weight:700; border:1px solid transparent; cursor:pointer; opacity:.5; transition:opacity .15s,transform .1s; white-space:nowrap; background:transparent; }
 .move-type-btn:hover { opacity:.85; }
 .move-type-btn.mtf-active { opacity:1; transform:scale(1.08); }
@@ -941,14 +941,13 @@ async function prefetchAbilityData(p) {
 
 // Nature mint colors — keyed by the stat that's boosted
 const natureColors = {
-    atk: '#e74c3c',   // red    (Protein)
-    def: '#a8c800',   // yellow-green (Iron)
-    spa: '#f07800',   // orange (Calcium)
-    spd: '#d4a800',   // yellow (Zinc)
-    spe: '#5db8f0',   // blue   (Carbos)
-    null: '#888'      // neutral
+    atk: '#e74c3c',
+    def: '#1a5ba8',
+    spa: '#7ec8e3',
+    spd: '#e991b0',
+    spe: '#48c774',
+    null: '#888'
 };
-
 function getNatureColor(natureName) {
     const nd = natureData[natureName];
     if (!nd || !nd.up) return '#888';
@@ -1967,7 +1966,7 @@ function buildExpanded(p, stats) {
                         }
                         return '<span style="width:20px;height:20px;flex-shrink:0;display:inline-block;"></span>';
                     })()}
-                    <select class="nature-select" style="flex:1;color:${getNatureColor(p.nature)};font-weight:${getNatureData(p.nature).up?'700':'400'}" onchange="updateField('${p.name}','nature',this.value);applyNatureSelectColor(this);(function(sel){const nd=natureData[sel.value];const img=sel.previousElementSibling;if(nd&&nd.up){img.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/'+sel.value.toLowerCase()+'-mint.png';img.style.display='';}else{img.src='';img.style.display='none';}})(this);">
+                    <select class="nature-select" style="flex:1;color:${getNatureColor(p.nature)};font-weight:${getNatureData(p.nature).up?'700':'400'}" onchange="updateField('${p.name}','nature',this.value);applyNatureSelectColor(this);(function(sel){const nd=natureData[sel.value];const img=sel.previousElementSibling;if(nd&&nd.up){img.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/'+sel.value.toLowerCase()+'-mint.png';img.style.display='';}else{img.style.display='none';}})(this);">
                         ${Object.keys(natureData).filter(n=>!['Docile','Serious','Bashful','Quirky'].includes(n)).map(n=>{const nd=natureData[n];const sl={atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};const hint=nd.up?` (+${sl[nd.up]} −${sl[nd.down]})`:' (neutral)';const col=getNatureColor(n);return`<option value="${n}" ${p.nature===n?'selected':''} style="color:${col};font-weight:${nd.up?'700':'400'}">${n}${hint}</option>`;}).join('')}
                     </select>
                 </div>
@@ -2147,17 +2146,19 @@ function buildMoveTypeFilterBar(p, pokeName, slot) {
     const sorted = TYPE_ORDER.filter(t => typesInLearnset.has(t));
 
     const catDefs = [
-        { cat:'physical', cls:'cat-phys', url:'https://archives.bulbagarden.net/media/upload/3/39/PhysicalIC_SV.png', fallback:'⚔' },
-        { cat:'special',  cls:'cat-spec', url:'https://archives.bulbagarden.net/media/upload/8/86/SpecialIC_SV.png',  fallback:'💫' },
-        { cat:'status',   cls:'cat-stat', url:'https://archives.bulbagarden.net/media/upload/8/8a/StatusIC_SV.png',   fallback:'●' },
+        { cat:'physical', cls:'cat-phys', url:'https://archives.bulbagarden.net/media/upload/3/39/PhysicalIC_SV.png', label:'Physical' },
+        { cat:'special',  cls:'cat-spec', url:'https://archives.bulbagarden.net/media/upload/8/86/SpecialIC_SV.png',  label:'Special' },
+        { cat:'status',   cls:'cat-stat', url:'https://archives.bulbagarden.net/media/upload/8/8a/StatusIC_SV.png',   label:'Status' },
     ];
 
-    const catBtns = catDefs.map(({cat, cls, url, fallback}) => {
+    const catPills = catDefs.map(({cat, cls, url, label}) => {
         const isActive = activeCats.has(cat);
-        return `<button class="move-cat-btn ${cls}${isActive?' cat-active':''}"
-            title="${cat.charAt(0).toUpperCase()+cat.slice(1)}"
+        const fallbackSymbol = cat === 'physical' ? '⚔' : cat === 'special' ? '✦' : '●';
+        return `<button class="move-cat-pill ${cls}${isActive?' cat-active':''}"
             onmousedown="event.preventDefault();toggleMoveCatFilter('${pokeName}',${slot},'${cat}')">
-            <img src="${url}" alt="${fallback}" onerror="this.outerHTML='<span style=font-size:.7rem>${fallback}</span>'">
+            <img src="${url}" alt="${fallbackSymbol}"
+                onerror="this.outerHTML='<span style=&quot;font-size:.7rem&quot;>${fallbackSymbol}</span>'">
+            ${label}
         </button>`;
     }).join('');
 
@@ -2173,9 +2174,9 @@ function buildMoveTypeFilterBar(p, pokeName, slot) {
     }).join('');
 
     filterBar.innerHTML = `
-        <div class="move-cat-stack">${catBtns}</div>
-        <div class="move-cat-divider"></div>
-        <div class="move-type-pills">${typePills}</div>`;
+        <div class="move-type-pills">${typePills}</div>
+        <div class="move-cat-divider-h"></div>
+        <div class="move-cat-row">${catPills}</div>`;
 }
 
 function toggleMoveTypeFilter(pokeName, slot, type) {
