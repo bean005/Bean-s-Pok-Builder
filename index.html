@@ -126,7 +126,18 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 /* MOVES */
 .exp-moves { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; overflow:visible; }
 /* MOVE TYPE FILTER */
-.move-type-filters { display:flex; flex-wrap:wrap; gap:3px; margin-bottom:5px; }
+.move-type-filters { display:grid; grid-template-columns:28px 1px 1fr; gap:0 6px; margin-bottom:5px; min-height:28px; }
+.move-cat-stack { display:flex; flex-direction:column; gap:3px; }
+.move-cat-divider { width:1px; background:#2e2e5e; align-self:stretch; }
+.move-cat-btn { width:26px; height:26px; border-radius:50%; border:2px solid transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; background:#1a1a3e; transition:all .15s; flex-shrink:0; overflow:hidden; }
+.move-cat-btn img { width:18px; height:18px; object-fit:contain; }
+.move-cat-btn.cat-phys { border-color:#e67e22; }
+.move-cat-btn.cat-spec { border-color:#3498db; }
+.move-cat-btn.cat-stat { border-color:#a855f7; }
+.move-cat-btn.cat-phys.cat-active { background:#e67e22; }
+.move-cat-btn.cat-spec.cat-active { background:#3498db; }
+.move-cat-btn.cat-stat.cat-active { background:#a855f7; }
+.move-type-pills { display:flex; flex-wrap:wrap; gap:3px; align-content:flex-start; }
 .move-type-btn { padding:2px 7px; border-radius:10px; font-size:.62rem; font-weight:700; border:1px solid transparent; cursor:pointer; opacity:.5; transition:opacity .15s,transform .1s; white-space:nowrap; background:transparent; }
 .move-type-btn:hover { opacity:.85; }
 .move-type-btn.mtf-active { opacity:1; transform:scale(1.08); }
@@ -196,12 +207,12 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
 .stat-bar-track { flex:1; height:9px; background:#1a1a3e; border-radius:5px; overflow:hidden; }
 .stat-bar-fill { height:100%; border-radius:5px; transition:width .25s ease; }
 .bar-num { font-size:.7rem; color:#aaa; width:28px; text-align:right; flex-shrink:0; }
-.bar-hp  { background:#48c774; }   /* HP      – green      (HP Up)       */
-.bar-atk { background:#e74c3c; }   /* Atk     – red        (Protein)     */
-.bar-def { background:#a8c800; }   /* Def     – yellow-grn (Iron)        */
-.bar-spa { background:#f07800; }   /* SpA     – orange     (Calcium)     */
-.bar-spd { background:#d4a800; }   /* SpD     – yellow-org (Zinc)        */
-.bar-spe { background:#5db8f0; }   /* Speed   – light blue (Carbos)      */
+.bar-hp  { background:#c9a84c; }
+.bar-atk { background:#e74c3c; }
+.bar-def { background:#4a90d9; }
+.bar-spa { background:#7ec8e3; }
+.bar-spd { background:#e991b0; }
+.bar-spe { background:#48c774; }
 
 /* ITEM SEARCH */
 .item-search-wrap { position:relative; }
@@ -1345,6 +1356,7 @@ async function fetchMoveData(rawName) {
 }
 // Track active type filter per move slot
 const moveTypeFilters = {}; // key: `${pokeName}-${slot}` → type string or null
+const moveCatFilters = {}; // key: `${pokeName}-${slot}` → Set of active categories ('physical','special','status')
 
 function formatMoveName(m) {
     // Showdown learnset keys are run-together lowercase (e.g. "fireblast")
@@ -1368,7 +1380,7 @@ function getTypeOrderForPokemon(pokeTypes) {
     return order;
 }
 
-function filterMoves(learnset, query, activeType, pokeTypes) {
+function filterMoves(learnset, query, activeType, pokeTypes, activeCats) {
     if (!learnset || learnset.length === 0) return [];
     let pool = learnset.slice();
 
@@ -1381,7 +1393,15 @@ function filterMoves(learnset, query, activeType, pokeTypes) {
             return md && md.type === activeType;
         });
     }
-
+// Apply category filter if set
+    if (activeCats && activeCats.size > 0) {
+        pool = pool.filter(m => {
+            const slug = m.toLowerCase().replace(/\s+/g, '-');
+            const showdownSlug = m.toLowerCase().replace(/[\s-]/g, '');
+            const md = moveCache[slug] || moveCache[showdownSlug];
+            return md && activeCats.has(md.category);
+        });
+    }
     // Apply text search
     if (query) {
         const q = query.toLowerCase();
@@ -1945,7 +1965,7 @@ function buildExpanded(p, stats) {
                                 title="${p.nature} Mint"
                                 style="width:20px;height:20px;image-rendering:pixelated;flex-shrink:0;">`;
                         }
-                        return '<img src="" style="width:20px;height:20px;flex-shrink:0;display:none;" aria-hidden="true">';
+                        return '<span style="width:20px;height:20px;flex-shrink:0;display:inline-block;"></span>';
                     })()}
                     <select class="nature-select" style="flex:1;color:${getNatureColor(p.nature)};font-weight:${getNatureData(p.nature).up?'700':'400'}" onchange="updateField('${p.name}','nature',this.value);applyNatureSelectColor(this);(function(sel){const nd=natureData[sel.value];const img=sel.previousElementSibling;if(nd&&nd.up){img.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/'+sel.value.toLowerCase()+'-mint.png';img.style.display='';}else{img.src='';img.style.display='none';}})(this);">
                         ${Object.keys(natureData).filter(n=>!['Docile','Serious','Bashful','Quirky'].includes(n)).map(n=>{const nd=natureData[n];const sl={atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};const hint=nd.up?` (+${sl[nd.up]} −${sl[nd.down]})`:' (neutral)';const col=getNatureColor(n);return`<option value="${n}" ${p.nature===n?'selected':''} style="color:${col};font-weight:${nd.up?'700':'400'}">${n}${hint}</option>`;}).join('')}
@@ -2098,27 +2118,52 @@ async function selectItem(pokeName, item) {
 }
 function closeItemDropdown(pokeName) { setTimeout(()=>{const d=document.getElementById(`itemDrop-${pokeName}`);if(d)d.style.display='none';},150); }
 
+function toggleMoveCatFilter(pokeName, slot, cat) {
+    cancelMoveDropdownClose(pokeName, slot);
+    const key = `${pokeName}-${slot}`;
+    if (!moveCatFilters[key]) moveCatFilters[key] = new Set();
+    const s = moveCatFilters[key];
+    if (s.has(cat)) s.delete(cat); else s.add(cat);
+    buildMoveTypeFilterBar(find(pokeName), pokeName, slot);
+    const input = document.getElementById(`moveinput-${pokeName}-${slot}`);
+    if (input) showMoveDropdown(input, pokeName, slot, input.value.trim());
+}
+
 function buildMoveTypeFilterBar(p, pokeName, slot) {
     const filterBar = document.getElementById(`movefilters-${pokeName}-${slot}`);
     if (!filterBar || !p._learnset || p._learnset.length === 0) return;
 
-    // Gather all types in learnset that have cached moves
     const typesInLearnset = new Set();
     p._learnset.forEach(m => {
         const md = moveCache[m.toLowerCase().replace(/\s+/g,'-')];
         if (md && md.type) typesInLearnset.add(md.type);
     });
-    if (typesInLearnset.size === 0) return;
 
     const filterKey = `${pokeName}-${slot}`;
-    const active = moveTypeFilters[filterKey] || null;
+    const activeType = moveTypeFilters[filterKey] || null;
+    const activeCats = moveCatFilters[filterKey] || new Set();
 
     const TYPE_ORDER = getTypeOrderForPokemon(p._data && p._data.type);
     const sorted = TYPE_ORDER.filter(t => typesInLearnset.has(t));
 
-    filterBar.innerHTML = sorted.map(t => {
+    const catDefs = [
+        { cat:'physical', cls:'cat-phys', url:'https://archives.bulbagarden.net/media/upload/3/39/PhysicalIC_SV.png', fallback:'⚔' },
+        { cat:'special',  cls:'cat-spec', url:'https://archives.bulbagarden.net/media/upload/8/86/SpecialIC_SV.png',  fallback:'💫' },
+        { cat:'status',   cls:'cat-stat', url:'https://archives.bulbagarden.net/media/upload/8/8a/StatusIC_SV.png',   fallback:'●' },
+    ];
+
+    const catBtns = catDefs.map(({cat, cls, url, fallback}) => {
+        const isActive = activeCats.has(cat);
+        return `<button class="move-cat-btn ${cls}${isActive?' cat-active':''}"
+            title="${cat.charAt(0).toUpperCase()+cat.slice(1)}"
+            onmousedown="event.preventDefault();toggleMoveCatFilter('${pokeName}',${slot},'${cat}')">
+            <img src="${url}" alt="${fallback}" onerror="this.outerHTML='<span style=font-size:.7rem>${fallback}</span>'">
+        </button>`;
+    }).join('');
+
+    const typePills = sorted.map(t => {
         const c = typeColors[t];
-        const isActive = active === t;
+        const isActive = activeType === t;
         const bg = c ? (isActive ? c.border : 'transparent') : 'transparent';
         const borderCol = c ? c.border : '#555';
         const textCol = c ? (isActive ? '#fff' : c.text) : '#aaa';
@@ -2126,6 +2171,11 @@ function buildMoveTypeFilterBar(p, pokeName, slot) {
             style="background:${bg};border-color:${borderCol};color:${textCol}"
             onmousedown="event.preventDefault();toggleMoveTypeFilter('${pokeName}',${slot},'${t}')">${t}</button>`;
     }).join('');
+
+    filterBar.innerHTML = `
+        <div class="move-cat-stack">${catBtns}</div>
+        <div class="move-cat-divider"></div>
+        <div class="move-type-pills">${typePills}</div>`;
 }
 
 function toggleMoveTypeFilter(pokeName, slot, type) {
@@ -2173,7 +2223,8 @@ function showMoveDropdown(input, pokeName, slot, query) {
     });
     rawMovesArray = mergedMoves;
     
-    const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type);
+  const activeCats = moveCatFilters[filterKey] && moveCatFilters[filterKey].size > 0 ? moveCatFilters[filterKey] : null;
+const matches = filterMoves(rawMovesArray, query, activeType, p._data && p._data.type, activeCats);
 
     function renderRows() {
         if (matches.length === 0) {
