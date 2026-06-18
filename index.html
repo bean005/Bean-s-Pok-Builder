@@ -130,8 +130,8 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .move-type-pills { display:flex; flex-wrap:wrap; gap:3px; }
 .move-cat-row { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
 .move-cat-divider-h { height:1px; background:#2e2e5e; margin:1px 0; }
-.move-cat-pill { display:inline-flex; align-items:center; gap:3px; padding:2px 6px; border-radius:20px; border:2px solid transparent; cursor:pointer; background:#1a1a3e; transition:box-shadow .15s, border-width .15s; font-size:.6rem; font-weight:700; color:#ccc; white-space:nowrap; }
-.move-cat-pill img { width:11px; height:11px; object-fit:contain; flex-shrink:0; }
+.move-cat-pill { display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:10px; border:1px solid transparent; cursor:pointer; background:transparent; transition:box-shadow .15s; font-size:.62rem; font-weight:700; color:#ccc; white-space:nowrap; }
+.move-cat-pill img { width:10px; height:10px; object-fit:contain; flex-shrink:0; }
 .move-cat-pill.cat-phys { border-color:#e67e22; color:#e67e22; }
 .move-cat-pill.cat-spec { border-color:#3498db; color:#3498db; }
 .move-cat-pill.cat-stat { border-color:#a855f7; color:#a855f7; }
@@ -140,7 +140,7 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .move-cat-pill.cat-stat.cat-active { box-shadow:0 0 7px 2px #a855f7; border-width:3px; }
 .move-type-btn { padding:2px 7px; border-radius:10px; font-size:.62rem; font-weight:700; border:1px solid transparent; cursor:pointer; opacity:.5; transition:opacity .15s,transform .1s; white-space:nowrap; background:transparent; }
 .move-type-btn:hover { opacity:.85; }
-.move-type-btn.mtf-active { opacity:1; transform:scale(1.08); }
+.move-type-btn.mtf-active { opacity:1; }
 .move-dd-type-header { padding:3px 10px; font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); background:#13132a; border-bottom:1px solid var(--border); cursor:default; pointer-events:none; }
 .move-slot { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; position:relative; overflow:visible; }
 .move-slot label { display:block; font-size:.63rem; color:#666; margin-bottom:3px; text-transform:uppercase; letter-spacing:.05em; }
@@ -1956,16 +1956,14 @@ function buildExpanded(p, stats) {
                 <label>Nature</label>
                 <div style="display:flex;align-items:center;gap:5px;">
                     ${(() => {
-                        const nd = getNatureData(p.nature);
-                        if (nd.up) {
-                            const mintSlug = p.nature.toLowerCase() + '-mint';
-                            return `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${mintSlug}.png"
-                                onerror="this.style.display='none'"
-                                title="${p.nature} Mint"
-                                style="width:20px;height:20px;image-rendering:pixelated;flex-shrink:0;">`;
-                        }
-                        return '<span style="width:20px;height:20px;flex-shrink:0;display:inline-block;"></span>';
-                    })()}
+    const nd = getNatureData(p.nature);
+    const mintSlug = p.nature.toLowerCase() + '-mint';
+    const hide = nd.up ? '' : 'display:none;';
+    return `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${mintSlug}.png"
+        onerror="this.style.display='none'"
+        title="${p.nature} Mint"
+        style="width:20px;height:20px;image-rendering:pixelated;flex-shrink:0;${hide}">`;
+})()}
                     <select class="nature-select" style="flex:1;color:${getNatureColor(p.nature)};font-weight:${getNatureData(p.nature).up?'700':'400'}" onchange="updateField('${p.name}','nature',this.value);applyNatureSelectColor(this);(function(sel){const nd=natureData[sel.value];const img=sel.previousElementSibling;if(nd&&nd.up){img.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/'+sel.value.toLowerCase()+'-mint.png';img.style.display='';}else{img.style.display='none';}})(this);">
                         ${Object.keys(natureData).filter(n=>!['Docile','Serious','Bashful','Quirky'].includes(n)).map(n=>{const nd=natureData[n];const sl={atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};const hint=nd.up?` (+${sl[nd.up]} −${sl[nd.down]})`:' (neutral)';const col=getNatureColor(n);return`<option value="${n}" ${p.nature===n?'selected':''} style="color:${col};font-weight:${nd.up?'700':'400'}">${n}${hint}</option>`;}).join('')}
                     </select>
