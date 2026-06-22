@@ -1362,7 +1362,6 @@ async function fetchMoveData(rawName) {
                    .replace(/\$effect_chance/g, d.effect_chance || '?')
                 : '')
         };
-        };
         moveCache[slug] = data;
         moveCache[showdownKey] = data;
         return data;
