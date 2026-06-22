@@ -99,6 +99,7 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
     #team,#pool { grid-template-columns:1fr; }
     .exp-controls-row { grid-template-columns:1fr 1fr; }
     .individual-weakness-grid { grid-template-columns:1fr; }
+    .exp-moves { grid-template-columns:repeat(2,1fr); }
 }
 
 /* POKEMON CARD */
@@ -144,7 +145,8 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .ability-info-icon { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#2e2e5e; color:var(--accent); font-size:.6rem; cursor:pointer; font-style:normal; font-weight:700; border:1px solid var(--border); transition:background .15s; flex-shrink:0; position:relative; line-height:1; }
 .ability-info-icon:hover { background:#3e3e7e; }
 .ability-tooltip { display:none; position:fixed; width:240px; background:#1a1a3e; border:1px solid var(--accent); border-radius:8px; padding:10px 12px; font-size:.72rem; color:var(--muted2); line-height:1.5; z-index:9999; pointer-events:none; box-shadow:0 4px 20px rgba(0,0,0,.7); white-space:normal; word-wrap:break-word; }
-.ability-info-icon:hover .ability-tooltip { display:block; }
+.ability-info-icon:hover .ability-tooltip,
+.ability-info-icon.tooltip-open .ability-tooltip { display:block; }
 
 /* item info icon */
 .item-info-wrap { display:flex; align-items:center; gap:4px; }
@@ -152,7 +154,8 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .item-info-icon { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:#2e2e5e; color:var(--accent); font-size:.6rem; cursor:pointer; font-style:normal; font-weight:700; border:1px solid var(--border); transition:background .15s; flex-shrink:0; position:relative; line-height:1; }
 .item-info-icon:hover { background:#3e3e7e; }
 .item-tooltip { display:none; position:fixed; width:240px; background:#1a1a3e; border:1px solid var(--accent); border-radius:8px; padding:10px 12px; font-size:.72rem; color:var(--muted2); line-height:1.5; z-index:9999; pointer-events:none; box-shadow:0 4px 20px rgba(0,0,0,.7); white-space:normal; word-wrap:break-word; }
-.item-info-icon:hover .item-tooltip { display:block; }
+.item-info-icon:hover .item-tooltip,
+.item-info-icon.tooltip-open .item-tooltip { display:block; }
 
 /* MOVES */
 .exp-moves { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px; overflow:visible; }
@@ -193,7 +196,8 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .move-info-icon { display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border-radius:50%; background:#2e2e5e; color:var(--accent); font-size:.6rem; cursor:pointer; font-style:normal; font-weight:700; border:1px solid var(--border); transition:background .15s; flex-shrink:0; position:relative; line-height:1; }
 .move-info-icon:hover { background:#3e3e7e; }
 .move-tooltip { display:none; position:fixed; width:220px; background:#1a1a3e; border:1px solid var(--accent); border-radius:8px; padding:10px 12px; font-size:.72rem; color:var(--muted2); line-height:1.5; z-index:9999; pointer-events:none; box-shadow:0 4px 20px rgba(0,0,0,.7); white-space:normal; word-wrap:break-word; }
-.move-info-icon:hover .move-tooltip { display:block; }
+.move-info-icon:hover .move-tooltip,
+.move-info-icon.tooltip-open .move-tooltip { display:block; }
 
 /* IVs */
 .exp-ivs { display:grid; grid-template-columns:auto repeat(6,1fr); align-items:center; gap:8px; margin-bottom:14px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; }
@@ -2435,7 +2439,13 @@ async function toggleExpand(name) {
     }
     render();
 }
-
+document.addEventListener('click', e => {
+    const icon = e.target.closest('.move-info-icon, .ability-info-icon, .item-info-icon');
+    document.querySelectorAll('.move-info-icon, .ability-info-icon, .item-info-icon').forEach(el => {
+        if (el !== icon) el.classList.remove('tooltip-open');
+    });
+    if (icon) icon.classList.toggle('tooltip-open');
+});
 document.addEventListener('mousemove', e => {
     document.querySelectorAll('.move-tooltip, .ability-tooltip, .item-tooltip').forEach(t => {
         if(t.parentElement.matches(':hover')){
