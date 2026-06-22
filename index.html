@@ -73,7 +73,8 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
     #team,#pool { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .pokemon-summary { grid-template-columns:56px 1fr 1fr 60px; gap:6px; align-items:start; min-height:72px; }
     .summary-info .poke-type { white-space:nowrap; }
-    .summary-moves { display:none; }
+    .summary-moves { display:block; }
+    .summary-moves div { font-size:.6rem; line-height:1.4; color:#ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90px; }
     .exp-controls-row { grid-template-columns:repeat(2,1fr); }
     .exp-moves { grid-template-columns:repeat(2,1fr); }
     .weakness-panels { grid-template-columns:1fr; }
@@ -85,7 +86,8 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
    .pokemon-summary { grid-template-columns:56px 1fr 60px; gap:6px; align-items:start; min-height:72px; }
     .summary-info .poke-type { white-space:nowrap; }
     .summary-meta { display:none; }
-    .summary-moves { display:none; }
+    .summary-moves { display:block; }
+    .summary-moves div { font-size:.6rem; line-height:1.4; color:#ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90px; }
     .exp-controls-row { grid-template-columns:repeat(2,1fr); }
     .exp-moves { grid-template-columns:repeat(2,1fr); }
     .exp-stats-grid { grid-template-columns:60px 60px 70px 1fr; }
@@ -100,6 +102,10 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
     .exp-controls-row { grid-template-columns:1fr 1fr; }
     .individual-weakness-grid { grid-template-columns:1fr; }
     .exp-moves { grid-template-columns:repeat(2,1fr); }
+    .exp-header { grid-template-columns:90px 1fr; gap:8px; }
+    .exp-sprite-box img { width:80px; height:80px; }
+    .pokemon-expanded { padding:10px; }
+    .exp-stats-grid { grid-template-columns:50px 50px 60px 1fr; font-size:.68rem; }
 }
 
 /* POKEMON CARD */
