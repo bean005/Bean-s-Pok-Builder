@@ -1906,9 +1906,11 @@ function buildExpanded(p, stats) {
     // Item info icon — show description of currently selected item (from cache)
     const itemSlug = p.item ? p.item.toLowerCase().replace(/\s+/g,'-') : '';
     const itemDetail = itemSlug ? itemDetailCache[itemSlug] : null;
-    const itemSpriteHtml = (p.item && itemDetail && itemDetail.sprite)
-        ? `<img id="itemSprite-${p.name}" src="${itemDetail.sprite}" alt="${p.item}" title="${p.item}" style="width:24px;height:24px;image-rendering:pixelated;flex-shrink:0;" onerror="this.style.display='none'">`
-        : (p.item ? `<div style="width:24px;height:24px;flex-shrink:0;"></div>` : '');
+    const itemSpriteHtml = p.item
+    ? `<div style="width:24px;height:24px;flex-shrink:0;">${itemDetail && itemDetail.sprite
+        ? `<img id="itemSprite-${p.name}" src="${itemDetail.sprite}" alt="${p.item}" title="${p.item}" style="width:24px;height:24px;image-rendering:pixelated;" onerror="this.style.display='none'">`
+        : ''}</div>`
+    : '<div style="width:24px;height:24px;flex-shrink:0;"></div>';
     const itemInfoIcon = (itemDescOverrides[itemSlug] || (itemDetail && itemDetail.desc))
         ? `<span class="item-info-icon">ℹ<div class="item-tooltip">${getItemDesc(itemSlug, itemDetail && itemDetail.desc)}</div></span>`
         : '';
