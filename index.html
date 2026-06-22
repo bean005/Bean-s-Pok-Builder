@@ -1000,7 +1000,7 @@ async function fetchEggMovesForSlug(slug) {
     } catch(e) { return []; }
 }
 
-async function fetchFullEvoLearnset(speciesUrl) {
+async function fetchFullEvoLearnset(speciesUrl, originalSlug) {
     try {
         const sr = await fetch(speciesUrl);
         if (!sr.ok) return null;
@@ -1018,8 +1018,13 @@ async function fetchFullEvoLearnset(speciesUrl) {
             const ls = await fetchLearnsetForSlug(s);
             ls.forEach(m => allMoves.add(m));
         }));
+        // If original slug differs from species name (e.g. tatsugiri-curly vs tatsugiri)
+        // fetch moves directly for the original form slug
+        if (originalSlug && !slugs.includes(originalSlug)) {
+            const formMoves = await fetchLearnsetForSlug(originalSlug);
+            formMoves.forEach(m => allMoves.add(m));
+        }
         // ALSO explicitly fetch egg moves from the FIRST (base) form in the chain
-        // because PokeAPI sometimes omits egg moves from later evolutions' entries
         const baseSlug = slugs[0];
         if (baseSlug) {
             const eggMoves = await fetchEggMovesForSlug(baseSlug);
@@ -1038,6 +1043,9 @@ const LEARNSET_ADDITIONS = {
     'lopunny': ['play-rough'],
     'lopunny-mega': ['play-rough', 'u-turn', 'fury-cutter'],
     'buneary': ['play-rough'],
+    'tatsugiri-curly': ['take-down','water-gun','hydro-pump','surf','hyper-beam','counter','harden','splash','rest','substitute','protect','icy-wind','outrage','endure','sleep-talk','baton-pass','rapid-spin','rain-dance','mirror-coat','whirlpool','memento','facade','taunt','helping-hand','muddy-water','dragon-dance','water-pulse','dragon-pulse','giga-impact','nasty-plot','draco-meteor','soak','lunge','tera-blast','chilling-water','dragon-cheer'],
+    'tatsugiri-droopy': ['take-down','water-gun','hydro-pump','surf','hyper-beam','counter','harden','splash','rest','substitute','protect','icy-wind','outrage','endure','sleep-talk','baton-pass','rapid-spin','rain-dance','mirror-coat','whirlpool','memento','facade','taunt','helping-hand','muddy-water','dragon-dance','water-pulse','dragon-pulse','giga-impact','nasty-plot','draco-meteor','soak','lunge','tera-blast','chilling-water','dragon-cheer'],
+    'tatsugiri-stretchy': ['take-down','water-gun','hydro-pump','surf','hyper-beam','counter','harden','splash','rest','substitute','protect','icy-wind','outrage','endure','sleep-talk','baton-pass','rapid-spin','rain-dance','mirror-coat','whirlpool','memento','facade','taunt','helping-hand','muddy-water','dragon-dance','water-pulse','dragon-pulse','giga-impact','nasty-plot','draco-meteor','soak','lunge','tera-blast','chilling-water','dragon-cheer'],
 };
 function applyLearnsetAdditions(slug, learnset) {
     const extra = LEARNSET_ADDITIONS[slug];
@@ -1097,8 +1105,8 @@ async function fetchPokemonFromAPI(rawName) {
         const data = {id:d.id, type:types, gender, abilities, baseStats, zaSprite:false};
         const name = d.name.charAt(0).toUpperCase()+d.name.slice(1).replace(/-./g,s=>'-'+s[1].toUpperCase());
         const p = makePokemon(name, data);
-        const evoLearnset = await fetchFullEvoLearnset(d.species.url);
-        p._learnset = applyLearnsetAdditions(slug, evoLearnset || d.moves.map(m=>m.move.name));
+        const evoLearnset = await fetchFullEvoLearnset(d.species.url, slug);
+p._learnset = applyLearnsetAdditions(slug, evoLearnset || d.moves.map(m=>m.move.name));
         if(status) status.textContent=`Added ${p.name}!`;
         return p;
     } catch(e) {
