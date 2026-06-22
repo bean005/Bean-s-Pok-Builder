@@ -71,7 +71,8 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 .pokemon.is-expanded { grid-column:1/-1; }
 @media (max-width:1024px) {
     #team,#pool { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    .pokemon-summary { grid-template-columns:56px 1fr 1fr 60px; gap:6px; }
+    .pokemon-summary { grid-template-columns:56px 1fr 1fr 60px; gap:6px; align-items:start; min-height:72px; }
+    .summary-info .poke-type { white-space:nowrap; }
     .summary-moves { display:none; }
     .exp-controls-row { grid-template-columns:repeat(2,1fr); }
     .exp-moves { grid-template-columns:repeat(2,1fr); }
@@ -81,7 +82,8 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 @media (max-width:768px) {
     #team,#pool { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .pokemon.is-expanded { grid-column:1/-1; }
-    .pokemon-summary { grid-template-columns:56px 1fr 60px; gap:6px; }
+   .pokemon-summary { grid-template-columns:56px 1fr 60px; gap:6px; align-items:start; min-height:72px; }
+    .summary-info .poke-type { white-space:nowrap; }
     .summary-meta { display:none; }
     .summary-moves { display:none; }
     .exp-controls-row { grid-template-columns:repeat(2,1fr); }
