@@ -1329,6 +1329,11 @@ async function prefetchLearnsetMoveData(p) {
         await Promise.all(batch.map(m => fetchMoveData(m.toLowerCase().replace(/\s+/g,'-'))));
     }
 }
+    const moveDescOverrides = {
+    'rage-fist': 'Deals damage based on how many times the user has been hit. Power starts at 50 and rises by 50 for each hit taken, up to a maximum of 350.',
+    'scald': 'Deals Water-type damage. Has a 30% chance to burn the target.',
+    'tri-attack': 'Deals Normal-type damage. Has a 20% chance to either burn, freeze, or paralyze the target.',
+};
 async function fetchMoveData(rawName) {
     const showdownKey = rawName.toLowerCase().replace(/[\s-]/g, '');
     const slug = rawName.toLowerCase().replace(/\s+/g, '-');
@@ -1343,10 +1348,12 @@ async function fetchMoveData(rawName) {
             category: d.damage_class.name,
             power: d.power || '—',
             accuracy: d.accuracy || '—',
-            description: (d.effect_entries && d.effect_entries.find(e=>e.language.name==='en'))
+            description: moveDescOverrides[slug] ||
+                ((d.effect_entries && d.effect_entries.find(e=>e.language.name==='en'))
                 ? d.effect_entries.find(e=>e.language.name==='en').short_effect
                    .replace(/\$effect_chance/g, d.effect_chance || '?')
-                : ''
+                : '')
+        };
         };
         moveCache[slug] = data;
         moveCache[showdownKey] = data;
@@ -1954,20 +1961,11 @@ function buildExpanded(p, stats) {
             </div>
             <div class="ctrl-group">
                 <label>Nature</label>
-                <div style="display:flex;align-items:center;gap:5px;">
-                    ${(() => {
-    const nd = getNatureData(p.nature);
-    const mintSlug = p.nature.toLowerCase() + '-mint';
-    const hide = nd.up ? '' : 'display:none;';
-    return `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${mintSlug}.png"
-        onerror="this.style.display='none'"
-        title="${p.nature} Mint"
-        style="width:20px;height:20px;image-rendering:pixelated;flex-shrink:0;${hide}">`;
-})()}
-                    <select class="nature-select" style="flex:1;color:${getNatureColor(p.nature)};font-weight:${getNatureData(p.nature).up?'700':'400'}" onchange="updateField('${p.name}','nature',this.value);applyNatureSelectColor(this);(function(sel){const nd=natureData[sel.value];const img=sel.previousElementSibling;if(nd&&nd.up){img.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/'+sel.value.toLowerCase()+'-mint.png';img.style.display='';}else{img.style.display='none';}})(this);">
-                        ${Object.keys(natureData).filter(n=>!['Docile','Serious','Bashful','Quirky'].includes(n)).map(n=>{const nd=natureData[n];const sl={atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};const hint=nd.up?` (+${sl[nd.up]} −${sl[nd.down]})`:' (neutral)';const col=getNatureColor(n);return`<option value="${n}" ${p.nature===n?'selected':''} style="color:${col};font-weight:${nd.up?'700':'400'}">${n}${hint}</option>`;}).join('')}
-                    </select>
-                </div>
+<div style="display:flex;align-items:center;gap:5px;">
+    <select class="nature-select" style="flex:1;color:${getNatureColor(p.nature)};font-weight:${getNatureData(p.nature).up?'700':'400'}" onchange="updateField('${p.name}','nature',this.value);applyNatureSelectColor(this);">
+        ${Object.keys(natureData).filter(n=>!['Docile','Serious','Bashful','Quirky'].includes(n)).map(n=>{const nd=natureData[n];const sl={atk:'Atk',def:'Def',spa:'SpA',spd:'SpD',spe:'Spe'};const hint=nd.up?` (+${sl[nd.up]} −${sl[nd.down]})`:' (neutral)';const col=getNatureColor(n);return`<option value="${n}" ${p.nature===n?'selected':''} style="color:${col};font-weight:${nd.up?'700':'400'}">${n}${hint}</option>`;}).join('')}
+    </select>
+</div>
             </div>
             <div class="ctrl-group">
                 <label>Nickname</label>
