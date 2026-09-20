@@ -1836,8 +1836,13 @@ function addDragHandlers() {
         const nameMatch = card.querySelector('.poke-name');
         if (!nameMatch) return;
         const name = nameMatch.textContent.trim();
-        card.setAttribute('draggable', true);
+        const isExpanded = card.classList.contains('is-expanded');
+        card.setAttribute('draggable', !isExpanded);
+        card.style.cursor = isExpanded ? 'default' : 'grab';
         card.addEventListener('dragstart', e => {
+            if (card.classList.contains('is-expanded')) { e.preventDefault(); return; }
+            const tag = e.target.tagName.toLowerCase();
+            if (['input','select','textarea','button'].includes(tag)) { e.preventDefault(); return; }
             dragSrcName = name;
             setTimeout(() => card.classList.add('dragging'), 0);
             e.dataTransfer.effectAllowed = 'move';
@@ -2425,7 +2430,8 @@ function updateEVFromSlider(name, stat, rawVal) {
     v=Math.min(v,510-tot); p.evs[stat]=v;
     document.querySelectorAll(`.ev-num-input[data-name="${name}"][data-stat="${stat}"]`).forEach(el=>el.value=v);
     const newTotal=getTotalEVs(p);
-    document.querySelectorAll(`.ev-total-live[data-name="${name}"]`).forEach(el=>{el.textContent=newTotal+' / 510';el.style.color='var(--accent)';});
+    document.querySelectorAll(`.ev-total-live[data-name="${name}"]`).forEach(el=>{el.textContent=newTotal+' / 510';el.style.color=newTotal>=510?'var(--green)':'var(--muted)';});
+    autoSave();
 }
 function updateEVFromInput(name, stat, rawVal) {
     const p=find(name); if(!p)return;
@@ -2447,7 +2453,7 @@ function liveIVInput(el, name, stat) {
 function commitIV(name, stat, rawVal) {
     const p=find(name); if(!p)return;
     let v=parseInt(rawVal,10); if(isNaN(v))v=31;
-    v=Math.max(0,Math.min(31,v)); p.ivs[stat]=v; render();
+    v=Math.max(0,Math.min(31,v)); p.ivs[stat]=v; render(); autoSave();
 }
 function updateIV(name, stat, rawVal) { commitIV(name,stat,rawVal); }
 function adjustIV(name, stat, delta) {
