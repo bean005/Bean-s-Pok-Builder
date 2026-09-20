@@ -2592,13 +2592,21 @@ async function doEvolveInto(fromName, evoSlug) {
 }
 async function init() { renderSavedTeams(); loadAllPokemonNames(); }
 function saveNotes(val) {
-    const team = savedTeams.find(t => t.id === currentTeamId);
-    if (team) { team.notes = val; localStorage.setItem('pokeTeams', JSON.stringify(savedTeams)); }
+    if (currentTeamId) {
+        const team = savedTeams.find(t => t.id === currentTeamId);
+        if (team) { team.notes = val; localStorage.setItem('pokeTeams', JSON.stringify(savedTeams)); }
+    } else {
+        localStorage.setItem('pokeTeams_draftNotes', val);
+    }
 }
 function loadNotes() {
     const el = document.getElementById('teamNotes'); if (!el) return;
-    const team = savedTeams.find(t => t.id === currentTeamId);
-    el.value = team && team.notes ? team.notes : '';
+    if (currentTeamId) {
+        const team = savedTeams.find(t => t.id === currentTeamId);
+        el.value = team && team.notes ? team.notes : '';
+    } else {
+        el.value = localStorage.getItem('pokeTeams_draftNotes') || '';
+    }
 }
 init();
 </script>
