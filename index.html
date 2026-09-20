@@ -1985,10 +1985,11 @@ function buildExpanded(p, stats) {
 <div class="exp-header">
     <div class="exp-sprite-box">
         <img src="${sprite(p)}" alt="${p.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
-        <div class="shiny-toggle">
+               <div class="shiny-toggle">
             <input type="checkbox" id="shiny-${p.name}" ${p.shiny?'checked':''} onchange="updateField('${p.name}','shiny',this.checked)">
             <label for="shiny-${p.name}">✨ Shiny</label>
         </div>
+        <button onclick="evolvePokemon('${p.name}')" style="margin-top:4px;background:#1a3a5e;border:1px solid #2e5a8e;color:#7ec8e3;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;width:100%;letter-spacing:.04em;" title="Evolve this Pokémon">Evolve →</button>
     </div>
     <div class="exp-controls-rows">
         <div class="exp-controls-row">
@@ -2467,6 +2468,84 @@ document.addEventListener('mousemove', e => {
 
 async function init() { renderSavedTeams(); loadAllPokemonNames(); }
 init();
+const evoCache = {}; // slug → array of evo slugs (empty = final form)
+async function getEvolutions(slug) {
+    if (evoCache[slug] !== undefined) return evoCache[slug];
+    try {
+        const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${slug}`);
+        if (!r.ok) { evoCache[slug]=[]; return []; }
+        const d = await r.json();
+        const sr = await fetch(d.species.url);
+        if (!sr.ok) { evoCache[slug]=[]; return []; }
+        const sd = await sr.json();
+        const ecr = await fetch(sd.evolution_chain.url);
+        if (!ecr.ok) { evoCache[slug]=[]; return []; }
+        const ecd = await ecr.json();
+        function findNext(node) {
+            if (node.species.name === slug || node.species.name === sd.name) return node.evolves_to.map(e=>e.species.name);
+            for (const c of node.evolves_to) { const f=findNext(c); if(f) return f; }
+            return null;
+        }
+        const result = findNext(ecd.chain) || [];
+        evoCache[slug] = result;
+        return result;
+    } catch(e) { evoCache[slug]=[]; return []; }
+}
+
+async function evolvePokemon(name) {
+    const p = find(name); if (!p) return;
+    const slug = name.toLowerCase().replace(/\s+/g,'-');
+    const evos = await getEvolutions(slug);
+    if (!evos || evos.length === 0) { showToast(`${name} can't evolve further.`); return; }
+    if (evos.length === 1) { await doEvolveInto(name, evos[0]); }
+    else {
+        // Multiple options (e.g. Eevee) — show a small picker modal
+        const overlay = document.createElement('div'); overlay.className='modal-overlay';
+        overlay.innerHTML=`<div class="modal-box"><h3>Evolve ${name} into…</h3><div class="modal-list">${evos.map(evo=>{
+            const id=pokemonIdMap[evo]||0;
+            const display=evo.charAt(0).toUpperCase()+evo.slice(1).replace(/-./g,s=>'-'+s[1].toUpperCase());
+            return `<button class="modal-pokemon-btn" onmousedown="this.closest('.modal-overlay').remove();doEvolveInto('${name}','${evo}')"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'"><span>${display}</span></button>`;
+        }).join('')}</div><button class="modal-cancel" onclick="this.closest('.modal-overlay').remove()">Cancel</button></div>`;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
+    }
+}
+
+async function doEvolveInto(fromName, evoSlug) {
+    const p = find(fromName); if (!p) return;
+    showToast('Evolving…');
+    try {
+        const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${evoSlug}`);
+        if (!r.ok) { showToast('Could not fetch evolution data.'); return; }
+        const d = await r.json();
+        let genderRate=-1;
+        try { const sr=await fetch(d.species.url);if(sr.ok){const sd=await sr.json();genderRate=sd.gender_rate;} } catch(e){}
+        let gender='mf'; if(genderRate===-1)gender='none'; else if(genderRate===8)gender='f';
+        const types=d.types.map(t=>t.type.name.charAt(0).toUpperCase()+t.type.name.slice(1));
+        const abilities=d.abilities.map(a=>a.ability.name.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '));
+        const baseStats={};
+        d.stats.forEach(s=>{const map={hp:'hp',attack:'atk',defense:'def','special-attack':'spa','special-defense':'spd',speed:'spe'};if(map[s.stat.name])baseStats[map[s.stat.name]]=s.base_stat;});
+        const newName=d.name.charAt(0).toUpperCase()+d.name.slice(1).replace(/-./g,s=>'-'+s[1].toUpperCase());
+        const newData={id:d.id,type:types,gender,abilities,baseStats,zaSprite:false};
+        const idx=pokemonList.findIndex(pk=>pk.name===fromName);
+        const newP={
+            ...p,
+            name:newName,
+            ability:abilities.includes(p.ability)?p.ability:(abilities[0]||''),
+            gender:gender==='none'?'none':(gender==='f'?'female':p.gender),
+            _data:newData,
+            _learnset:[]
+        };
+        pokemonList[idx]=newP;
+        render();
+        fetchFullEvoLearnset(d.species.url, evoSlug).then(ls=>{
+            newP._learnset=applyLearnsetAdditions(evoSlug, ls||d.moves.map(m=>m.move.name));
+            render();
+        });
+        prefetchAbilityData(newP);
+        showToast(`✅ Evolved into ${newName}!`);
+    } catch(e) { showToast('Evolution failed.'); }
+}
 </script>
 </body>
 </html>
