@@ -111,7 +111,9 @@ h2 { font-size:.95rem; font-weight:700; letter-spacing:.08em; text-transform:upp
 }
 
 /* POKEMON CARD */
-.pokemon { background:var(--bg3); border:1px solid var(--border2); border-radius:10px; padding:10px; overflow:visible; transition:border-color .2s; }
+.pokemon { background:var(--bg3); border:1px solid var(--border2); border-radius:10px; padding:10px; overflow:visible; transition:border-color .2s; cursor:grab; }
+.pokemon.dragging { opacity:.4; cursor:grabbing; border-color:var(--accent); }
+.pokemon.drag-over { border-color:#c084fc; border-style:dashed; }
 .pokemon.active { background:#0d3b2e; border-color:var(--green); }
 .pokemon:hover { border-color:var(--accent); }
 .pokemon *:focus { outline:none!important; box-shadow:none!important; }
@@ -461,15 +463,20 @@ input[type="range"].ev-slider:disabled { opacity:.35; cursor:not-allowed; }
                         <div class="coverage-grid" id="offensiveCoverage"></div>
                     </div>
                 </div>
-                <div class="weakness-section">
+                                <div class="weakness-section">
                     <h3>Individual Pokémon Weaknesses</h3>
                     <div class="individual-weakness-grid" id="individualWeakness"></div>
                 </div>
             </div>
         </div>
     </div>
+        <div class="panel">
+            <h2>📝 Notes</h2>
+            <textarea id="teamNotes" placeholder="Write any team notes here — strategy, matchup tips, reminders…"
+                style="width:100%;min-height:140px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:.85rem;font-family:inherit;padding:10px 12px;outline:none;resize:vertical;line-height:1.6;"
+                oninput="saveNotes(this.value)"></textarea>
+        </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -827,6 +834,7 @@ document.addEventListener('click', e => {
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    if (id === 'builderScreen') loadNotes();
 }
 function goHome() { showScreen('homeScreen'); renderSavedTeams(); }
 function startMode(mode) {
@@ -1822,7 +1830,42 @@ function renderWeaknesses() {
         }
     }
 }
-
+let dragSrcName = null;
+function addDragHandlers() {
+    document.querySelectorAll('.pokemon').forEach(card => {
+        const nameMatch = card.querySelector('.poke-name');
+        if (!nameMatch) return;
+        const name = nameMatch.textContent.trim();
+        card.setAttribute('draggable', true);
+        card.addEventListener('dragstart', e => {
+            dragSrcName = name;
+            setTimeout(() => card.classList.add('dragging'), 0);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            document.querySelectorAll('.pokemon').forEach(c => c.classList.remove('drag-over'));
+        });
+        card.addEventListener('dragover', e => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            card.classList.add('drag-over');
+        });
+        card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+        card.addEventListener('drop', e => {
+            e.preventDefault();
+            card.classList.remove('drag-over');
+            if (!dragSrcName || dragSrcName === name) return;
+            const fromIdx = pokemonList.findIndex(p => p.name === dragSrcName);
+            const toIdx = pokemonList.findIndex(p => p.name === name);
+            if (fromIdx === -1 || toIdx === -1) return;
+            const moved = pokemonList.splice(fromIdx, 1)[0];
+            pokemonList.splice(toIdx, 0, moved);
+            dragSrcName = null;
+            render();
+        });
+    });
+}
 function render() {
     const teamEl=document.getElementById('team'), poolEl=document.getElementById('pool');
     const teamCount=document.getElementById('teamCount'), poolCount=document.getElementById('poolCount');
@@ -1831,6 +1874,7 @@ function render() {
     const active=getActiveTeam(), pool=getPool();
     active.forEach(p=>teamEl.appendChild(buildCard(p)));
     pool.forEach(p=>poolEl.appendChild(buildCard(p)));
+    addDragHandlers();
     if(teamCount) teamCount.textContent=`(${active.length}/6)`;
     if(poolCount) poolCount.textContent=`(${pool.length}${currentMode==='draft'?' / 30':''})`;
     renderWeaknesses();
@@ -2547,6 +2591,15 @@ async function doEvolveInto(fromName, evoSlug) {
     } catch(e) { showToast('Evolution failed.'); }
 }
 async function init() { renderSavedTeams(); loadAllPokemonNames(); }
+function saveNotes(val) {
+    const team = savedTeams.find(t => t.id === currentTeamId);
+    if (team) { team.notes = val; localStorage.setItem('pokeTeams', JSON.stringify(savedTeams)); }
+}
+function loadNotes() {
+    const el = document.getElementById('teamNotes'); if (!el) return;
+    const team = savedTeams.find(t => t.id === currentTeamId);
+    el.value = team && team.notes ? team.notes : '';
+}
 init();
 </script>
 </body>
