@@ -1169,7 +1169,7 @@ async function searchAndAddPokemon() {
     if(p){pokemonList.push(p);input.value='';render();prefetchLearnsetMoveData(p);prefetchAbilityData(p);}
 }
 
-const ZA_MEGA_STONES=["Choice Band","Choice Specs","Choice Scarf","Life Orb","Focus Sash","Leftovers","Black Sludge","Rocky Helmet","Assault Vest","Eviolite","Heavy-Duty Boots","Air Balloon","Flame Orb","Toxic Orb","Weakness Policy","Power Herb","White Herb","Mental Herb","Shed Shell","Scope Lens","Wide Lens","Expert Belt","Muscle Band","Wise Glasses","Shell Bell","Covert Cloak","Ability Shield","Clear Amulet","Loaded Dice","Punching Glove","Booster Energy","Mirror Herb","Eject Button","Eject Pack","Red Card","Throat Spray","Blunder Policy","Terrain Extender","Light Clay","Heat Rock","Damp Rock","Smooth Rock","Icy Rock","Safety Goggles","Utility Umbrella","Kings Rock","Razor Fang","Quick Claw","Bright Powder","Zoom Lens","Chesto Berry","Salac Berry","Petaya Berry","Apicot Berry","Lansat Berry","Starf Berry","Liechi Berry","Ganlon Berry","Micle Berry","Custap Berry","Oran Berry","Raichu-Mega-X-ite",
+const ZA_MEGA_STONES=["Choice Band","Choice Specs","Choice Scarf","Life Orb","Focus Sash","Leftovers","Black Sludge","Rocky Helmet","Assault Vest","Eviolite","Heavy-Duty Boots","Air Balloon","Flame Orb","Toxic Orb","Weakness Policy","Power Herb","White Herb","Mental Herb","Shed Shell","Scope Lens","Wide Lens","Expert Belt","Muscle Band","Wise Glasses","Shell Bell","Covert Cloak","Ability Shield","Clear Amulet","Loaded Dice","Punching Glove","Booster Energy","Mirror Herb","Eject Button","Eject Pack","Red Card","Throat Spray","Blunder Policy","Terrain Extender","Light Clay","Heat Rock","Damp Rock","Smooth Rock","Icy Rock","Safety Goggles","Utility Umbrella","Kings Rock","Razor Fang","Quick Claw","Bright Powder","Zoom Lens","Chesto Berry","Salac Berry","Petaya Berry","Apicot Berry","Lansat Berry","Starf Berry","Liechi Berry","Ganlon Berry","Micle Berry","Custap Berry","Oran Berry","Raichu-Mega-X-ite","Raichu-Mega-Y-ite","Victreebelite","Starmiite","Dragonite-Mega-Stone","Meganiumite","Feraligatrite","Skarmoryite","Staraptorite","Froslasite","Chimechoite","Chandelurite","Golurkite","Chesnaughite","Delphoxite","Floetite","Dragalgite","Hawluchite","Scovillainite","Glimmorite","Crabominite","Drampite","Golisopodite","Magiarnite","Zeraorate","Falinksite","Tatsugirite","Baxcalibrite","Garchomp-Z-Stone","Lucario-Z-Stone","Heatranite","Darkreonite","Zygardeite","Excadrillite","Scolipedite","Scraftite","Eelektrosite","Emboarite","Absol-Mega-Stone"];
 
 const itemDescOverrides = {
     'choice-band':        '+50% Attack boost, but locks the holder into the last move used until it switches out.',
@@ -2543,9 +2543,11 @@ async function doEvolveInto(fromName, evoSlug) {
             render();
         });
         prefetchAbilityData(newP);
-        showToast(`✅ Evolved into ${newName}!`);
+                showToast(`✅ Evolved into ${newName}!`);
     } catch(e) { showToast('Evolution failed.'); }
 }
+async function init() { renderSavedTeams(); loadAllPokemonNames(); }
+init();
 </script>
 </body>
 </html>
