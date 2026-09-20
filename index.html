@@ -2457,7 +2457,7 @@ function adjustIV(name, stat, delta) {
     render();
 }
 
-function updateField(name, field, value) { const p=find(name);if(!p)return; if(field==='level'){value=Math.max(1,Math.min(100,Math.round(Number(value))||1));} p[field]=value;render(); if(field==='ability')prefetchAbilityData(p); }
+function updateField(name, field, value) { const p=find(name);if(!p)return;p[field]=value;render();autoSave(); }
 
 function confirmRemovePokemon(name) {
     showConfirm(`Remove ${name}?`, 'This will remove them from the pool entirely.', () => {
@@ -2597,6 +2597,14 @@ function saveNotes(val) {
         if (team) { team.notes = val; localStorage.setItem('pokeTeams', JSON.stringify(savedTeams)); }
     } else {
         localStorage.setItem('pokeTeams_draftNotes', val);
+    }
+}
+function autoSave() {
+    if (!currentTeamId) return;
+    const idx = savedTeams.findIndex(t => t.id === currentTeamId);
+    if (idx !== -1) {
+        savedTeams[idx] = buildSaveObj();
+        localStorage.setItem('pokeTeams', JSON.stringify(savedTeams));
     }
 }
 function loadNotes() {
