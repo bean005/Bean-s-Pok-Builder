@@ -736,6 +736,10 @@ body { overflow-x:hidden; }
 .guide-tile{flex:1 1 240px;text-align:left;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:16px;color:var(--text);cursor:pointer}
 .guide-tile:hover:not(.off){border-color:var(--accent);background:#1a4a7a}
 .guide-tile.off{opacity:.5;cursor:default;border-style:dashed}
+.gp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:6px 0 12px}
+.gp-game{text-align:left;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;color:var(--text);cursor:pointer;transition:border-color .15s,background-color .15s}
+.gp-game:hover{border-color:var(--accent);background:#1a4a7a}.gp-game b{display:block;font-size:.9rem}.gp-game small{color:var(--muted);font-size:.72rem}
+.gp-cont{display:block;width:100%;max-width:420px;margin:8px 0 6px;border-color:var(--accent)}
 .guide-tile b{display:block;font-size:1.05rem}.guide-tile small{color:var(--muted)}
 .guide-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .guide-bar select{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 8px;font-size:.8rem}
@@ -861,6 +865,7 @@ img.dx-link:hover{filter:brightness(1.18) drop-shadow(0 0 4px rgba(160,196,255,.
 /* ===== unified pill buttons: back / nav / small actions (same look family as the dropdowns + toggles) ===== */
 .guide-back,.builder-back,.dx-nav button,.dx-shinebtn{display:inline-flex;align-items:center;gap:7px;height:28px;box-sizing:border-box;padding:0 12px;background:var(--bg2);border:1px solid var(--border);border-radius:999px;color:var(--muted2);font-size:.74rem;font-weight:600;font-family:inherit;line-height:1;cursor:pointer;white-space:nowrap;transition:border-color .15s,background-color .15s,color .15s}
 .guide-back:has(.pb-ico),.builder-back:has(.pb-ico),.dx-nav button:has(.pb-ico){padding-left:4px}
+.dx-nav button:has(.pb-ico:last-child){padding-left:12px;padding-right:4px}
 .guide-back:hover,.builder-back:hover,.dx-nav button:hover,.dx-shinebtn:hover{background:var(--bg3);border-color:var(--accent);color:var(--text)}
 .guide-back:focus-visible,.builder-back:focus-visible,.dx-nav button:focus-visible,.dx-shinebtn:focus-visible{outline:none;border-color:var(--accent)}
 .pb-ico{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;box-sizing:border-box;border-radius:50%;border:1.5px solid var(--border2);color:var(--accent);font-size:.8rem;font-weight:800;line-height:1;transition:background-color .15s,border-color .15s,color .15s}
@@ -905,6 +910,42 @@ img.dx-link:hover{filter:brightness(1.18) drop-shadow(0 0 4px rgba(160,196,255,.
 .gc-t small{color:var(--muted)}.gc-ty{font-size:.64rem;font-weight:700;margin-left:4px}
 .gc-ok{color:#86efac}.gc-meh{color:#f4d03f}.gc-bad{color:#f87171}
 @media (max-width:560px){.gc-row{grid-template-columns:1fr;gap:2px}}
+
+/* compact toggle variant + per-Pokémon toggles in calc cards */
+.cx-tg.sm{width:fit-content;height:22px;padding:0 9px 0 3px;gap:5px;font-size:.68rem}
+.cx-tg.sm .cx-tg-dot{width:16px;height:16px;font-size:.5rem}
+.cx-tgcell{align-self:flex-end;display:flex}
+
+/* bigger scrollbar + arrow buttons for the trainer strip */
+.gs-wrap{display:flex;align-items:center;gap:8px}
+.gs-wrap .guide-strip{flex:1;min-width:0;scrollbar-width:auto;scrollbar-color:#4a78b8 var(--bg2);padding-bottom:12px}
+.guide-strip::-webkit-scrollbar{height:14px}
+.guide-strip::-webkit-scrollbar-track{background:var(--bg2);border-radius:999px;border:1px solid var(--border)}
+.guide-strip::-webkit-scrollbar-thumb{background:#4a78b8;border-radius:999px;border:3px solid var(--bg2)}
+.guide-strip::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+.guide-strip::-webkit-scrollbar-button{display:none;width:0;height:0}
+.gs-arrow{flex-shrink:0;width:42px;height:42px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--accent);font-size:1.5rem;font-weight:800;line-height:1;padding:0 0 3px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;transition:background-color .15s,border-color .15s,color .15s,opacity .15s}
+.gs-arrow:hover{background:var(--accent);border-color:var(--accent);color:var(--bg4)}
+.gs-arrow.dis{opacity:.3;pointer-events:none}
+@media (max-width:560px){.gs-arrow{display:none}}
+
+/* Dex move-list section dividers */
+.dx-div{display:flex;align-items:baseline;gap:10px;margin:14px 0 2px;padding:6px 10px;border-left:4px solid var(--c);background:var(--bg3);border-radius:0 8px 8px 0;position:sticky;top:env(safe-area-inset-top,0px);z-index:2}
+.dx-div b{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--c)}
+.dx-div small{font-size:.7rem;color:var(--muted)}
+/* No page jumps: reserve the scrollbar's space, and stop things above the cards from changing height */
+html{scrollbar-gutter:stable}
+#savedTeamList{min-height:58px}
+#saveStatus{white-space:nowrap}
+@media (max-width:768px){.builder-actions{flex:1 1 100%;justify-content:flex-end;flex-wrap:wrap}#saveStatus{flex:1 0 100%;min-height:1.2em;line-height:1.2;margin:0!important;text-align:right}}
+/* Dex: ability descriptions */
+.dx-rowab{align-items:start}
+.dx-abs{min-width:0}
+.dx-ab{padding:0 0 7px}
+.dx-ab+.dx-ab{border-top:1px dashed var(--border);padding-top:7px}
+.dx-abn{font-weight:700}
+.dx-abd{font-weight:400;font-size:.74rem;color:var(--muted2);line-height:1.45;margin-top:2px}
+.dx-abld{opacity:.55}
 </style>
 </head>
 <body>
@@ -919,6 +960,9 @@ img.dx-link:hover{filter:brightness(1.18) drop-shadow(0 0 4px rgba(160,196,255,.
 <path d="M6 15l17-5v39l-17 5z" fill="#4ade80" fill-opacity=".55" stroke="none"/><path d="M23 10l18 5v39l-18-5z" fill="#38bdf8" fill-opacity=".55" stroke="none"/><path d="M41 15l17-5v39l-17 5z" fill="#86efac" fill-opacity=".5" stroke="none"/><path d="M6 15l17-5 18 5 17-5v39l-17 5-18-5-17 5z" fill="none"/><path d="M23 10v39M41 15v39"/>
 <path d="M12 41l10-8 10 5 9-12" stroke="#ef4444" stroke-dasharray="1 5.5"/>
 <circle cx="49" cy="25" r="5.5" fill="#ef4444" stroke="currentColor"/><circle cx="49" cy="25" r="1.8" fill="#fff" stroke="none"/></g></symbol>
+<symbol id="ico-journal" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+<rect x="12" y="6" width="40" height="52" rx="6" fill="#a78bfa" fill-opacity=".5"/><path d="M21 6v52"/>
+<circle cx="37" cy="27" r="11" fill="#fff" fill-opacity=".14"/><path d="M26 27h22"/><circle cx="37" cy="27" r="3.4" fill="#fbbf24" fill-opacity=".85"/><path d="M28 45h18M28 51h11"/></g></symbol>
 <symbol id="ico-dex" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
 <rect x="13" y="5" width="38" height="54" rx="8" fill="#ef4444" fill-opacity=".5"/>
 <circle cx="24" cy="16" r="6" fill="#38bdf8" fill-opacity=".75"/><circle cx="24" cy="16" r="1.8" fill="#fff" stroke="none"/>
@@ -1354,7 +1398,7 @@ async function loadAllPokemonNames() {
             if (!allPokemonNames.includes(k)) allPokemonNames.push(k);
             if (v.id) pokemonIdMap[k.toLowerCase()] = v.id;
         });
-        allPokemonNames = allPokemonNames.filter(n => !/-Mega(-[XYZ])?$/i.test(n));   // Megas are reached with the Mega button, not search
+        allPokemonNames = allPokemonNames.filter(n => !/-Mega(-[XYZ]|-Curly|-Droopy|-Stretchy)?$/i.test(n));   // Megas are reached with the Mega button, not search
         document.getElementById('searchStatus').textContent = 'Ready — type a Pokémon name to search.';
     } catch(e) {
         document.getElementById('searchStatus').textContent = 'Could not load Pokémon list. Manual search still works.';
@@ -1455,12 +1499,20 @@ function openSection(name) {
 
 /* ===================== DAMAGE CALC ===================== */
 const calcState = {
-    format: '1v1', gen: 9, weather: '', terrain: '', gravity: false, picked: null,
+    format: '1v1', gen: 9, anyGen: true, weather: '', terrain: '', gravity: false, picked: null,
     you: { roster: [null,null,null,null,null,null], hh:false, reflect:false, ls:false, av:false, fg:false },
     opp: { roster: [null,null,null,null,null,null], hh:false, reflect:false, ls:false, av:false, fg:false }
 };
 const CALC_BOOSTS = ['atk','def','spa','spd','spe'];
 const CALC_BNAME = { atk:'Atk', def:'Def', spa:'SpA', spd:'SpD', spe:'Spe' };
+/* Gen 1 has a single Special stat (no separate Sp. Atk / Sp. Def) */
+const calcG1 = () => calcState.gen === 1;
+const calcStatKeys = () => calcG1() ? ['hp','atk','def','spa','spe'] : ['hp','atk','def','spa','spd','spe'];
+const calcStatLbl = k => (calcG1() && k === 'spa') ? 'Special' : ({ hp:'HP', atk:'Atk', def:'Def', spa:'SpA', spd:'SpD', spe:'Spe' })[k];
+function calcFinalStats(p) {
+    if (calcG1()) { try { const m = calcBuildMon(calc.Generations.get(1), p); if (m && m.stats) return { hp: m.stats.hp, atk: m.stats.atk, def: m.stats.def, spa: m.stats.spa, spd: m.stats.spa, spe: m.stats.spe }; } catch (e) {} }
+    return getFinalStats(p);
+}
 const CALC_STATUS = [['','Healthy'],['brn','Burn'],['par','Paralysis'],['psn','Poison'],['tox','Toxic'],['slp','Sleep'],['frz','Freeze']];
 const CALC_WEATHER = [['','No weather'],['Sun','Sun'],['Rain','Rain'],['Sand','Sandstorm'],['Snow','Snow'],['Hail','Hail (Gen 8 or older)'],['Harsh Sunshine','Harsh sun'],['Heavy Rain','Heavy rain'],['Strong Winds','Strong winds']];
 const CALC_TERRAIN = [['','No terrain'],['Electric','Electric'],['Grassy','Grassy'],['Misty','Misty'],['Psychic','Psychic']];
@@ -1496,6 +1548,19 @@ function calcSpecies(gen, p) {
     if (has(base)) return { name: base, fallback: true };
     return null;
 }
+/* "Everything goes": if a Pokémon or move isn't in the chosen generation, calculate with the newest generation that has everything */
+function calcGenFor(a, d) {
+    const order = [calcState.gen, 9, 8, 7, 6, 5, 4, 3, 2, 1].filter((g, i, arr) => arr.indexOf(g) === i);
+    const hasMove = (gen, n) => { try { return !!gen.moves.get(calcId(n)); } catch (e) { return false; } };
+    let first = null;
+    for (const g of order) {
+        const gen = calc.Generations.get(g);
+        if (!calcSpecies(gen, a) || !calcSpecies(gen, d)) continue;
+        if (!first) first = { gen, g };
+        if ((a.moves || []).every(m => !m || hasMove(gen, m))) return { gen, g };
+    }
+    return first;
+}
 function calcBuildMon(gen, p) {
     const sp = calcSpecies(gen, p);
     if (!sp) throw new Error(p.name + " isn't in the Gen " + calcState.gen + ' data.');
@@ -1510,7 +1575,8 @@ function calcBuildMon(gen, p) {
         ivs: Object.assign({}, p.ivs),
         boosts: Object.assign({}, p.cBoosts),
         status: p.cStatus || undefined,
-        teraType: (p.cTera && p.teraType) ? p.teraType : undefined
+        teraType: (p.cTera && p.teraType) ? p.teraType : undefined,
+        isDynamaxed: !!(p.cDmax && gen.num === 8)
     };
     if (sp.fallback && p._data) {
         opts.overrides = { types: p._data.type.slice(), baseStats: Object.assign({}, p._data.baseStats) };
@@ -1542,8 +1608,8 @@ function calcSpeed(p) {
     return s;
 }
 function calcStatLine(p) {
-    const s = getFinalStats(p);
-    return `HP ${s.hp} · Atk ${s.atk} · Def ${s.def} · SpA ${s.spa} · SpD ${s.spd} · Spe ${s.spe}`;
+    const s = calcFinalStats(p);
+    return calcG1() ? `HP ${s.hp} · Atk ${s.atk} · Def ${s.def} · Special ${s.spa} · Spe ${s.spe}` : `HP ${s.hp} · Atk ${s.atk} · Def ${s.def} · SpA ${s.spa} · SpD ${s.spd} · Spe ${s.spe}`;
 }
 
 /* ---- damage results ---- */
@@ -1554,7 +1620,7 @@ function calcMoveRow(gen, a, atkMon, defMon, field, slot) {
     try { known = !!gen.moves.get(calcId(name)); } catch (e) {}
     if (!known) return `<div class="cx-mrow"><div class="cx-mname">${calcEsc(name)}</div><div class="cx-note">Not a known move in Gen ${calcState.gen}. Pick one from the list.</div></div>`;
     try {
-        const mv = new calc.Move(gen, name, { isCrit: !!a.cCrit[slot] });
+        const mv = new calc.Move(gen, name, { isCrit: !!a.cCrit[slot], useMax: !!(a.cDmax && gen.num === 8) });
         const tc = typeColors[mv.type];
         const chip = `<span class="cx-mtype" ${tc ? `style="background:${tc.bg};border-color:${tc.border};color:${tc.text}"` : ''}>${mv.type || ''}</span>${calcCatIcon(mv.category)}`;
         if (mv.category === 'Status') return `<div class="cx-mrow"><div class="cx-mname">${calcEsc(mv.name)} ${chip}</div><div class="cx-note">Status move, no damage.</div></div>`;
@@ -1582,7 +1648,8 @@ function calcMoveRow(gen, a, atkMon, defMon, field, slot) {
 }
 function calcMatchupHTML(gen, aSide, ai, dSide, di) {
     const a = calcPrep(calcState[aSide].roster[ai]), d = calcPrep(calcState[dSide].roster[di]);
-    let body = '';
+    let body = '', genNote = '';
+    if (calcState.anyGen !== false) { const e = calcGenFor(a, d); if (e) { if (e.g !== calcState.gen) genNote = `<div class="cx-note">Using Gen ${e.g} data — a Pokémon or move here isn't in Gen ${calcState.gen}.</div>`; gen = e.gen; } }
     try {
         const atkMon = calcBuildMon(gen, a), defMon = calcBuildMon(gen, d), field = calcField(aSide, dSide);
         body = [0,1,2,3].map(s => calcMoveRow(gen, a, atkMon, defMon, field, s)).join('')
@@ -1593,7 +1660,7 @@ function calcMatchupHTML(gen, aSide, ai, dSide, di) {
     const im = p => `<img src="${sprite(p)}" alt="" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">`;
     return `<div class="cx-match"><div class="cx-mhead">${im(a)}<b>${calcEsc(a.nickname || a.name)}</b><span class="cx-arrow">→</span>${im(d)}<b>${calcEsc(d.nickname || d.name)}</b>
         <span class="cx-spd">Spe ${sa} vs ${sd} · ${order}</span>
-        <span class="cx-spd">Items: ${calcEsc(a.item || 'none')} (attacker) · ${calcEsc(d.item || 'none')} (defender)</span></div>${body}</div>`;
+        <span class="cx-spd">Items: ${calcEsc(a.item || 'none')} (attacker) · ${calcEsc(d.item || 'none')} (defender)</span></div>${genNote}${body}</div>`;
 }
 function calcResultsHTML() {
     if (typeof calc === 'undefined') return '';
@@ -1614,7 +1681,7 @@ function calcRefresh() {
         if (!p) return;
         const el = document.getElementById(`cxStats-${side}-${i}`);
         if (el) el.textContent = calcStatLine(p);
-        const fin = getFinalStats(p);
+        const fin = calcFinalStats(p);
         ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].forEach(k => {
             const c = document.getElementById(`cxFin-${side}-${i}-${k}`);
             if (c) c.textContent = fin[k];
@@ -1630,11 +1697,12 @@ function calcSet(side, i, field, val) {
     else if (field === 'hp') p.cHP = Math.max(1, Math.min(100, Number(val) || 100));
     else if (field === 'status') p.cStatus = val;
     else if (field === 'tera') p.cTera = !!val;
+    else if (field === 'dmax') p.cDmax = !!val;
     else if (field === 'abon') p.cAbOn = !!val;
     else p[field] = val;
     calcRefresh();
 }
-function calcSetBoost(side, i, stat, val) { const p = calcState[side].roster[i]; if (!p) return; p.cBoosts[stat] = Number(val) || 0; calcRefresh(); }
+function calcSetBoost(side, i, stat, val) { const p = calcState[side].roster[i]; if (!p) return; p.cBoosts[stat] = Number(val) || 0; if (calcG1() && stat === 'spa') p.cBoosts.spd = p.cBoosts.spa; calcRefresh(); }
 function calcSetMove(side, i, slot, val) { const p = calcState[side].roster[i]; if (!p) return; p.moves[slot] = String(val).trim(); calcRefresh(); }
 function calcSetCrit(side, i, slot, on) { const p = calcState[side].roster[i]; if (!p) return; p.cCrit[slot] = !!on; calcRefresh(); }
 function calcSetEV(side, i, stat, el) {
@@ -1653,6 +1721,14 @@ function calcSetIV(side, i, stat, el) {
 }
 function calcSetField(key, val) { calcState[key] = val; calcRefresh(); }
 function calcSetSide(side, key, val) { calcState[side][key] = val; calcRefresh(); }
+function cxMonTg(on, abbr, label, side, i, field, slot, small) {
+    return `<button type="button" class="cx-tg${small ? ' sm' : ''}${on ? ' on' : ''}" aria-pressed="${on ? 'true' : 'false'}" onclick="calcMonToggle(this,'${side}',${i},'${field}',${slot === undefined ? 0 : slot})"><span class="cx-tg-dot">${abbr}</span>${label}</button>`;
+}
+function calcMonToggle(btn, side, i, field, slot) {
+    const on = !btn.classList.contains('on');
+    btn.classList.toggle('on', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (field === 'crit') calcSetCrit(side, i, slot, on); else calcSet(side, i, field, on);
+}
 function calcToggle(btn, side, key) {
     const val = !(side ? calcState[side][key] : calcState[key]);
     btn.classList.toggle('on', val);
@@ -1760,7 +1836,7 @@ function calcFieldHTML() {
         <label class="cx-f">Generation<select onchange="calcSetGen(this.value)">${gens}</select></label>
         <label class="cx-f">Weather<select onchange="calcSetField('weather',this.value)">${opt(CALC_WEATHER, calcState.weather)}</select></label>
         <label class="cx-f">Terrain<select onchange="calcSetField('terrain',this.value)">${opt(CALC_TERRAIN, calcState.terrain)}</select></label>
-        <div class="cx-grav">${tg(!!calcState.gravity, 'G', 'Gravity', `,null,'gravity'`)}</div>
+        <div class="cx-grav">${tg(!!calcState.gravity, 'G', 'Gravity', `,null,'gravity'`)}${tg(calcState.anyGen !== false, '∞', 'Everything goes', `,null,'anyGen'`)}</div>
         ${sideBox('you', 'Your side')}${sideBox('opp', 'Opponent side')}</div>`;
 }
 /* ===== CALC PICKERS: searchable moves + items ===== */
@@ -1839,7 +1915,7 @@ function calcMoveCellHTML(side, i, s) {
         </div>
         <div class="cx-dd ${s % 2 ? 'cx-dd-r' : ''}" id="cxmd-${key}" style="display:none" onmousedown="event.preventDefault()"></div>
     </div>
-    <label class="cx-chk"><input type="checkbox" ${p.cCrit[s] ? 'checked' : ''} onchange="calcSetCrit('${side}',${i},${s},this.checked)"> Crit</label>`;
+    ${cxMonTg(!!p.cCrit[s], 'C', 'Crit', side, i, 'crit', s, true)}`;
 }
 function calcMoveCell(side, i, s) {
     const el = document.getElementById(`cxmc-${side}-${i}-${s}`);
@@ -1990,13 +2066,13 @@ function calcActiveCard(side, i, p) {
     const sel = (arr, cur) => arr.map(v => `<option value="${calcEsc(v)}" ${cur === v ? 'selected' : ''}>${calcEsc(v)}</option>`).join('');
     const natures = Object.keys(natureData).map(n => `<option value="${n}" ${p.nature === n ? 'selected' : ''}>${n}</option>`).join('');
     const status = CALC_STATUS.map(([v, l]) => `<option value="${v}" ${p.cStatus === v ? 'selected' : ''}>${l}</option>`).join('');
-    const boostSel = CALC_BOOSTS.map(k => {
+    const boostSel = CALC_BOOSTS.filter(k => !(calcG1() && k === 'spd')).map(k => {
         let o = ''; for (let b = 6; b >= -6; b--) o += `<option value="${b}" ${p.cBoosts[k] === b ? 'selected' : ''}>${b > 0 ? '+' + b : b}</option>`;
-        return `<label class="cx-f cx-mini">${CALC_BNAME[k]}<select onchange="calcSetBoost('${side}',${i},'${k}',this.value)">${o}</select></label>`;
+        return `<label class="cx-f cx-mini">${calcStatLbl(k) === 'Special' ? 'Special' : CALC_BNAME[k]}<select onchange="calcSetBoost('${side}',${i},'${k}',this.value)">${o}</select></label>`;
     }).join('');
     const moves = [0,1,2,3].map(s => `<div class="cx-move" id="cxmc-${side}-${i}-${s}">${calcMoveCellHTML(side, i, s)}</div>`).join('');
-    const statsKeys = ['hp','atk','def','spa','spd','spe'], statsName = { hp:'HP', atk:'Atk', def:'Def', spa:'SpA', spd:'SpD', spe:'Spe' };
-    const fin = getFinalStats(p);
+    const statsKeys = calcStatKeys(), statsName = { hp: calcStatLbl('hp'), atk: calcStatLbl('atk'), def: calcStatLbl('def'), spa: calcStatLbl('spa'), spd: calcStatLbl('spd'), spe: calcStatLbl('spe') };
+    const fin = calcFinalStats(p);
     const evTable = `<table class="cx-evtable cx-evh">
         <thead><tr><th></th>${statsKeys.map(k => `<th>${statsName[k]}</th>`).join('')}</tr></thead>
         <tbody>
@@ -2016,9 +2092,10 @@ function calcActiveCard(side, i, p) {
             <label class="cx-f">Ability<span class="cx-abwrap"><select onchange="calcAbilityChange('${side}',${i},this)">${sel(abilities, p.ability)}${customAbOptions(p)}</select>${customAbIcons(p, `calcRemoveCustomAbility('${side}',${i})`)}</span></label>
             <label class="cx-f">Status<select onchange="calcSet('${side}',${i},'status',this.value)">${status}</select></label>
             <label class="cx-f">HP %<input type="number" min="1" max="100" value="${p.cHP}" onchange="calcSet('${side}',${i},'hp',this.value)"></label>
-            <label class="cx-chk"><input type="checkbox" ${p.cTera ? 'checked' : ''} onchange="calcSet('${side}',${i},'tera',this.checked)"> Terastallized</label>
+            ${calcState.gen === 8 ? `<div class="cx-tgcell">${cxMonTg(!!p.cDmax, 'D', 'Dynamax', side, i, 'dmax')}</div>` : ''}
+            <div class="cx-tgcell">${cxMonTg(!!p.cTera, 'T', 'Terastallized', side, i, 'tera')}</div>
             <label class="cx-f">Tera type<select onchange="calcSet('${side}',${i},'teraType',this.value)">${[...CALC_TYPES, 'Stellar'].map(t => `<option value="${t}" ${p.teraType === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
-            <label class="cx-chk"><input type="checkbox" ${p.cAbOn ? 'checked' : ''} onchange="calcSet('${side}',${i},'abon',this.checked)"> Ability active</label>
+            <div class="cx-tgcell">${cxMonTg(!!p.cAbOn, 'A', 'Ability active', side, i, 'abon')}</div>
         </div>
         <div class="cx-boosts">${boostSel}</div>
         <div class="cx-itemrow"><span class="cx-lbl">Held item</span><div id="cxic-${side}-${i}">${calcItemCellHTML(side, i)}</div></div>
@@ -2037,12 +2114,18 @@ function calcBenchTile(side, i, p) {
         <span>${calcEsc(p.nickname || p.name)}</span>
         <button class="cx-x" onclick="event.stopPropagation();calcRemove('${side}',${i})" title="Remove">✕</button></div>`;
 }
+const CALC_RIVALS = [['rb','Blue'],['gsc','Silver'],['dp','Barry'],['bw','Cheren'],['bw','Bianca'],['xy','Shauna'],['sm','Hau'],['sm','Gladion'],['swsh','Hop'],['swsh','Bede'],['swsh','Marnie'],['sv','Nemona'],['sv','Arven']];
+function calcRival() { if (!calcState.rival) calcState.rival = CALC_RIVALS[Math.floor(Math.random() * CALC_RIVALS.length)]; return calcState.rival; }
 function calcAvatarHTML(side) {
     const src = calcState[side].src;
     let img = '', alt = '', name = side === 'you' ? 'You' : 'Opponent', sub = side === 'you' ? 'Trainer' : 'Load a trainer to face', ch = side === 'you' ? 'R' : '?', has = false;
     if (src && src.kind === 'g') {
         const parts = String(src.id).split(':'), g = GAME_TEAMS[parts[0]], t = g && g.trainers[+parts[1]];
-        if (t) { img = cxSpr(parts[0], t); alt = cxSprAlt(t); name = t.n; sub = g.name; ch = String(t.n).charAt(0); has = true; }
+        if (t) { img = cxSpr(parts[0], t); alt = cxSprAlt(t); name = t.n; sub = g.name; ch = String(t.n).charAt(0); has = true; calcState.rival = null; }
+    } else if (side === 'opp') {   // hand-entered / saved team: show a random rival instead of a "?"
+        const r = calcRival(), rt = { n: r[1] };
+        img = cxSpr(r[0], rt); alt = cxSprAlt(rt); ch = r[1].charAt(0); has = true;
+        name = src ? src.name : 'Rival'; sub = src ? (src.kind === 'c' ? 'Damage Calc team' : 'Team Builder team') : 'Manual team · ' + r[1];
     } else if (src) {
         name = src.name; sub = src.kind === 'c' ? 'Damage Calc team' : 'Team Builder team'; ch = '👤'; has = true;
     } else if (side === 'you') {
@@ -2346,8 +2429,9 @@ function deleteTeam(id, e) {
 }
 function renderSavedTeams() {
     const container = document.getElementById('savedTeamList'); if (!container) return;
-    if (savedTeams.length === 0) { container.innerHTML='<div class="home-no-teams">No saved teams yet — build your first one!</div>'; return; }
-    container.innerHTML = savedTeams.slice().reverse().map(t => {
+    let html;
+    if (savedTeams.length === 0) html = '<div class="home-no-teams">No saved teams yet — build your first one!</div>';
+    else html = savedTeams.slice().reverse().map(t => {
         const active = t.pokemonList ? t.pokemonList.filter(p=>p.active).length : 0;
         const total = t.pokemonList ? t.pokemonList.length : 0;
         const date = new Date(t.savedAt).toLocaleDateString();
@@ -2357,6 +2441,8 @@ function renderSavedTeams() {
             <button class="stb-del" onclick="deleteTeam(${t.id},event)" title="Delete">🗑</button>
         </div>`;
     }).join('');
+    if (container._html === html) return;      // nothing changed: leave it alone (no flicker, no layout shift)
+    container._html = html; container.innerHTML = html;
 }
 
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
@@ -3671,8 +3757,8 @@ function buildExpanded(p, stats) {
         const mv=p.moves[i]||'';
         const slug=mv.toLowerCase().replace(/\s+/g,'-');
         const mvData=mv&&moveCache[slug];
-        const typeColor=(typeColors[mvData.type]&&typeColors[mvData.type].text)||'var(--accent)';
-        const accDisplay=mvData.accuracy==='—'?'—':`${mvData.accuracy}%`;
+        const typeColor=(mvData&&typeColors[mvData.type]&&typeColors[mvData.type].text)||'var(--accent)';
+        const accDisplay=!mvData?'':(mvData.accuracy==='—'?'—':`${mvData.accuracy}%`);
         const infoBar=mvData
              ?`<div class="move-info-bar">
                   ${moveIsOldGen(p, mv) ? '<span class="old-gen-tag">Old Gen</span>' : ''}
@@ -4328,7 +4414,7 @@ async function doEvolveInto(fromKey, evoSlug, verb) {
             ability:(abilities.includes(p.ability)||isCustomAb(p,p.ability))?p.ability:(abilities[0]||''),
             gender:gender==='none'?'none':(gender==='f'?'female':p.gender),
             _data:newData,
-            _learnset:[]
+            _learnset:[], _newGen:null, _lsV:0
         };
         pokemonList[idx]=newP;
         render();
@@ -4652,8 +4738,8 @@ async function calcLoadGame(gid, ti) {
 /* ===== Mega evolve / devolve, Devolve button, Z-A mega sprite fallbacks ===== */
 const MEGA_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.2 7.2c6.5 2.2 1.8 7.4 7.6 9.6M15.8 7.2c-6.5 2.2-1.8 7.4-7.6 9.6"/></svg>';
 const megaCache = {}, megaPending = {};
-const isMegaName = n => /-Mega(-[XYZ])?$/i.test(n || '');
-const megaBase = n => String(n).replace(/-Mega(-[XYZ])?$/i, '');
+const isMegaName = n => /-Mega(-[XYZ]|-Curly|-Droopy|-Stretchy)?$/i.test(n || '');
+const megaBase = n => String(n).replace(/-Mega-(Curly|Droopy|Stretchy)$/i, '-$1').replace(/-Mega(-[XYZ])?$/i, '');
 const megaNice = slug => slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-');
 function megaKick(name) {
     if (!name || isMegaName(name) || megaCache[name] !== undefined || megaPending[name]) return megaPending[name];
@@ -4806,21 +4892,47 @@ const guideNoProg = c => /^(Rematch|Other)$/.test(c);
 const guideCap = w => String(w).split('-').map(x => x.charAt(0).toUpperCase() + x.slice(1)).join('-');
 function guideDone() { try { return JSON.parse(localStorage.getItem('guideDone') || '{}'); } catch (e) { return {}; } }
 function guideToggle(k) { const d = guideDone(); if (d[k]) delete d[k]; else d[k] = 1; try { localStorage.setItem('guideDone', JSON.stringify(d)); } catch (e) {} guideRender(); }
-function guideGo(v) { guideState.view = v; if (typeof dexState !== 'undefined') dexState.ret = null; if (v === 'guide' && !guideState.game) guideState.game = GAME_TEAMS[cxLoad.game] ? cxLoad.game : Object.keys(GAME_TEAMS)[0]; guideRender(); }
+function guideGo(v) {
+    if (v === 'guide' && !guideState.picked) v = 'pick';           // first stop: choose a game
+    guideState.view = v; if (typeof dexState !== 'undefined') dexState.ret = null;
+    if (v === 'guide' && !guideState.game) guideState.game = GAME_TEAMS[cxLoad.game] ? cxLoad.game : Object.keys(GAME_TEAMS)[0];
+    guideRender();
+}
+function guideStart(id) { guideState.picked = true; guideState.view = 'guide'; guideGame(id); }
 function guideGame(g) { guideState.game = g; guideState.ti = -1; guideState.sx = null; try { localStorage.setItem('cxLastGame', g); } catch (e) {} guideRender(); }
+function guideScroll(dir) { const st = document.getElementById('guideStrip'); if (st) st.scrollBy({ left: dir * Math.max(240, st.clientWidth * 0.8), behavior: 'smooth' }); }
+function guideScrollUpd() {
+    const st = document.getElementById('guideStrip'); if (!st) return;
+    const l = document.querySelector('.gs-arrow.l'), r = document.querySelector('.gs-arrow.r');
+    if (l) l.classList.toggle('dis', st.scrollLeft <= 2);
+    if (r) r.classList.toggle('dis', st.scrollLeft + st.clientWidth >= st.scrollWidth - 2);
+}
 function guidePick(i) { const st = document.getElementById('guideStrip'); guideState.sx = st ? st.scrollLeft : null; guideState.ti = i; guideRender(); }
 function guideSend(side) { cxLoad.side = side; openSection('calc'); calcLoadGame(guideState.game, guideState.ti); }
 function guideRender() {
     const root = document.getElementById('guideRoot'); if (!root) return;
     const keepY = window.scrollY, keepH = root.offsetHeight;
     if (keepH) root.style.minHeight = keepH + 'px';   // stop the page shrinking (and snapping to top) while it re-renders
-    const title = `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-map"/></svg> Trainer Guide</h2>`;
+    const title = (guideState.view === 'guide' || guideState.view === 'pick') ? `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-journal"/></svg> Guide</h2>` : `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-map"/></svg> Trainer Guide</h2>`;
     if (guideState.view === 'home') {
         root.style.minHeight = '';
-        root.innerHTML = title + `<div class="guide-choose"><button class="guide-tile" onclick="guideGo('dex')"><b><svg class="h2-svg" aria-hidden="true"><use href="#ico-dex"/></svg> Pokédex</b><small>Look up any Pokémon, stats and moves</small></button><button class="guide-tile" onclick="guideGo('guide')"><b><svg class="h2-svg" aria-hidden="true"><use href="#ico-map"/></svg> Guide</b><small>Navigate regions and trainers</small></button></div>`;
+        root.innerHTML = title + `<div class="guide-choose"><button class="guide-tile" onclick="guideGo('dex')"><b><svg class="h2-svg" aria-hidden="true"><use href="#ico-dex"/></svg> Pokédex</b><small>Look up any Pokémon, stats and moves</small></button><button class="guide-tile" onclick="guideGo('guide')"><b><svg class="h2-svg" aria-hidden="true"><use href="#ico-journal"/></svg> Guide</b><small>Navigate regions and trainers</small></button></div>`;
         return;
     }
     if (guideState.view === 'dex') { root.style.minHeight = ''; dexRender(); return; }
+    if (guideState.view === 'pick') {
+        root.style.minHeight = '';
+        const done = guideDone(), groups = {}; Object.entries(GAME_TEAMS).forEach(([id, x]) => (groups[x.grp] = groups[x.grp] || []).push([id, x]));
+        let last = guideState.game; if (!last) { try { last = localStorage.getItem('cxLastGame'); } catch (e) {} }
+        const cont = last && GAME_TEAMS[last] ? `<button class="guide-tile gp-cont" onclick="guideStart('${last}')"><b>▶ Continue</b><small>${calcEsc(GAME_TEAMS[last].name)}</small></button>` : '';
+        const card = ([id, x]) => { const prog = x.trainers.map((t, i) => [t, i]).filter(([t]) => !guideNoProg(t.c)), n = prog.filter(([t, i]) => done[id + ':' + i]).length;
+            return `<button class="gp-game" onclick="guideStart('${id}')"><b>${calcEsc(x.name)}</b><small>${n ? n + ' / ' + prog.length + ' beaten' : prog.length + ' trainers'}</small></button>`; };
+        root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideGo('home')"><span class="pb-ico">‹</span>Back</button></div>
+            <div class="dx-note">Pick a game to open its trainer guide.</div>${cont}
+            ${Object.entries(groups).map(([grp, arr]) => `<div class="guide-cat">${calcEsc(grp)}</div><div class="gp-grid">${arr.map(card).join('')}</div>`).join('')}`;
+        window.scrollTo(0, 0);
+        return;
+    }
     const gid = guideState.game, g = GAME_TEAMS[gid], done = guideDone();
     const groups = {}; Object.entries(GAME_TEAMS).forEach(([id, x]) => (groups[x.grp] = groups[x.grp] || []).push([id, x]));
     const sel = Object.entries(groups).map(([grp, arr]) => `<optgroup label="${grp}">${arr.map(([id, x]) => `<option value="${id}" ${id === gid ? 'selected' : ''}>${x.name}</option>`).join('')}</optgroup>`).join('');
@@ -4828,15 +4940,15 @@ function guideRender() {
     const nDone = prog.filter(([t, i]) => done[gid + ':' + i]).length, next = prog.find(([t, i]) => !done[gid + ':' + i]);
     const cap = t => Math.max(...t.m.map(x => x[1])), cats = {};
     g.trainers.forEach((t, i) => (cats[t.c] = cats[t.c] || []).push(i));
-    const strip = `<div class="guide-strip" id="guideStrip">` + Object.entries(cats).map(([c, idx]) => `<div class="gs-group"><div class="guide-cat">${calcEsc(c)}</div><div class="gs-row">${idx.map(i => {
+    const strip = `<div class="gs-wrap"><button type="button" class="gs-arrow l" aria-label="Scroll left" onclick="guideScroll(-1)">‹</button><div class="guide-strip" id="guideStrip" onscroll="guideScrollUpd()">` + Object.entries(cats).map(([c, idx]) => `<div class="gs-group"><div class="guide-cat">${calcEsc(c)}</div><div class="gs-row">${idx.map(i => {
         const t = g.trainers[i], img = cxSpr(gid, t), d = done[gid + ':' + i], loc = guideLoc(gid, t);
         return `<button class="gs-node${i === guideState.ti ? ' on' : ''}${d ? ' done' : ''}" onclick="guidePick(${i})" title="${calcEsc(t.n)}${loc ? ' — ' + calcEsc(loc[0] + ' · ' + loc[1]) : ''}">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<span class="gs-n">${calcEsc(t.n)}</span>${loc ? `<span class="gs-l">${calcEsc(loc[0])}</span>` : ''}${d ? '<i>✓</i>' : ''}</button>`;
-    }).join('')}</div></div>`).join('') + `</div>`;
-    root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideGo('home')"><span class="pb-ico">‹</span>Back</button><select onchange="guideGame(this.value)">${sel}</select>
+    }).join('')}</div></div>`).join('') + `</div><button type="button" class="gs-arrow r" aria-label="Scroll right" onclick="guideScroll(1)">›</button></div>`;
+    root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideGo('pick')"><span class="pb-ico">‹</span>Games</button><select onchange="guideGame(this.value)">${sel}</select>
         <span class="guide-stat">${nDone}/${prog.length} defeated</span>${next ? `<span class="guide-stat">Next: ${calcEsc(next[0].n)}</span><span class="guide-cap">Level cap ${cap(next[0])}</span>${guideLoc(gid, next[0]) ? `<span class="guide-nloc">📍 ${calcEsc(guideLoc(gid, next[0])[0])} · ${calcEsc(guideLoc(gid, next[0])[1])}</span>` : ''}` : '<span class="guide-stat">🏆 Complete!</span>'}</div>
         <div class="guide-prog"><div style="width:${prog.length ? Math.round(nDone / prog.length * 100) : 0}%"></div></div>${strip}<div id="guideDetail"></div>`;
     const st = document.getElementById('guideStrip');
-    if (st) { const on = st.querySelector('.gs-node.on'); st.scrollLeft = guideState.sx != null ? guideState.sx : (on ? on.offsetLeft - st.clientWidth / 2 + on.clientWidth / 2 : 0); }
+    if (st) { const on = st.querySelector('.gs-node.on'); st.scrollLeft = guideState.sx != null ? guideState.sx : (on ? on.offsetLeft - st.clientWidth / 2 + on.clientWidth / 2 : 0); guideScrollUpd(); }
     window.scrollTo(0, keepY);
     const dp = guideDetail(), my = _gdTok;
     dp.then(() => { if (my === _gdTok) { window.scrollTo(0, keepY); root.style.minHeight = ''; } });
@@ -4994,7 +5106,7 @@ function dexCells(i) {
 }
 async function dexFillMoves(list) {
     let k = 0; const st = dexMvGet();
-    const work = async () => { while (k < list.length) { const n = list[k++]; if (st[n]) continue; const i = await dexMoveInfo(n); const el = document.getElementById('dxm-' + n); if (el && i) el.innerHTML = dexCells(i); } };
+    const work = async () => { while (k < list.length) { const n = list[k++]; if (st[n]) continue; const i = await dexMoveInfo(n); if (i) document.querySelectorAll('[data-mv="' + n + '"]').forEach(el => { el.innerHTML = dexCells(i); }); } };
     await Promise.all(Array.from({ length: 8 }, work)); dexMvSave();
 }
 
@@ -5021,23 +5133,31 @@ function dexMoveSug(v) {
     box.style.display = hits.length ? 'block' : 'none';
     box.innerHTML = hits.map(m => `<button onclick="dexPickMove('${m}')">${calcEsc(dexName(m))}</button>`).join('');
 }
+function dexPlace(body, y) {   // keep the reader where they were; only pull the page up if the new view starts above the screen
+    if (y != null) { window.scrollTo(0, y); return; }
+    const t = Math.max(0, body.getBoundingClientRect().top + window.scrollY - 70);
+    if (window.scrollY > t) window.scrollTo(0, t);
+}
 function dexPickMove(m) {
+    dexState.pickY = window.scrollY;
     dexState.from = dexState.sel; dexState.fromForm = dexState.form;      // remember the Pokémon we came from
     dexState.move = m; dexState.sel = null; dexState.q = '';
     const box = document.getElementById('dxSug'); if (box) box.style.display = 'none';
     const inp = document.getElementById('dxM'); if (inp) inp.value = dexName(m);
     const qi = document.getElementById('dxQ'); if (qi) qi.value = '';
-    dexUpdate(); window.scrollTo(0, 0);
+    dexUpdate();
 }
 function dexClearMove() { dexState.move = null; dexState.from = null; const inp = document.getElementById('dxM'); if (inp) inp.value = ''; dexUpdate(); }
-function dexOpen(id) { dexState.y = window.scrollY; dexState.sel = id; dexState.form = null; dexUpdate(); window.scrollTo(0, 0); }
-function dexNav(id, form) { dexState.sel = id; dexState.form = form || null; dexUpdate(); window.scrollTo(0, 0); }
+function dexOpen(id) { dexState.y = window.scrollY; dexState.sel = id; dexState.form = null; dexUpdate(); }
+function dexNav(id, form) { dexState.sel = id; dexState.form = form || null; dexUpdate(); }
 function dexBack() { dexState.sel = null; dexState.ret = null; const y = dexState.y || 0; window.scrollTo(0, y); Promise.resolve(dexUpdate()).then(() => window.scrollTo(0, y)); }
-function dexBackToMon() { dexState.sel = dexState.from; dexState.form = dexState.fromForm; dexUpdate(); window.scrollTo(0, 0); }
+function dexBackToMon() { const y = dexState.pickY || 0; dexState.sel = dexState.from; dexState.form = dexState.fromForm; Promise.resolve(dexUpdate()).then(() => window.scrollTo(0, y)); }
 function dexUpdate() {
     const body = document.getElementById('dxBody'); if (!body || !dexCache.species) return;
     if (dexState.sel) return dexDetail(body);
+    body.style.minHeight = '';
     if (dexState.move) return dexMoveView(body);
+    body.dataset.v = 'list';
     return dexList(body);
 }
 
@@ -5056,6 +5176,7 @@ async function dexMoveView(body) {
         <div class="dx-note dx-effect">${calcEsc(eff)}</div></div></div>
         <div class="dx-note"><b>${ids.length}</b> Pokémon can learn this${dexState.gen === 'all' ? '' : ' (Gen ' + dexState.gen + ' only — set the generation filter to “All” to see everyone)'} — in at least one game.</div>
         <div class="dx-grid">${ids.map(p => dexChip(p)).join('')}</div>`;
+    body.dataset.v = 'move'; dexPlace(body, null);
 }
 
 /* ---- stat hexagon (200 = outer edge) + equal tiles ---- */
@@ -5199,8 +5320,35 @@ function dexTypeChartHtml(d) {
 }
 
 /* ---- Pokémon page ---- */
+/* ---- Dex: what each ability does (own words from the builder's list first, then PokéAPI) ---- */
+function dexAbilDesc(slug) { return getAbilityDesc(slug.replace(/-/g, ' ')) || abilityDetailCache[slug] || ''; }
+function dexAbilHtml(abil, norm) {
+    return abil.map(a => {
+        const slug = a.ability.name, nm = calcEsc(dexName(slug));
+        const label = a.is_hidden ? `${nm} <small>(hidden ability)</small>` : `${norm.length > 1 ? (norm.indexOf(a) + 1) + '. ' : ''}${nm}`;
+        const desc = dexAbilDesc(slug);
+        return `<div class="dx-ab"><div class="dx-abn">${label}</div><div class="dx-abd" data-ab="${slug}">${desc ? calcEsc(desc) : '<span class="dx-abld">Loading description…</span>'}</div></div>`;
+    }).join('');
+}
+async function dexAbilFetch(slug) {
+    let t = await fetchAbilityDetail(slug); if (t) return t;
+    const d = await dexJson('https://pokeapi.co/api/v2/ability/' + slug); if (!d) return '';
+    const ft = (d.flavor_text_entries || []).filter(e => e.language.name === 'en').pop();      // newer abilities may only have in-game text
+    t = ft ? ft.flavor_text.replace(/[\n\f]+/g, ' ').trim() : '';
+    if (t) abilityDetailCache[slug] = t;
+    return t;
+}
+function dexFillAbilities(root) {
+    (root || document).querySelectorAll('.dx-abd[data-ab]').forEach(async el => {
+        const slug = el.dataset.ab; if (dexAbilDesc(slug)) return;
+        const t = await dexAbilFetch(slug);
+        if (el.isConnected) el.textContent = t || 'No description available.';       // fills in place: nothing else moves
+    });
+}
 async function dexDetail(body) {
-    const id = dexState.sel; body.innerHTML = '<div class="dx-note">Loading…</div>';
+    const id = dexState.sel, was = body.dataset.v === 'detail', keepY = window.scrollY, h0 = body.offsetHeight;
+    if (was && h0) body.style.minHeight = h0 + 'px';          // hold the height while loading so phones don't snap to the top
+    body.innerHTML = '<div class="dx-note">Loading…</div>';
     const [sp, base] = await Promise.all([dexSpec(id), dexMon(id)]);
     if (dexState.sel !== id) return;
     if (!sp || !base) { body.innerHTML = '<button class="guide-back" onclick="dexBack()"><span class="pb-ico">‹</span>Back</button><div class="dx-note">Couldn\'t load this Pokémon (check your connection).</div>'; return; }
@@ -5220,7 +5368,7 @@ async function dexDetail(body) {
     const abilTxt = abil.map(a => a.is_hidden ? `${calcEsc(dexName(a.ability.name))} <small>(hidden ability)</small>` : `${norm.length > 1 ? (norm.indexOf(a) + 1) + '. ' : ''}${calcEsc(dexName(a.ability.name))}`).join('<br>');
     const oa = d.sprites.other && d.sprites.other['official-artwork'], art = (dexState.shiny ? ((oa && oa.front_shiny) || d.sprites.front_shiny) : '') || (oa && oa.front_default) || d.sprites.front_default || '';
     const prev = dexCache.species.find(p => p.id === id - 1), next = dexCache.species.find(p => p.id === id + 1);
-    const nav = `<div class="dx-nav">${dexState.ret ? `<button onclick="dexReturn()"><span class="pb-ico">‹</span>Back to ${DEX_RET_LABEL[dexState.ret.sec] || 'app'}</button>` : ''}${dexState.move ? `<button onclick="dexBack()"><span class="pb-ico">‹</span>Back to ${calcEsc(dexName(dexState.move))}</button>` : `<button onclick="dexBack()">‹ List</button>`}<span class="sp"></span>${prev ? `<button onclick="dexNav(${prev.id})">‹ #${dexPad(prev.id)} ${calcEsc(dexName(prev.n))}</button>` : ''}${next ? `<button onclick="dexNav(${next.id})">#${dexPad(next.id)} ${calcEsc(dexName(next.n))} ›</button>` : ''}</div>`;
+    const nav = `<div class="dx-nav">${dexState.ret ? `<button onclick="dexReturn()"><span class="pb-ico">‹</span>Back to ${DEX_RET_LABEL[dexState.ret.sec] || 'app'}</button>` : ''}${dexState.move ? `<button onclick="dexBack()"><span class="pb-ico">‹</span>Back to ${calcEsc(dexName(dexState.move))}</button>` : `<button onclick="dexBack()"><span class="pb-ico">‹</span>List</button>`}<span class="sp"></span>${prev ? `<button onclick="dexNav(${prev.id})"><span class="pb-ico">‹</span>#${dexPad(prev.id)} ${calcEsc(dexName(prev.n))}</button>` : ''}${next ? `<button onclick="dexNav(${next.id})">#${dexPad(next.id)} ${calcEsc(dexName(next.n))}<span class="pb-ico">›</span></button>` : ''}</div>`;
     const formRow = forms.length > 1 ? `<div class="dx-forms"><span class="dx-note">Forms</span>${forms.map(f => `<button class="dx-form${f.name === d.name ? ' on' : ''}${f.kind === 'x' ? ' mega' : ''}" onclick="dexState.form='${f.name}';dexUpdate()">${calcEsc(f.label)}</button>`).join('')}</div>` : '';
     // ---- learnset (selected game)
     const vgs = DEX_VG.filter(v => mvSrc.moves.some(mm => mm.version_group_details.some(x => x.version_group.name === v)));
@@ -5240,10 +5388,17 @@ async function dexDetail(body) {
     const rank = n => info[n].m.has('level-up') ? 0 : info[n].m.has('machine') ? 1 : info[n].m.has('tutor') ? 2 : info[n].m.has('egg') ? 3 : 4;
     const rows = { all: names.slice().sort((a, b) => rank(a) - rank(b) || minLv(a) - minLv(b) || a.localeCompare(b)) };
     KEYS.forEach(k => { rows[k] = names.filter(n => info[n].m.has(k)).sort((a, b) => k === 'level-up' ? minLv(a) - minLv(b) || a.localeCompare(b) : a.localeCompare(b)); });
+    rows.other = names.filter(n => info[n].m.has('other')).sort((a, b) => a.localeCompare(b));
     rows.older = olderOnly.sort();
     const tabs = [['all', 'All'], ['level-up', 'Level-up'], ['machine', 'TM / HM'], ['egg', 'Egg'], ['tutor', 'Tutor'], ['older', 'Older games']];
     const cur = rows[tab] || rows.all, st = dexMvGet();
-    const row = n => `<div class="dx-mv" onclick="dexPickMove('${n}')" title="${calcEsc((st[n] && st[n].e) || 'Tap for full move details')}"><span class="dx-pills">${tab === 'older' ? pill('older') + `<small class="dx-gens">Gen ${[...old[n]].sort((a, b) => a - b).join(', ')}</small>` : pills(n)}</span><span class="dx-mn">${calcEsc(dexName(n))}</span><span class="dx-cells" id="dxm-${n}">${dexCells(st[n])}</span></div>`;
+    const row = (n, only) => `<div class="dx-mv" onclick="dexPickMove('${n}')" title="${calcEsc((st[n] && st[n].e) || 'Tap for full move details')}"><span class="dx-pills">${tab === 'older' ? pill('older') + `<small class="dx-gens">Gen ${[...old[n]].sort((a, b) => a - b).join(', ')}</small>` : only ? pill(only, only === 'level-up' ? lvTxt(n) : '') : pills(n)}</span><span class="dx-mn">${calcEsc(dexName(n))}</span><span class="dx-cells" data-mv="${n}">${dexCells(st[n])}</span></div>`;
+    // "All" tab: section dividers so the list reads Level-up / TM / Tutor / Egg / Special instead of one long block
+    const GROUPS = [['level-up', 'Level-up moves'], ['machine', 'TMs / HMs'], ['tutor', 'Move Tutor'], ['egg', 'Egg moves'], ['other', 'Special / other']];
+    const listHtml = tab === 'all'
+        ? GROUPS.filter(([k]) => rows[k] && rows[k].length).map(([k, label]) =>
+            `<div class="dx-div" style="--c:${DEX_M[k][1]}"><b>${label}</b><small>${rows[k].length} move${rows[k].length === 1 ? '' : 's'}</small></div>` + rows[k].map(n => row(n, k)).join('')).join('')
+        : cur.map(n => row(n)).join('');
     const hint = tab === 'older' ? `<div class="dx-note">Moves this Pokémon could learn in earlier games but can't in ${calcEsc(dexName(vg || ''))} (removed, or only available by transfer).</div>` : '';
     const legend = `<div class="dx-legend"><b>Category</b><span>${dexCatIcon('physical')} Physical — contact / body moves</span><span>${dexCatIcon('special')} Special — energy / elemental moves</span><span>${dexCatIcon('status')} Status — no direct damage</span></div><div class="dx-legend"><b>Method</b>${['level-up', 'machine', 'tutor', 'egg', 'other', 'older'].map(k => `<span><i class="dx-pill" style="--c:${DEX_M[k][1]}">${DEX_M[k][0]}</i> ${{ 'level-up': 'learned by levelling up (Lv)', machine: 'taught by a TM / HM / TR', tutor: 'taught by a move tutor', egg: 'passed down as an egg move', other: 'event / form / special', older: 'only in earlier games' }[k]}</span>`).join('')}<span>Pow. = power · Acc. = accuracy · “—” = no damage / never misses</span></div>`;
     const head = `<div class="dx-mv dx-mvh"><span>Method</span><span>Move</span><span>Type</span><span>Cat.</span><span class="dx-n">Pow.</span><span class="dx-n">Acc.</span><span class="dx-n">PP</span><span>Effect</span><span></span></div>`;
@@ -5255,16 +5410,18 @@ async function dexDetail(body) {
             <div class="dx-row"><span>Species</span><b>${calcEsc(genus)}</b></div>
             <div class="dx-row"><span>Height</span><b>${m.toFixed(1)} m (${Math.floor(inch / 12)}′${String(inch % 12).padStart(2, '0')}″)</b></div>
             <div class="dx-row"><span>Weight</span><b>${kg.toFixed(1)} kg (${(kg * 2.20462).toFixed(1)} lbs)</b></div>
-            <div class="dx-row"><span>Abilities</span><b>${abilTxt}</b></div>
+            <div class="dx-row dx-rowab"><span>Abilities</span><div class="dx-abs">${dexAbilHtml(abil, norm)}</div></div>
         </div></div>${formRow}
         <div class="dx-note"><b>Base stats</b></div>${dexStatsHtml(d.stats)}
         <div class="dx-note"><b>Type matchups</b> · damage taken</div>${dexTypeChartHtml(d)}
         <div class="dx-note"><b>Evolution</b></div>${evoHtml ? `<div class="dx-evo">${evoHtml}</div>` : '<div class="dx-note">Does not evolve.</div>'}
         <div class="dx-tabs">${tabs.map(([k, l]) => `<button class="${k === tab ? 'on' : ''}" onclick="dexState.tab='${k}';dexUpdate()">${l}${rows[k] ? ' (' + rows[k].length + ')' : ''}</button>`).join('')}
             <select onchange="dexState.vg=this.value;dexUpdate()">${vgs.map(v => `<option value="${v}" ${v === vg ? 'selected' : ''}>${dexName(v)}</option>`).join('')}</select></div>
-        ${hint}${cur.length ? legend + head + cur.map(row).join('') : '<div class="dx-note">No moves of this kind in this game.</div>'}
+        ${hint}${cur.length ? legend + head + listHtml : '<div class="dx-note">No moves of this kind in this game.</div>'}
         <div class="dx-note">Hover a move (or tap ⓘ) for what it does; tap it for full details and every Pokémon that learns it.</div>` + nav;
     dexFillMoves(cur.slice());
+    dexFillAbilities(body);
+    body.dataset.v = 'detail'; body.style.minHeight = ''; dexPlace(body, was ? keepY : null);
 }
 
 /* ===== Dex extras: type filter, stat sort, shiny toggle ===== */
@@ -5333,6 +5490,24 @@ function dexReturn() {
     if (r.sec === 'guide') guideState.view = (r.view && r.view !== 'dex') ? r.view : 'home';
     openSection(r.sec);
 }
+
+/* ---- no page jumps: whenever the builder or the calc redraw, hold the page height and put the scroll position back ---- */
+(function () {
+    function guard(name, rootSel) {
+        const orig = window[name]; if (typeof orig !== 'function') return;
+        window[name] = function () {
+            const y = window.scrollY, root = document.querySelector(rootSel), h = root ? root.offsetHeight : 0;
+            if (root && h) root.style.minHeight = h + 'px';          // the page can't shrink mid-redraw
+            try { return orig.apply(this, arguments); }
+            finally {
+                window.scrollTo(0, y);
+                requestAnimationFrame(() => { if (root) root.style.minHeight = ''; window.scrollTo(0, y); });
+            }
+        };
+    }
+    guard('render', '#builderScreen');
+    guard('renderCalc', '#calcRoot');
+})();
 </script>
 </body>
 </html>
