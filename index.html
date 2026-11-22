@@ -966,6 +966,14 @@ html{scrollbar-gutter:stable}
 .dx-abl:hover{color:var(--accent);text-decoration:underline}
 .ab-dex{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:5px;border-radius:50%;border:1.5px solid var(--border2);color:var(--accent);font-size:.8rem;font-weight:800;line-height:1;cursor:pointer;vertical-align:middle;transition:background-color .15s,color .15s}
 .ab-dex:hover{background:var(--accent);border-color:var(--accent);color:var(--bg4)}
+
+.all-level{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:8px 0 12px;font-size:.78rem;color:var(--muted2)}
+.all-level input,.all-level select{background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:6px 10px;font-size:.82rem;font-family:inherit;height:30px;box-sizing:border-box}
+.all-level input{width:78px}
+.all-level input:focus,.all-level select:focus{outline:none;border-color:var(--accent)}
+.confirm-yes.ok{background:#1a3a5e;color:#7ec8e3}
+.confirm-yes.ok:hover{background:#245083}
+.all-level [hidden]{display:none}
 </style>
 </head>
 <body>
@@ -1052,6 +1060,15 @@ html{scrollbar-gutter:stable}
                 <button onclick="searchAndAddPokemon()">+ Add</button>
             </div>
             <div class="search-status" id="searchStatus">Loading Pokémon list…</div>
+            <div class="all-level">
+                <span>Set all to level</span>
+                <input type="number" id="allLevelInput" min="1" max="100" placeholder="50" onkeydown="if(event.key==='Enter')setAllLevels()">
+                <select id="allLevelScope" aria-label="Which Pokémon">
+                    <option value="all">Everyone</option><option value="team">Active team only</option><option value="pool">Pool only</option>
+                </select>
+                <button type="button" class="pill-btn" onclick="setAllLevels()">Apply</button>
+                <button type="button" class="pill-btn" id="allLevelUndo" hidden onclick="undoSetAllLevels()" title="Put the levels back the way they were before the last Apply"></button>
+            </div>
             <div id="pool"></div>
         </div>
         <div class="panel">
@@ -2466,9 +2483,9 @@ function renderSavedTeams() {
 }
 
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
-function showConfirm(title, body, onYes) {
+function showConfirm(title, body, onYes, yesLabel) {
     const overlay=document.createElement('div'); overlay.className='modal-overlay';
-    overlay.innerHTML=`<div class="confirm-box"><h3>${title}</h3><p>${body}</p><div class="confirm-btns"><button class="confirm-yes" id="cY">Delete</button><button class="confirm-no" id="cN">Cancel</button></div></div>`;
+    overlay.innerHTML=`<div class="confirm-box"><h3>${title}</h3><p>${body}</p><div class="confirm-btns"><button class="confirm-yes${yesLabel ? ' ok' : ''}" id="cY">${yesLabel || 'Delete'}</button><button class="confirm-no" id="cN">Cancel</button></div></div>`;
     document.body.appendChild(overlay);
     overlay.querySelector('#cY').onclick=()=>{onYes();overlay.remove();};
     overlay.querySelector('#cN').onclick=()=>overlay.remove();
@@ -5624,6 +5641,35 @@ function dexReturn() {
     guard('render', '#builderScreen');
     guard('renderCalc', '#calcRoot');
 })();
+
+/* ===== set every Pokémon to one level ===== */
+let levelUndo = null;
+function updateLevelUndoBtn() {
+    const b = document.getElementById('allLevelUndo'); if (!b) return;
+    b.hidden = !levelUndo; b.textContent = levelUndo ? '↶ Undo (back from Lv ' + levelUndo.lv + ')' : '';
+}
+function undoSetAllLevels() {
+    if (!levelUndo) return;
+    const u = levelUndo; let n = 0;
+    u.map.forEach(([uid, old]) => { const p = pokemonList.find(x => x.uid === uid); if (p && p.level === u.lv) { p.level = old; n++; } });   // anything you edited by hand afterwards is left alone
+    levelUndo = null; updateLevelUndoBtn();
+    if (!n) { showToast('Nothing to undo: those Pokémon were removed or changed since.'); return; }
+    render(); autoSave(); showToast(`↶ Restored ${n} Pokémon to their previous levels`);
+}
+function setAllLevels() {
+    const inp = document.getElementById('allLevelInput'), scope = (document.getElementById('allLevelScope') || {}).value || 'all';
+    const lv = Math.round(Number(inp && inp.value));
+    if (!lv || lv < 1 || lv > 100) { showToast('Enter a level from 1 to 100.'); if (inp) inp.focus(); return; }
+    const targets = pokemonList.filter(p => scope === 'team' ? p.active : scope === 'pool' ? !p.active : true);
+    if (!targets.length) { showToast('No Pokémon to change yet.'); return; }
+    const who = scope === 'team' ? 'active team' : scope === 'pool' ? 'pool' : 'pool and active team';
+    showConfirm(`Set ${targets.length} Pokémon to Lv ${lv}?`, `This changes the level of every Pokémon in your ${who} and recalculates their stats. You can still change any Pokémon on its own afterwards.`, () => {
+        levelUndo = { lv, map: targets.map(p => [p.uid, p.level]) };      // remember the old levels so Undo can put them back
+        targets.forEach(p => { p.level = lv; });
+        updateLevelUndoBtn(); render(); autoSave();
+        showToast(`✅ Set ${targets.length} Pokémon to Lv ${lv}`);
+    }, 'Set level');
+}
 </script>
 </body>
 </html>
