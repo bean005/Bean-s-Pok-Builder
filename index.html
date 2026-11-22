@@ -777,6 +777,7 @@ body { overflow-x:hidden; }
 .dx-sug button:hover{background:rgba(255,255,255,.07)}
 .dx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:6px;margin-top:8px}
 .dx-chip{background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:inherit;padding:7px 9px;font-size:.8rem;text-align:left;cursor:pointer}
+.dx-chip{content-visibility:auto;contain-intrinsic-size:auto 48px}
 .dx-chip:hover{border-color:var(--accent)}.dx-chip small{color:var(--muted);margin-right:5px}
 .dx-h{display:flex;gap:12px;align-items:center;margin:8px 0}.dx-h img{width:96px;height:96px;object-fit:contain}
 .dx-h .n{font-size:1.15rem;font-weight:800}.dx-sub{font-size:.78rem;color:var(--muted)}
@@ -1504,7 +1505,7 @@ function closeSections() {
     document.querySelectorAll('.mode-card[data-section]').forEach(c => c.classList.remove('selected'));
     currentSection = null;
 }
-function openSection(name) {
+function openSection(name, opts) {
     if (currentSection === 'draft' && name !== 'draft' && typeof doAutoSave === 'function') doAutoSave();
     parkBuilder();
     currentSection = name;
@@ -1531,7 +1532,7 @@ function openSection(name) {
         host.innerHTML = `<div class="panel" id="guideRoot"></div>`;
         guideRender();
     }
-    host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!(opts && opts.noScroll)) host.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ===================== DAMAGE CALC ===================== */
@@ -4346,16 +4347,21 @@ document.addEventListener('click', e => {
     });
     if (icon) icon.classList.toggle('tooltip-open');
 });
+let _ttRaf = 0, _ttEv = null, _ttIcon = null;
 document.addEventListener('mousemove', e => {
-    document.querySelectorAll('.move-tooltip, .ability-tooltip, .item-tooltip').forEach(t => {
-        if(t.parentElement.matches(':hover')){
-            let x=e.clientX+12, y=e.clientY-10;
-            if(x+240>window.innerWidth) x=e.clientX-252;
-            if(y+120>window.innerHeight) y=e.clientY-130;
-            t.style.left=x+'px'; t.style.top=y+'px';
-        }
+    const icon = e.target && e.target.closest ? e.target.closest('.move-info-icon, .ability-info-icon, .item-info-icon') : null;
+    if (!icon) return;
+    _ttEv = e; _ttIcon = icon;
+    if (_ttRaf) return;
+    _ttRaf = requestAnimationFrame(() => {
+        _ttRaf = 0;
+        const t = _ttIcon && _ttIcon.querySelector('.move-tooltip, .ability-tooltip, .item-tooltip'); if (!t || !_ttEv) return;
+        let x = _ttEv.clientX + 12, y = _ttEv.clientY - 10;
+        if (x + 240 > window.innerWidth) x = _ttEv.clientX - 252;
+        if (y + 120 > window.innerHeight) y = _ttEv.clientY - 130;
+        t.style.left = x + 'px'; t.style.top = y + 'px';
     });
-});
+}, { passive: true });
 
 init();
 const evoCache = {}; // slug → array of evo slugs (empty = final form)
@@ -5133,7 +5139,7 @@ const dexEvo = u => dexCache.evo[u] ? Promise.resolve(dexCache.evo[u]) : dexJson
 function dexInGen(id) { if (dexState.gen === 'all') return true; const r = DEX_GENS[dexState.gen]; return id >= r[0] && id <= r[1]; }
 const dexTypePill = n => { const t = dexCap(n), tc = (typeof typeColors !== 'undefined' && typeColors[t]) || null; return `<span class="cx-mtype" ${tc ? `style="background:${tc.bg};border-color:${tc.border};color:${tc.text}"` : ''}>${calcEsc(t)}</span>`; };
 const dexCatIcon = c => (typeof calcCatIcon === 'function' && c) ? calcCatIcon(dexCap(c)) : '';
-const dexChip = (p, v) => `<button class="dx-chip" onclick="dexOpen(${p.id})"><span class="t"><small>#${dexPad(p.id)}</small>${calcEsc(dexName(p.n))}</span>${v == null ? '' : `<span class="dx-val">${v}</span>`}<img loading="lazy" src="${dexSpr(p.id)}" alt="" onerror="this.style.visibility='hidden'"></button>`;
+const dexChip = (p, v) => `<button class="dx-chip" onclick="dexOpen(${p.id})"><span class="t"><small>#${dexPad(p.id)}</small>${calcEsc(dexName(p.n))}</span>${v == null ? '' : `<span class="dx-val">${v}</span>`}<img loading="lazy" decoding="async" src="${dexSpr(p.id)}" alt="" onerror="this.style.visibility='hidden'"></button>`;
 
 /* ---- move details (type / category / power / accuracy / PP / effect), cached in memory + localStorage ---- */
 let dexMvStore = null;
@@ -5601,8 +5607,10 @@ async function dexList(body) {
 function dexShiny() { dexState.shiny = !dexState.shiny; const b = document.getElementById('dxShBtn'); if (b) b.classList.toggle('on', dexState.shiny); dexUpdate(); }
 
 /* ===== Open any Pokémon in the Dex from the builder, calc or trainer guide ===== */
-const DEX_RET_LABEL = { draft: 'Builder', calc: 'Calc', guide: 'Trainer Guide' };
+const DEX_RET_LABEL = { draft: 'Draft Pool', calc: 'Calc', guide: 'Trainer Guide' };
 async function openInDex(name) {
+    const _y = window.scrollY; let _uid = null;                       // remember where you were, and which card you clicked
+    try { const c = window.event && window.event.target && window.event.target.closest ? window.event.target.closest('[data-uid]') : null; if (c) _uid = c.dataset.uid; } catch (e) {}
     try {
         await dexLists();
         if (!dexCache.species) { showToast('Couldn\'t load the Dex (check your connection).'); return; }
@@ -5610,7 +5618,7 @@ async function openInDex(name) {
         let sp = null;
         for (const s of dexCache.species) if ((slug === s.n || slug.startsWith(s.n + '-')) && (!sp || s.n.length > sp.n.length)) sp = s;
         if (!sp) { showToast('No Dex page found for ' + name + '.'); return; }
-        dexState.ret = { sec: currentSection || 'draft', view: guideState.view };
+        dexState.ret = { sec: currentSection || 'draft', view: guideState.view, y: _y, uid: _uid };
         dexState.move = null; dexState.abil = null; dexState.from = null; dexState.q = '';
         dexState.sel = sp.id; dexState.form = slug === sp.n ? null : slug;
         guideState.view = 'dex';
@@ -5621,7 +5629,14 @@ function dexReturn() {
     const r = dexState.ret; dexState.ret = null; dexState.sel = null; dexState.abil = null; dexState.form = null;
     if (!r) { dexUpdate(); return; }
     if (r.sec === 'guide') guideState.view = (r.view && r.view !== 'dex') ? r.view : 'home';
-    openSection(r.sec);
+    if ((r.sec === 'draft' || r.sec === 'calc') && r.y != null) {
+        openSection(r.sec, { noScroll: true });
+        const fix = () => {
+            window.scrollTo(0, r.y);
+            if (r.uid) { const c = document.querySelector('.pokemon[data-uid="' + r.uid + '"]'); if (c) { const bb = c.getBoundingClientRect(); if (bb.bottom < 0 || bb.top > window.innerHeight) c.scrollIntoView({ block: 'center' }); } }
+        };
+        fix(); requestAnimationFrame(fix); setTimeout(fix, 150);
+    } else openSection(r.sec);
 }
 
 /* ---- no page jumps: whenever the builder or the calc redraw, hold the page height and put the scroll position back ---- */
