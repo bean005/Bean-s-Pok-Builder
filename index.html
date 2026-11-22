@@ -946,6 +946,20 @@ html{scrollbar-gutter:stable}
 .dx-abn{font-weight:700}
 .dx-abd{font-weight:400;font-size:.74rem;color:var(--muted2);line-height:1.45;margin-top:2px}
 .dx-abld{opacity:.55}
+
+/* back/forward circle icons: chevron drawn with borders so it is truly centered (text glyph sat off-center) */
+.pb-ico.pb-ico:not(.x){position:relative;font-size:0;line-height:0;color:var(--accent)}
+.pb-ico.pb-ico:not(.x)::before{content:"";position:absolute;left:50%;top:50%;box-sizing:border-box;width:7px;height:7px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;border-radius:1px;transform:translate(calc(-50% + 1.8px),-50%) rotate(45deg)}
+.pb-ico.pb-ico:not(.x):last-child::before{border-left:0;border-bottom:0;border-right:2px solid currentColor;border-top:2px solid currentColor;transform:translate(calc(-50% - 1.8px),-50%) rotate(45deg)}
+.pb-ico.pb-ico:not(.x):first-child:last-child::before{border-left:2px solid currentColor;border-bottom:2px solid currentColor;border-right:0;border-top:0;transform:translate(calc(-50% + 1.8px),-50%) rotate(45deg)}
+
+.dx-gmax{margin:10px 0;padding:10px 14px;border:1px solid var(--border2);border-left:3px solid #e11d48;border-radius:10px;background:var(--bg3);font-size:.78rem;color:var(--muted2);line-height:1.45}
+.dx-gmax b{color:var(--text)}
+.dx-gmax p{margin:4px 0 6px}
+.dx-gmax ul{margin:0 0 6px;padding-left:18px}
+.dx-gmax li{margin:2px 0}
+.dx-gmax .dx-src{font-size:.68rem;color:var(--muted)}
+.dx-gmax a{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -2092,7 +2106,7 @@ function calcActiveCard(side, i, p) {
             <label class="cx-f">Ability<span class="cx-abwrap"><select onchange="calcAbilityChange('${side}',${i},this)">${sel(abilities, p.ability)}${customAbOptions(p)}</select>${customAbIcons(p, `calcRemoveCustomAbility('${side}',${i})`)}</span></label>
             <label class="cx-f">Status<select onchange="calcSet('${side}',${i},'status',this.value)">${status}</select></label>
             <label class="cx-f">HP %<input type="number" min="1" max="100" value="${p.cHP}" onchange="calcSet('${side}',${i},'hp',this.value)"></label>
-            ${calcState.gen === 8 ? `<div class="cx-tgcell">${cxMonTg(!!p.cDmax, 'D', 'Dynamax', side, i, 'dmax')}</div>` : ''}
+            ${calcState.gen === 8 ? `<div class="cx-tgcell" title="Dynamax / Gigantamax only raises HP (1.5x at Dynamax Lv 0, up to 2x at Lv 10). Atk, Def, Sp. Atk, Sp. Def and Speed don't change.">${cxMonTg(!!p.cDmax, 'D', 'Dynamax', side, i, 'dmax')}</div>` : ''}
             <div class="cx-tgcell">${cxMonTg(!!p.cTera, 'T', 'Terastallized', side, i, 'tera')}</div>
             <label class="cx-f">Tera type<select onchange="calcSet('${side}',${i},'teraType',this.value)">${[...CALC_TYPES, 'Stellar'].map(t => `<option value="${t}" ${p.teraType === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
             <div class="cx-tgcell">${cxMonTg(!!p.cAbOn, 'A', 'Ability active', side, i, 'abon')}</div>
@@ -5170,7 +5184,7 @@ async function dexMoveView(body) {
     const full = (d.effect_entries || []).find(e => e.language.name === 'en'), eff = ((full ? (full.effect || full.short_effect || '').replace('$effect_chance', d.effect_chance) : '').trim()) || dexFlavor(d) || 'No description available yet.';
     const ids = d.learned_by_pokemon.map(p => ({ n: p.name, id: dexIdOf(p.url) })).filter(p => p.id <= 1025 && dexInGen(p.id)).sort((a, b) => a.id - b.id);
     const back = dexState.from ? `<button class="guide-back" onclick="dexBackToMon()"><span class="pb-ico">‹</span>Back to ${calcEsc(dexSpName(dexState.from))}</button>` : '';
-    body.innerHTML = `<div class="dx-nav">${back}<span class="sp"></span><button onclick="dexClearMove()"><span class="pb-ico">✕</span>Close move</button></div>
+    body.innerHTML = `<div class="dx-nav">${back}<span class="sp"></span><button onclick="dexClearMove()"><span class="pb-ico x">✕</span>Close move</button></div>
         <div class="dx-h"><div><div class="n">${calcEsc(dexName(m))}</div>
         <div class="dx-mvhead">${dexTypePill(d.type.name)}${dexCatIcon(d.damage_class.name)}<span>${dexCap(d.damage_class.name)}</span><span>Power <b>${d.power ?? '—'}</b></span><span>Accuracy <b>${d.accuracy ?? '—'}</b></span><span>PP <b>${d.pp ?? '—'}</b></span>${d.priority ? `<span>Priority <b>${d.priority > 0 ? '+' : ''}${d.priority}</b></span>` : ''}</div>
         <div class="dx-note dx-effect">${calcEsc(eff)}</div></div></div>
@@ -5180,6 +5194,12 @@ async function dexMoveView(body) {
 }
 
 /* ---- stat hexagon (200 = outer edge) + equal tiles ---- */
+const DEX_GMAX_NOTE = `<div class="dx-gmax"><b>Gigantamax stats</b>
+<p>Gigantamaxing only raises <b>HP</b>. Attack, Defense, Sp. Atk, Sp. Def and Speed stay the same.</p>
+<ul><li><b>HP multiplier:</b> 1.5× at Dynamax Level 0, rising 0.05× per level to 2× at Dynamax Level 10 (Shedinja is the exception).</li>
+<li><b>Current HP:</b> keeps the same percentage (rounded up) when it grows, and shrinks proportionally when the three turns end.</li>
+<li><b>No extra stats:</b> Gigantamax gives no more stats than a normal Dynamax. The differences are the form change and the stronger exclusive G-Max moves.</li></ul>
+<span class="dx-src">Sources: <a href="https://bulbapedia.bulbagarden.net/wiki/Gigantamax" target="_blank" rel="noopener">Bulbapedia</a> · <a href="https://pokemondb.net/pokebase/365406/how-know-characteristics-dynamaxed-gigantamaxed-pokemon" target="_blank" rel="noopener">PokéBase</a></span></div>`;
 function dexStatsHtml(stats) {
     const val = {}; stats.forEach(x => { val[x.stat.name] = x.base_stat; });
     const cx = 150, cy = 128, R = 86, MAX = 200, pt = (i, r) => { const a = (-90 + i * 60) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
@@ -5412,7 +5432,7 @@ async function dexDetail(body) {
             <div class="dx-row"><span>Weight</span><b>${kg.toFixed(1)} kg (${(kg * 2.20462).toFixed(1)} lbs)</b></div>
             <div class="dx-row dx-rowab"><span>Abilities</span><div class="dx-abs">${dexAbilHtml(abil, norm)}</div></div>
         </div></div>${formRow}
-        <div class="dx-note"><b>Base stats</b></div>${dexStatsHtml(d.stats)}
+        <div class="dx-note"><b>Base stats</b></div>${dexStatsHtml(d.stats)}${/-gmax/i.test(d.name) ? DEX_GMAX_NOTE : ''}
         <div class="dx-note"><b>Type matchups</b> · damage taken</div>${dexTypeChartHtml(d)}
         <div class="dx-note"><b>Evolution</b></div>${evoHtml ? `<div class="dx-evo">${evoHtml}</div>` : '<div class="dx-note">Does not evolve.</div>'}
         <div class="dx-tabs">${tabs.map(([k, l]) => `<button class="${k === tab ? 'on' : ''}" onclick="dexState.tab='${k}';dexUpdate()">${l}${rows[k] ? ' (' + rows[k].length + ')' : ''}</button>`).join('')}
