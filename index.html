@@ -960,6 +960,12 @@ html{scrollbar-gutter:stable}
 .dx-gmax li{margin:2px 0}
 .dx-gmax .dx-src{font-size:.68rem;color:var(--muted)}
 .dx-gmax a{color:var(--accent)}
+
+.dx-abl{cursor:pointer;display:inline-block;transition:color .15s}
+.dx-abl::after{content:" ›";color:var(--accent);font-weight:800}
+.dx-abl:hover{color:var(--accent);text-decoration:underline}
+.ab-dex{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:5px;border-radius:50%;border:1.5px solid var(--border2);color:var(--accent);font-size:.8rem;font-weight:800;line-height:1;cursor:pointer;vertical-align:middle;transition:background-color .15s,color .15s}
+.ab-dex:hover{background:var(--accent);border-color:var(--accent);color:var(--bg4)}
 </style>
 </head>
 <body>
@@ -3802,7 +3808,7 @@ function buildExpanded(p, stats) {
 
     const abilityDesc = getAbilityDesc(p.ability);
     const abilityInfoIcon = abilityDesc
-        ? `<span class="ability-info-icon">ℹ<div class="ability-tooltip">${abilityDesc}</div></span>`
+        ? `<span class="ability-info-icon">ℹ<div class="ability-tooltip">${abilityDesc}</div></span><span class="ab-dex" role="button" tabindex="0" title="See every Pokémon with ${calcEsc(p.ability)}" onclick="event.stopPropagation();openAbilityInDex('${String(p.ability).replace(/'/g, "\\'")}')">⌕</span>`
         : '';
 
     // Item info icon — show description of currently selected item (from cache)
@@ -5081,7 +5087,7 @@ const DEX_M = { 'level-up':['Level','#48c774'], machine:['TM/HM','#7ec8e3'], egg
 const DEX_STAT = [['hp', 'HP', '#d4a017'], ['attack', 'Atk', '#e74c3c'], ['defense', 'Def', '#2c6fad'], ['special-attack', 'SpA', '#7ec8e3'], ['special-defense', 'SpD', '#e991b0'], ['speed', 'Spe', '#48c774']];
 const DEX_NAMES = { 'ho-oh':'Ho-Oh','porygon-z':'Porygon-Z','nidoran-f':'Nidoran ♀','nidoran-m':'Nidoran ♂','mr-mime':'Mr. Mime','mr-rime':'Mr. Rime','mime-jr':'Mime Jr.','farfetchd':"Farfetch'd",'sirfetchd':"Sirfetch'd",'type-null':'Type: Null','jangmo-o':'Jangmo-o','hakamo-o':'Hakamo-o','kommo-o':'Kommo-o','flabebe':'Flabébé','wo-chien':'Wo-Chien','chien-pao':'Chien-Pao','ting-lu':'Ting-Lu','chi-yu':'Chi-Yu',
     'u-turn':'U-turn','x-scissor':'X-Scissor','will-o-wisp':'Will-O-Wisp','double-edge':'Double-Edge','self-destruct':'Self-Destruct','lock-on':'Lock-On','mud-slap':'Mud-Slap','soft-boiled':'Soft-Boiled','baby-doll-eyes':'Baby-Doll Eyes','v-create':'V-create','trick-or-treat':'Trick-or-Treat','topsy-turvy':'Topsy-Turvy','wake-up-slap':'Wake-Up Slap','power-up-punch':'Power-Up Punch','king-s-shield':"King's Shield",'forest-s-curse':"Forest's Curse",'land-s-wrath':"Land's Wrath",'nature-s-madness':"Nature's Madness" };
-const dexState = { gen: 'all', q: '', sel: null, form: null, move: null, from: null, fromForm: null, tab: 'all', vg: null, y: 0, type: '', sort: 'num', shiny: false, ret: null };
+const dexState = { gen: 'all', q: '', sel: null, form: null, move: null, abil: null, from: null, fromForm: null, tab: 'all', vg: null, y: 0, type: '', sort: 'num', shiny: false, ret: null };
 const dexCache = { species: null, moves: null, mon: {}, spec: {}, evo: {}, move: {} };
 const dexName = s => DEX_NAMES[s] || String(s).split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 const dexNorm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -5093,6 +5099,15 @@ const dexSpName = id => { const p = (dexCache.species || []).find(x => x.id === 
 async function dexJson(u) { try { const r = await fetch(u); return r.ok ? await r.json() : null; } catch (e) { return null; } }
 async function dexLists() {
     if (!dexCache.species) { const d = await dexJson('https://pokeapi.co/api/v2/pokemon-species?limit=2000'); if (d) dexCache.species = d.results.map(x => ({ n: x.name, id: dexIdOf(x.url) })).sort((a, b) => a.id - b.id); }
+    if (!dexCache.abils) {
+        const d = await dexJson('https://pokeapi.co/api/v2/ability?limit=1000');
+        if (d) {
+            const set = new Set(d.results.map(x => x.name));
+            try { Object.keys(zaMegaDB).forEach(k => (zaMegaDB[k].abilities || []).forEach(a => { if (!/unknown/i.test(a)) set.add(String(a).toLowerCase().replace(/\s+/g, '-')); })); } catch (e) {}
+            try { Object.keys(abilityDescriptions).forEach(k => set.add(String(k).toLowerCase().trim().replace(/\s+/g, '-'))); } catch (e) {}
+            dexCache.abils = [...set].sort();
+        }
+    }
     if (!dexCache.moves) { const d = await dexJson('https://pokeapi.co/api/v2/move?limit=2000'); if (d) dexCache.moves = d.results.map(x => x.name); }
 }
 const dexMon = k => dexCache.mon[k] ? Promise.resolve(dexCache.mon[k]) : dexJson('https://pokeapi.co/api/v2/pokemon/' + k).then(d => d && (dexCache.mon[k] = d));
@@ -5135,6 +5150,7 @@ function dexRender() {
         <select onchange="dexSet('sort',this.value)">${Object.entries(DEX_SORTS).map(([k, l]) => `<option value="${k}" ${dexState.sort === k ? 'selected' : ''}>Sort: ${l}</option>`).join('')}</select>
         <button class="dx-shinebtn${dexState.shiny ? ' on' : ''}" id="dxShBtn" onclick="dexShiny()" title="Show shiny sprites">✨ Shiny</button></div>
         <div class="dx-move"><input id="dxM" placeholder="Search a move to see who learns it — e.g. Strength Sap" autocomplete="off" value="${dexState.move ? calcEsc(dexName(dexState.move)) : ''}" oninput="dexMoveSug(this.value)" onblur="setTimeout(() => { const b = document.getElementById('dxSug'); if (b) b.style.display = 'none'; }, 180)"><div class="dx-sug" id="dxSug" style="display:none"></div></div>
+        <div class="dx-move"><input id="dxA" placeholder="Search an ability to see who has it — e.g. Levitate" autocomplete="off" value="${dexState.abil ? calcEsc(dexName(dexState.abil)) : ''}" oninput="dexAbilSug(this.value)" onblur="setTimeout(() => { const b = document.getElementById('dxSugA'); if (b) b.style.display = 'none'; }, 180)"><div class="dx-sug" id="dxSugA" style="display:none"></div></div>
         <div id="dxBody"><div class="dx-note">Loading…</div></div>`;
     dexLists().then(() => { const b = document.getElementById('dxBody'); if (!dexCache.species) { if (b) b.innerHTML = '<div class="dx-note">Couldn\'t load the Pokédex (check your connection).</div><button class="guide-back" onclick="dexRender()">Retry</button>'; } else dexUpdate(); });
 }
@@ -5147,6 +5163,15 @@ function dexMoveSug(v) {
     box.style.display = hits.length ? 'block' : 'none';
     box.innerHTML = hits.map(m => `<button onclick="dexPickMove('${m}')">${calcEsc(dexName(m))}</button>`).join('');
 }
+function dexAbilSug(v) {
+    const box = document.getElementById('dxSugA'); if (!box) return;
+    const q = dexNorm(v); if (!q && dexState.abil) { dexState.abil = null; dexUpdate(); }
+    if (!q || !dexCache.abils) { box.style.display = 'none'; return; }
+    const hits = dexCache.abils.filter(a => dexNorm(a).includes(q)).sort((a, b) => (dexNorm(a).startsWith(q) ? 0 : 1) - (dexNorm(b).startsWith(q) ? 0 : 1)).slice(0, 8);
+    box.style.display = hits.length ? 'block' : 'none';
+    box.innerHTML = hits.map(a => `<button onclick="dexPickAbil('${a}')">${calcEsc(dexName(a))}</button>`).join('');
+}
+function dexHold(body) { const h = body.offsetHeight; if (h) body.style.minHeight = h + 'px'; }   // keep the page from shrinking (and snapping to the top) while a view loads
 function dexPlace(body, y) {   // keep the reader where they were; only pull the page up if the new view starts above the screen
     if (y != null) { window.scrollTo(0, y); return; }
     const t = Math.max(0, body.getBoundingClientRect().top + window.scrollY - 70);
@@ -5155,9 +5180,10 @@ function dexPlace(body, y) {   // keep the reader where they were; only pull the
 function dexPickMove(m) {
     dexState.pickY = window.scrollY;
     dexState.from = dexState.sel; dexState.fromForm = dexState.form;      // remember the Pokémon we came from
-    dexState.move = m; dexState.sel = null; dexState.q = '';
+    dexState.move = m; dexState.abil = null; dexState.sel = null; dexState.q = '';
     const box = document.getElementById('dxSug'); if (box) box.style.display = 'none';
     const inp = document.getElementById('dxM'); if (inp) inp.value = dexName(m);
+    const ia = document.getElementById('dxA'); if (ia) ia.value = ''; const sa = document.getElementById('dxSugA'); if (sa) sa.style.display = 'none';
     const qi = document.getElementById('dxQ'); if (qi) qi.value = '';
     dexUpdate();
 }
@@ -5165,11 +5191,12 @@ function dexClearMove() { dexState.move = null; dexState.from = null; const inp 
 function dexOpen(id) { dexState.y = window.scrollY; dexState.sel = id; dexState.form = null; dexUpdate(); }
 function dexNav(id, form) { dexState.sel = id; dexState.form = form || null; dexUpdate(); }
 function dexBack() { dexState.sel = null; dexState.ret = null; const y = dexState.y || 0; window.scrollTo(0, y); Promise.resolve(dexUpdate()).then(() => window.scrollTo(0, y)); }
-function dexBackToMon() { const y = dexState.pickY || 0; dexState.sel = dexState.from; dexState.form = dexState.fromForm; Promise.resolve(dexUpdate()).then(() => window.scrollTo(0, y)); }
+function dexBackToMon() { dexState.abil = null; { const ia = document.getElementById('dxA'); if (ia) ia.value = ''; } const y = dexState.pickY || 0; dexState.sel = dexState.from; dexState.form = dexState.fromForm; Promise.resolve(dexUpdate()).then(() => window.scrollTo(0, y)); }
 function dexUpdate() {
     const body = document.getElementById('dxBody'); if (!body || !dexCache.species) return;
     if (dexState.sel) return dexDetail(body);
     body.style.minHeight = '';
+    if (dexState.abil) return dexAbilView(body);
     if (dexState.move) return dexMoveView(body);
     body.dataset.v = 'list';
     return dexList(body);
@@ -5177,10 +5204,10 @@ function dexUpdate() {
 
 /* ---- move page: details + every Pokémon that learns it ---- */
 async function dexMoveView(body) {
-    const m = dexState.move; body.innerHTML = '<div class="dx-note">Loading move…</div>';
+    const m = dexState.move; dexHold(body); body.innerHTML = '<div class="dx-note">Loading move…</div>';
     const d = dexCache.move[m] || (dexCache.move[m] = await dexJson('https://pokeapi.co/api/v2/move/' + m));
     if (dexState.move !== m || dexState.sel) return;
-    if (!d) { body.innerHTML = '<div class="dx-note">Couldn\'t load that move.</div>'; return; }
+    if (!d) { body.style.minHeight = ''; body.innerHTML = '<div class="dx-note">Couldn\'t load that move.</div>'; return; }
     const full = (d.effect_entries || []).find(e => e.language.name === 'en'), eff = ((full ? (full.effect || full.short_effect || '').replace('$effect_chance', d.effect_chance) : '').trim()) || dexFlavor(d) || 'No description available yet.';
     const ids = d.learned_by_pokemon.map(p => ({ n: p.name, id: dexIdOf(p.url) })).filter(p => p.id <= 1025 && dexInGen(p.id)).sort((a, b) => a.id - b.id);
     const back = dexState.from ? `<button class="guide-back" onclick="dexBackToMon()"><span class="pb-ico">‹</span>Back to ${calcEsc(dexSpName(dexState.from))}</button>` : '';
@@ -5190,7 +5217,76 @@ async function dexMoveView(body) {
         <div class="dx-note dx-effect">${calcEsc(eff)}</div></div></div>
         <div class="dx-note"><b>${ids.length}</b> Pokémon can learn this${dexState.gen === 'all' ? '' : ' (Gen ' + dexState.gen + ' only — set the generation filter to “All” to see everyone)'} — in at least one game.</div>
         <div class="dx-grid">${ids.map(p => dexChip(p)).join('')}</div>`;
-    body.dataset.v = 'move'; dexPlace(body, null);
+    body.style.minHeight = ''; body.dataset.v = 'move'; dexPlace(body, null);
+}
+
+
+/* ---- ability page: details + every Pokémon that can have it ---- */
+function dexPickAbil(slug) {
+    dexState.pickY = window.scrollY;
+    dexState.from = dexState.sel; dexState.fromForm = dexState.form;
+    dexState.abil = slug; dexState.move = null; dexState.sel = null; dexState.q = '';
+    const inp = document.getElementById('dxM'); if (inp) inp.value = '';
+    const ia = document.getElementById('dxA'); if (ia) ia.value = dexName(slug); const sa = document.getElementById('dxSugA'); if (sa) sa.style.display = 'none';
+    const qi = document.getElementById('dxQ'); if (qi) qi.value = '';
+    dexUpdate();
+}
+function dexClearAbil() { dexState.abil = null; dexState.from = null; const ia = document.getElementById('dxA'); if (ia) ia.value = ''; dexUpdate(); }
+function dexSpeciesOfForm(name) {
+    let sp = null;
+    for (const s of dexCache.species || []) if ((name === s.n || name.startsWith(s.n + '-')) && (!sp || s.n.length > sp.n.length)) sp = s;
+    return sp;
+}
+async function dexAbilView(body) {
+    const a = dexState.abil; dexHold(body); body.innerHTML = '<div class="dx-note">Loading ability…</div>';
+    dexCache.abil = dexCache.abil || {};
+    const d = dexCache.abil[a] || (dexCache.abil[a] = await dexJson('https://pokeapi.co/api/v2/ability/' + a));
+    if (dexState.abil !== a || dexState.sel) return;
+    // species -> { hidden:boolean (only as hidden), forms:Set }, from PokeAPI plus the built-in Z-A Mega table (new abilities PokeAPI may not list yet)
+    const found = new Map();
+    const add = (name, hidden) => {
+        const sp = dexSpeciesOfForm(name); if (!sp || !dexInGen(sp.id)) return;
+        const e = found.get(sp.id) || { sp, base: false, hiddenOnly: true, forms: [] };
+        if (name === sp.n) { e.base = true; if (!hidden) e.hiddenOnly = false; }
+        else { const f = name.slice(sp.n.length + 1).split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); if (!e.forms.includes(f)) e.forms.push(f); if (!hidden) e.formStd = true; }
+        found.set(sp.id, e);
+    };
+    if (d) d.pokemon.forEach(p => add(p.pokemon.name, p.is_hidden));
+    try {
+        Object.keys(zaMegaDB).forEach(k => {
+            const abl = (zaMegaDB[k].abilities || []).map(x => String(x).toLowerCase().replace(/\s+/g, '-'));
+            if (abl.includes(a)) add(k.toLowerCase(), false);
+        });
+    } catch (e) {}
+    const list = [...found.values()].sort((x, y) => x.sp.id - y.sp.id);
+    const desc = dexAbilDesc(a) || (d && ((d.effect_entries || []).find(e => e.language.name === 'en') || {}).effect) || await dexAbilFetch(a) || 'No description available yet.';
+    if (dexState.abil !== a || dexState.sel) return;
+    const back = dexState.from ? `<button class="guide-back" onclick="dexBackToMon()"><span class="pb-ico">‹</span>Back to ${calcEsc(dexSpName(dexState.from))}</button>`
+        : (dexState.ret ? `<button class="guide-back" onclick="dexReturn()"><span class="pb-ico">‹</span>Back to ${DEX_RET_LABEL[dexState.ret.sec] || 'app'}</button>` : '');
+    const chip = e => {
+        const tags = [];
+        if (e.base && e.hiddenOnly) tags.push('Hidden');
+        if (e.forms.length) tags.push(e.forms.length > 2 ? e.forms.slice(0, 2).join(', ') + ' +' + (e.forms.length - 2) : e.forms.join(', '));
+        return dexChip({ n: e.sp.n, id: e.sp.id }, tags.length ? calcEsc(tags.join(' · ')) : null);
+    };
+    body.innerHTML = `<div class="dx-nav">${back}<span class="sp"></span><button onclick="dexClearAbil()"><span class="pb-ico x">✕</span>Close ability</button></div>
+        <div class="dx-h"><div><div class="n">${calcEsc(dexName(a))}</div>
+        <div class="dx-note dx-effect">${calcEsc(String(desc).replace(/\s+/g, ' ').trim())}</div></div></div>
+        <div class="dx-note"><b>${list.length}</b> Pokémon can have this ability${dexState.gen === 'all' ? '' : ' (Gen ' + dexState.gen + ' only — set the generation filter to “All” to see everyone)'}. “Hidden” means only as a Hidden Ability; form names (like Mega) mean only that form has it.</div>
+        <div class="dx-grid">${list.map(chip).join('')}</div>`;
+    body.style.minHeight = ''; body.dataset.v = 'abil'; dexPlace(body, null);
+}
+// open the ability page from the builder / calc
+async function openAbilityInDex(name) {
+    try {
+        await dexLists();
+        if (!dexCache.species) { showToast('Couldn\'t load the Dex (check your connection).'); return; }
+        const slug = String(name).toLowerCase().trim().replace(/\s+/g, '-');
+        dexState.ret = { sec: currentSection || 'draft', view: guideState.view };
+        dexState.move = null; dexState.from = null; dexState.sel = null; dexState.form = null; dexState.q = '';
+        dexState.abil = slug; guideState.view = 'dex';
+        openSection('guide');
+    } catch (e) { showToast('Couldn\'t open the Dex.'); }
 }
 
 /* ---- stat hexagon (200 = outer edge) + equal tiles ---- */
@@ -5347,7 +5443,7 @@ function dexAbilHtml(abil, norm) {
         const slug = a.ability.name, nm = calcEsc(dexName(slug));
         const label = a.is_hidden ? `${nm} <small>(hidden ability)</small>` : `${norm.length > 1 ? (norm.indexOf(a) + 1) + '. ' : ''}${nm}`;
         const desc = dexAbilDesc(slug);
-        return `<div class="dx-ab"><div class="dx-abn">${label}</div><div class="dx-abd" data-ab="${slug}">${desc ? calcEsc(desc) : '<span class="dx-abld">Loading description…</span>'}</div></div>`;
+        return `<div class="dx-ab"><div class="dx-abn dx-abl" onclick="dexPickAbil('${slug}')" title="See every Pokémon with this ability">${label}</div><div class="dx-abd" data-ab="${slug}">${desc ? calcEsc(desc) : '<span class="dx-abld">Loading description…</span>'}</div></div>`;
     }).join('');
 }
 async function dexAbilFetch(slug) {
@@ -5367,11 +5463,11 @@ function dexFillAbilities(root) {
 }
 async function dexDetail(body) {
     const id = dexState.sel, was = body.dataset.v === 'detail', keepY = window.scrollY, h0 = body.offsetHeight;
-    if (was && h0) body.style.minHeight = h0 + 'px';          // hold the height while loading so phones don't snap to the top
+    if (h0 && (was || body.dataset.v === 'abil' || body.dataset.v === 'move')) body.style.minHeight = h0 + 'px';          // hold the height while loading so phones don't snap to the top
     body.innerHTML = '<div class="dx-note">Loading…</div>';
     const [sp, base] = await Promise.all([dexSpec(id), dexMon(id)]);
     if (dexState.sel !== id) return;
-    if (!sp || !base) { body.innerHTML = '<button class="guide-back" onclick="dexBack()"><span class="pb-ico">‹</span>Back</button><div class="dx-note">Couldn\'t load this Pokémon (check your connection).</div>'; return; }
+    if (!sp || !base) { body.style.minHeight = ''; body.innerHTML = '<button class="guide-back" onclick="dexBack()"><span class="pb-ico">‹</span>Back</button><div class="dx-note">Couldn\'t load this Pokémon (check your connection).</div>'; return; }
     const forms = dexForms(sp);
     const fname = forms.some(f => f.name === dexState.form) ? dexState.form : base.name;
     const d = fname === base.name ? base : ((await dexMon(fname)) || base);
@@ -5498,14 +5594,14 @@ async function openInDex(name) {
         for (const s of dexCache.species) if ((slug === s.n || slug.startsWith(s.n + '-')) && (!sp || s.n.length > sp.n.length)) sp = s;
         if (!sp) { showToast('No Dex page found for ' + name + '.'); return; }
         dexState.ret = { sec: currentSection || 'draft', view: guideState.view };
-        dexState.move = null; dexState.from = null; dexState.q = '';
+        dexState.move = null; dexState.abil = null; dexState.from = null; dexState.q = '';
         dexState.sel = sp.id; dexState.form = slug === sp.n ? null : slug;
         guideState.view = 'dex';
         openSection('guide');
     } catch (e) { showToast('Couldn\'t open the Dex.'); }
 }
 function dexReturn() {
-    const r = dexState.ret; dexState.ret = null; dexState.sel = null; dexState.form = null;
+    const r = dexState.ret; dexState.ret = null; dexState.sel = null; dexState.abil = null; dexState.form = null;
     if (!r) { dexUpdate(); return; }
     if (r.sec === 'guide') guideState.view = (r.view && r.view !== 'dex') ? r.view : 'home';
     openSection(r.sec);
