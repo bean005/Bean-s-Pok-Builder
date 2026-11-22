@@ -783,7 +783,7 @@ body { overflow-x:hidden; }
 .dx-tabs button.on{border-color:var(--accent);color:var(--accent);font-weight:700}
 .dx-tabs select{background:var(--bg2);color:inherit;border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:.78rem}
 .dx-mv{display:flex;gap:10px;padding:5px 4px;border-bottom:1px solid var(--border);font-size:.82rem;cursor:pointer}
-.dx-mv:hover{background:rgba(255,255,255,.05)}.dx-mv b{width:38px;color:var(--muted);font-weight:600}
+.dx-mv:hover{background:rgba(255,255,255,.05)}.dx-mv{align-items:center}.dx-pills{display:flex;gap:4px;flex-wrap:wrap;min-width:104px}.dx-pill{font-style:normal;font-size:.66rem;font-weight:800;border-radius:999px;padding:2px 8px;border:1px solid var(--c);color:var(--c);white-space:nowrap;background:rgba(255,255,255,.03)}.dx-mn{flex:1}.dx-gens{font-size:.72rem;color:var(--muted)}
 .dx-note{font-size:.76rem;color:var(--muted);margin:6px 0}
 /* shared look for Guide + Dex controls (matches the calc/builder dropdowns) */
 .guide-bar select,.dx-bar select,.dx-tabs select{appearance:none;-webkit-appearance:none;color-scheme:dark;cursor:pointer;background-color:var(--bg3);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23a0c4ff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-size:10px 6px;border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 26px 7px 11px;font-size:.8rem;font-family:inherit;transition:border-color .15s,background-color .15s}
@@ -806,6 +806,41 @@ body { overflow-x:hidden; }
 .dx-tile span{font-size:.68rem;font-weight:800;letter-spacing:.04em;color:var(--c);text-transform:uppercase}
 .dx-tile b{font-size:1.15rem;line-height:1.2}
 .dx-tile.tot{grid-column:1/-1;height:40px;flex-direction:row;gap:10px;border-top-color:var(--accent);--c:var(--accent)}
+/* Dex v2: sprites in list, info table, forms, evolutions, rich move rows */
+.dx-grid{grid-template-columns:repeat(auto-fill,minmax(168px,1fr))}
+.dx-chip{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:3px 6px 3px 10px;min-height:48px}
+.dx-chip .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dx-chip img{width:44px;height:44px;object-fit:contain;flex-shrink:0;image-rendering:auto}
+.dx-h{align-items:flex-start}.dx-h>img{width:120px;height:120px;object-fit:contain;flex-shrink:0}
+.dx-info{flex:1;min-width:0}.dx-row{display:grid;grid-template-columns:96px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:.82rem;align-items:center}
+.dx-row>span{color:var(--muted)}.dx-row b{font-weight:600}.dx-row small{color:var(--muted)}.dx-formtag{font-size:.7rem;font-weight:800;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.dx-forms{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.dx-form{background:var(--bg3);border:1px solid var(--border2);border-radius:999px;color:inherit;padding:4px 12px;font-size:.78rem;cursor:pointer;transition:border-color .15s,color .15s}
+.dx-form:hover{border-color:var(--accent)}.dx-form.on{border-color:var(--accent);color:var(--accent);font-weight:800}.dx-form.mega.on{border-color:#f4d03f;color:#f4d03f}
+.dx-evo{margin:4px 0 8px;overflow-x:auto}.dx-evt{display:flex;align-items:center;gap:10px}.dx-evk{display:flex;flex-direction:column;gap:6px}.dx-evb{display:flex;align-items:center;gap:8px}
+.dx-evc{font-size:.7rem;color:var(--muted);max-width:140px;text-align:center}
+.dx-ev{display:flex;flex-direction:column;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:inherit;padding:4px 8px;font-size:.75rem;cursor:pointer;min-width:74px}
+.dx-ev img{width:56px;height:56px;object-fit:contain}.dx-ev:hover{border-color:var(--accent)}.dx-ev.on{border-color:var(--accent);background:rgba(160,196,255,.1)}
+.dx-mv{display:grid;grid-template-columns:128px minmax(108px,1.1fr) 78px 74px 42px 42px 34px minmax(0,2.4fr) 20px;gap:8px;align-items:center}
+.dx-mvh{cursor:default;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:2px solid var(--border2)}.dx-mvh:hover{background:none}
+.dx-cells{display:contents}.dx-n{text-align:center;font-size:.8rem}.dx-ca{display:flex;justify-content:center}.dx-ty{display:flex}
+.dx-ef{font-size:.74rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dx-i{color:var(--accent);font-size:.8rem;text-align:center;cursor:help}
+.dx-pills{display:flex;gap:4px;flex-wrap:wrap;align-items:center;min-width:0}.dx-gens{color:var(--muted);font-size:.7rem}.dx-mn{font-weight:600}
+.dx-mvhead{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:.82rem;margin:6px 0}.dx-mvhead b{font-weight:800}.dx-effect{font-size:.82rem;color:var(--text);line-height:1.45}
+
+/* Dex v2.1: aligned evolution tree, legend, category labels */
+.dx-evo{display:flex;flex-direction:column;gap:6px;overflow-x:auto;padding-bottom:4px}
+.dx-evr{display:flex;align-items:center;gap:10px}
+.dx-evl{color:var(--muted);font-size:1rem;width:14px;text-align:center}
+.dx-ev{width:112px;flex:0 0 112px;min-width:0}.dx-ev span{text-align:center;line-height:1.2}
+.dx-evc{font-size:.76rem;color:var(--muted);max-width:none;text-align:left}
+.dx-legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:.72rem;color:var(--muted);margin:6px 0}.dx-legend b{color:var(--text);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+.dx-legend span{display:inline-flex;align-items:center;gap:5px}
+.dx-ca{display:flex;align-items:center;gap:4px;justify-content:flex-start}.dx-ca small{font-size:.68rem;color:var(--muted)}
+.dx-radar{flex:1 1 260px}.dx-tiles{flex:1 1 220px}
+.dx-abnote{padding:2px 8px;border-radius:12px;font-size:.66rem;font-weight:700;border:1px dashed var(--accent);color:var(--accent);background:rgba(160,196,255,.06)}
+.dx-tc{margin:4px 0 8px}.dx-tcab{margin:6px 0;font-size:.8rem}.dx-tcab small{color:var(--muted)}.dx-tcab .indiv-chips{margin-top:4px}
+@media (max-width:760px){.dx-mv{display:flex;flex-wrap:wrap;gap:6px 10px}.dx-mvh{display:none}.dx-ef{flex-basis:100%;white-space:normal}.dx-i{display:none}.dx-pills{min-width:0}.dx-mn{flex:1}.dx-h>img{width:92px;height:92px}.dx-row{grid-template-columns:82px 1fr}}
+
 
 .dx-nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0}.dx-nav .sp{flex:1}
 .dx-nav button{background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:inherit;padding:6px 10px;font-size:.78rem;cursor:pointer}.dx-nav button:hover{border-color:var(--accent)}
@@ -816,6 +851,60 @@ body { overflow-x:hidden; }
 .guide-mon>img{height:64px;float:right;image-rendering:pixelated}.gm-name{font-weight:700;color:var(--text);font-size:.82rem}.gm-name small{color:var(--muted)}
 .guide-mv{display:inline-block;margin:2px 3px 0 0;padding:1px 7px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:.66rem}
 
+.dx-link{cursor:pointer;transition:filter .15s}
+img.dx-link:hover{filter:brightness(1.18) drop-shadow(0 0 4px rgba(160,196,255,.55))}
+.gm-name.dx-link:hover{color:var(--accent);text-decoration:underline}
+.dx-val{font-size:.72rem;font-weight:800;color:var(--accent);margin-left:auto;padding-left:6px;white-space:nowrap}
+.dx-shinebtn{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:inherit;padding:6px 12px;font-size:.8rem;cursor:pointer;white-space:nowrap}
+.dx-shinebtn:hover{border-color:var(--accent)}.dx-shinebtn.on{border-color:#f4d03f;color:#f4d03f;font-weight:800}
+
+/* ===== unified pill buttons: back / nav / small actions (same look family as the dropdowns + toggles) ===== */
+.guide-back,.builder-back,.dx-nav button,.dx-shinebtn{display:inline-flex;align-items:center;gap:7px;height:28px;box-sizing:border-box;padding:0 12px;background:var(--bg2);border:1px solid var(--border);border-radius:999px;color:var(--muted2);font-size:.74rem;font-weight:600;font-family:inherit;line-height:1;cursor:pointer;white-space:nowrap;transition:border-color .15s,background-color .15s,color .15s}
+.guide-back:has(.pb-ico),.builder-back:has(.pb-ico),.dx-nav button:has(.pb-ico){padding-left:4px}
+.guide-back:hover,.builder-back:hover,.dx-nav button:hover,.dx-shinebtn:hover{background:var(--bg3);border-color:var(--accent);color:var(--text)}
+.guide-back:focus-visible,.builder-back:focus-visible,.dx-nav button:focus-visible,.dx-shinebtn:focus-visible{outline:none;border-color:var(--accent)}
+.pb-ico{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;box-sizing:border-box;border-radius:50%;border:1.5px solid var(--border2);color:var(--accent);font-size:.8rem;font-weight:800;line-height:1;transition:background-color .15s,border-color .15s,color .15s}
+.guide-back:hover .pb-ico,.builder-back:hover .pb-ico,.dx-nav button:hover .pb-ico{background:var(--accent);border-color:var(--accent);color:var(--bg4)}
+.dx-shinebtn.on{border-color:rgba(244,208,63,.55);background:rgba(244,208,63,.1);color:#f4d03f}
+/* calc matchup banner */
+.calc-banner{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 12px;padding:8px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:12px}
+.cb-side{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.cb-side.opp{flex-direction:row-reverse;text-align:right}
+.cb-av{width:56px;height:56px;border-radius:50%;background:var(--bg4);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;transition:border-color .15s}
+.cb-side.has .cb-av{border-color:var(--accent)}
+.cb-av img{width:100%;height:100%;object-fit:contain;object-position:center top}
+.cb-ch{font-size:1.3rem;font-weight:800;color:var(--muted2)}
+.cb-txt{min-width:0}.cb-n{font-size:.84rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cb-s{font-size:.66rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-vs{flex-shrink:0;font-weight:900;font-size:.78rem;color:var(--muted);padding:3px 11px;border:1.5px solid var(--border2);border-radius:999px}
+
+/* backup & restore + small pill buttons */
+.pill-btn{display:inline-flex;align-items:center;gap:7px;height:28px;box-sizing:border-box;padding:0 13px;background:var(--bg2);border:1px solid var(--border);border-radius:999px;color:var(--muted2);font-size:.74rem;font-weight:600;font-family:inherit;line-height:1;cursor:pointer;white-space:nowrap;transition:border-color .15s,background-color .15s,color .15s}
+.pill-btn:hover{background:var(--bg3);border-color:var(--accent);color:var(--text)}
+.pill-btn.danger:hover{border-color:var(--red);color:#fff}
+.home-tools{display:flex;justify-content:center;margin:10px 0 0}
+.bk-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.bk-row[hidden]{display:none}
+.bk-h{font-size:.74rem;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 0}
+.bk-sum,.bk-msg{font-size:.74rem;color:var(--muted2);margin:4px 0}
+.bk-msg.ok{color:#4ade80}.bk-msg.bad{color:#f87171}
+.bk-ta{resize:vertical;font-family:inherit;margin-bottom:4px}
+.calc-sides>.calc-vs{visibility:hidden}
+@media (max-width:1000px){.calc-sides>.calc-vs{display:none}}
+@media (max-width:560px){.calc-banner{gap:8px;padding:8px 10px}.cb-side,.cb-side.opp{flex-direction:column;text-align:center;gap:4px}.cb-av{width:50px;height:50px}.cb-txt{width:100%}.cb-vs{padding:2px 9px}}
+
+/* is my team ready? */
+.gc-box{margin:8px 0;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px}
+.gc-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.gc-top select{appearance:none;-webkit-appearance:none;color-scheme:dark;cursor:pointer;background-color:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 24px 6px 8px;font-size:.78rem;font-family:inherit;max-width:100%;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23a0c4ff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:10px 6px;transition:border-color .15s}
+.gc-top select:hover,.gc-top select:focus{outline:none;border-color:var(--accent)}
+.gc-v{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:999px;border:1px solid;font-size:.74rem;font-weight:800}
+.gc-v.ready{color:#4ade80;border-color:#4ade80;background:rgba(74,222,128,.1)}.gc-v.caution{color:#f4d03f;border-color:#e0a020;background:rgba(224,160,32,.12)}.gc-v.risky{color:#f87171;border-color:#f87171;background:rgba(248,113,113,.1)}
+.gc-sum{font-size:.76rem;color:var(--muted2);margin:4px 0}
+.gc-row{display:grid;grid-template-columns:minmax(130px,34%) 1fr;gap:8px;padding:6px 0;border-top:1px solid var(--border);font-size:.76rem;align-items:center}
+.gc-t small{color:var(--muted)}.gc-ty{font-size:.64rem;font-weight:700;margin-left:4px}
+.gc-ok{color:#86efac}.gc-meh{color:#f4d03f}.gc-bad{color:#f87171}
+@media (max-width:560px){.gc-row{grid-template-columns:1fr;gap:2px}}
 </style>
 </head>
 <body>
@@ -830,6 +919,13 @@ body { overflow-x:hidden; }
 <path d="M6 15l17-5v39l-17 5z" fill="#4ade80" fill-opacity=".55" stroke="none"/><path d="M23 10l18 5v39l-18-5z" fill="#38bdf8" fill-opacity=".55" stroke="none"/><path d="M41 15l17-5v39l-17 5z" fill="#86efac" fill-opacity=".5" stroke="none"/><path d="M6 15l17-5 18 5 17-5v39l-17 5-18-5-17 5z" fill="none"/><path d="M23 10v39M41 15v39"/>
 <path d="M12 41l10-8 10 5 9-12" stroke="#ef4444" stroke-dasharray="1 5.5"/>
 <circle cx="49" cy="25" r="5.5" fill="#ef4444" stroke="currentColor"/><circle cx="49" cy="25" r="1.8" fill="#fff" stroke="none"/></g></symbol>
+<symbol id="ico-dex" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+<rect x="13" y="5" width="38" height="54" rx="8" fill="#ef4444" fill-opacity=".5"/>
+<circle cx="24" cy="16" r="6" fill="#38bdf8" fill-opacity=".75"/><circle cx="24" cy="16" r="1.8" fill="#fff" stroke="none"/>
+<circle cx="37" cy="12" r="1.8" fill="#facc15" stroke="none"/><circle cx="43" cy="12" r="1.8" fill="#4ade80" stroke="none"/>
+<rect x="19" y="27" width="26" height="17" rx="3" fill="#0b1020" fill-opacity=".6"/>
+<path d="M26.5 35.5a5.5 5.5 0 0 1 11 0z" fill="#ef4444" stroke="none"/><circle cx="32" cy="35.5" r="5.5"/><path d="M26.5 35.5h11"/><circle cx="32" cy="35.5" r="1.7" fill="#fff" stroke="none"/>
+<circle cx="25" cy="52" r="2.6" fill="currentColor" stroke="none"/><path d="M34 52h10"/></g></symbol>
 </defs></svg>
 <!-- HOME SCREEN -->
 <div id="homeScreen" class="screen active">
@@ -851,18 +947,19 @@ body { overflow-x:hidden; }
         <div class="mode-card guide-card" data-section="guide" onclick="openSection('guide')">
             <span class="mode-icon"><svg class="mode-svg" aria-hidden="true"><use href="#ico-map"/></svg></span>
             <div class="mode-title">Trainer Guide</div>
-            <div class="mode-desc">Search gym leaders, Elite Four and champions across the games and Cobblemon.</div>
-            <div class="mode-badge" style="background:#b45309;color:#fff">COMING SOON</div>
+            <div class="mode-desc">Search gym leaders, Elite Four and champions across the games and Cobblemon, plus a full Pokédex to look up any Pokémon or move.</div>
+            <div class="mode-badge">GUIDE / DEX</div>
         </div>
     </div>
     <div class="scroll-hint">Click a mode above, then scroll down to start building your team</div>
+    <div class="home-tools"><button type="button" class="pill-btn" onclick="bkOpen()">💾 Backup &amp; Restore</button></div>
     <div id="sectionHost" class="section-host"></div>
 </div>
 
 <!-- BUILDER SCREEN -->
 <div id="builderScreen" style="display:none">
     <div class="builder-header">
-        <button class="builder-back" onclick="goHome()">← Home</button>
+        <button class="builder-back" onclick="goHome()"><span class="pb-ico">‹</span>Home</button>
         <div class="team-name-wrap">
             <input type="text" class="team-name-input" id="teamNameInput" placeholder="Team name…" value="My Team" onchange="currentTeamName=this.value">
             <span class="mode-badge-header" id="modeBadge">REGULAR</span>
@@ -1013,14 +1110,14 @@ const abilityImmunityMap = {
     'sap sipper':         {immune:['Grass'], halfDmg:[]},
     'earth eater':        {immune:['Ground'], halfDmg:[]},
     'well-baked body':    {immune:['Fire'], halfDmg:[]},
-    'wind rider':         {immune:['Flying'], halfDmg:[]},
-    'purifying salt':     {immune:['Ghost'], halfDmg:[]},
+    'wind rider':         {immune:[], halfDmg:[]},          // only blocks wind moves, not the Flying type
+    'purifying salt':     {immune:[], halfDmg:['Ghost']},   // halves Ghost damage (not immune)
     'soundproof':         {immune:[], halfDmg:[]},
     'wonder guard':       {immune:[], halfDmg:[]},
     'thick fat':          {immune:[], halfDmg:['Fire','Ice']},
     'heatproof':          {immune:[], halfDmg:['Fire']},
     'water bubble':       {immune:[], halfDmg:['Fire']},
-    'fluffy':             {immune:[], halfDmg:['Fire']},
+    'fluffy':             {immune:[], halfDmg:[]},          // contact x0.5 / Fire x2 (cancel for contact Fire) - not a plain type change
     'solid rock':         {immune:[], halfDmg:[]},
     'filter':             {immune:[], halfDmg:[]},
     'prism armor':        {immune:[], halfDmg:[]},
@@ -1611,16 +1708,6 @@ function calcSaveTeam(side) {
     calcSetStatus(side, `Saved "${name}" (${list.length} Pokémon)`);
     showToast('Team saved! 💾');
 }
-function calcLoadTeam(side, id) {
-    if (!id) return;
-    const team = savedTeams.find(t => String(t.id) === String(id)); if (!team) return;
-    let list = team.pokemonList.filter(p => p.active);
-    if (list.length === 0) list = team.pokemonList.slice(0, 6);
-    const roster = [null,null,null,null,null,null];
-    list.slice(0, 6).forEach((p, i) => { roster[i] = JSON.parse(JSON.stringify(p)); });
-    calcState[side].roster = roster; calcState.picked = null;
-    renderCalc(); calcSetStatus(side, `Loaded "${team.name}"`);
-}
 async function calcAddPokemon(side) {
     const input = document.getElementById(`calcSearch-${side}`); if (!input) return;
     const name = input.value.trim(); if (!name) return;
@@ -1634,8 +1721,6 @@ async function calcAddPokemon(side) {
     renderCalc(); calcSetStatus(side, `Added ${p.name}`);
 }
 function calcRemove(side, i) { calcState[side].roster[i] = null; calcState.picked = null; renderCalc(); }
-function calcClearSide(side) { calcState[side].roster = [null,null,null,null,null,null]; calcState.picked = null; renderCalc(); }
-
 /* ---- lists for the search boxes ---- */
 function calcList(id) {
     let dl = document.getElementById(id);
@@ -1921,7 +2006,7 @@ function calcActiveCard(side, i, p) {
         </tbody></table>`;
     return `<div class="cx-card ${picked ? 'cx-picked' : ''}" ${dnd}>
         <div class="cx-head" draggable="true" ondragstart="calcDragStart(event,'${side}',${i})" onclick="calcTileClick('${side}',${i})" title="Tap to select, then tap another slot to swap">
-            <img src="${sprite(p)}" alt="" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
+            <img src="${sprite(p)}" alt="" class="dx-link" title="Open in Dex" onclick="event.stopPropagation();openInDex('${p.name}')" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
             <div class="cx-hinfo"><div class="cx-name">${calcEsc(p.nickname || p.name)}${megaBtnHTML(p, `event.stopPropagation();calcMegaToggle('${side}',${i})`, 'mini')}</div><div>${types}</div><div class="cx-stats" id="cxStats-${side}-${i}">${calcStatLine(p)}</div></div>
             <button class="cx-x" onclick="event.stopPropagation();calcRemove('${side}',${i})" title="Remove">✕</button>
         </div>
@@ -1952,24 +2037,19 @@ function calcBenchTile(side, i, p) {
         <span>${calcEsc(p.nickname || p.name)}</span>
         <button class="cx-x" onclick="event.stopPropagation();calcRemove('${side}',${i})" title="Remove">✕</button></div>`;
 }
-function calcSideHTML(side, title, n) {
-    const roster = calcState[side].roster;
-    const teams = savedTeams.map(t => `<option value="${t.id}">${calcEsc(t.name)}</option>`).join('');
-    const pk = calcState.picked && calcState.picked.side === side ? roster[calcState.picked.idx] : null;
-    return `<div class="calc-side"><h3>${title}</h3>
-        <div class="calc-tools">
-            <select onchange="calcLoadTeam('${side}',this.value)"><option value="">Load saved team…</option>${teams}</select>
-            <input id="calcSearch-${side}" list="calcNameList" placeholder="Search Pokémon…" autocomplete="off" onkeydown="if(event.key==='Enter')calcAddPokemon('${side}')">
-            <button class="btn btn-new" onclick="calcAddPokemon('${side}')">+ Add</button>
-            <button class="btn cx-clear" onclick="calcClearSide('${side}')">Clear</button>
-            <button class="btn btn-new" onclick="calcSaveTeam('${side}')" title="Save this side as a team">💾 Save</button>
-        </div>
-        <div class="calc-status" id="calcStatus-${side}"></div>
-        <div class="cx-actives">${roster.slice(0, n).map((p, i) => calcActiveCard(side, i, p)).join('')}</div>
-        <div class="calc-bench-label">Bench</div>
-        <div class="calc-bench">${roster.slice(n).map((p, i) => calcBenchTile(side, i + n, p)).join('')}</div>
-        ${pk ? `<div class="cx-pickmsg">${calcEsc(pk.nickname || pk.name)} selected. Tap another slot to swap. <a href="#" onclick="calcState.picked=null;renderCalc();return false">Cancel</a></div>` : ''}
-    </div>`;
+function calcAvatarHTML(side) {
+    const src = calcState[side].src;
+    let img = '', alt = '', name = side === 'you' ? 'You' : 'Opponent', sub = side === 'you' ? 'Trainer' : 'Load a trainer to face', ch = side === 'you' ? 'R' : '?', has = false;
+    if (src && src.kind === 'g') {
+        const parts = String(src.id).split(':'), g = GAME_TEAMS[parts[0]], t = g && g.trainers[+parts[1]];
+        if (t) { img = cxSpr(parts[0], t); alt = cxSprAlt(t); name = t.n; sub = g.name; ch = String(t.n).charAt(0); has = true; }
+    } else if (src) {
+        name = src.name; sub = src.kind === 'c' ? 'Damage Calc team' : 'Team Builder team'; ch = '👤'; has = true;
+    } else if (side === 'you') {
+        const red = { n: 'Red' }; img = cxSpr('hgss', red); alt = cxSprAlt(red); has = true;
+    }
+    const av = img ? `<img src="${img}" data-a="${alt}" data-n="${calcEsc(ch)}" alt="" onerror="cxSprErr(this)">` : `<span class="cb-ch">${calcEsc(ch)}</span>`;
+    return `<div class="cb-side ${side}${has ? ' has' : ''}"><span class="cb-av">${av}</span><div class="cb-txt"><div class="cb-n">${calcEsc(name)}</div><div class="cb-s">${calcEsc(sub)}</div></div></div>`;
 }
 /* ===== POKÉMON SEARCH (short dropdown) ===== */
 function calcPokeMatches(q) {
@@ -2204,6 +2284,7 @@ function renderCalc() {
             <button class="calc-fmt-btn ${calcState.format === '2v2' ? 'on' : ''}" onclick="setCalcFormat('2v2')">2v2</button>
         </div>
         ${calcFieldHTML()}
+        <div class="calc-banner">${calcAvatarHTML('you')}<span class="cb-vs">VS</span>${calcAvatarHTML('opp')}</div>
         <div class="calc-sides">${calcSideHTML('you', 'Your Team', n)}<div class="calc-vs">VS</div>${calcSideHTML('opp', 'Opponent', n)}</div>
         <div id="cxResults" class="cx-results">${calcResultsHTML()}</div>`;
 }
@@ -2335,7 +2416,7 @@ function evoRowHTML(p) {
 }
 function sprite(p) {
     const id=p._data.id;
-    if (p._data.zaSprite) { const sl=String(p.name).toLowerCase().replace(/\s+/g,'-'), zl=(String(p.name).match(/-Mega-([XYZ])$/i)||[])[1]||''; return `https://serebii.net/legendsz-a/pokemon/${String(id||0).padStart(3,'0')}-m${zl.toLowerCase()}.png#b=${id||0}&s=${p.shiny?1:0}&n=${sl}`; }
+    if (p._data.zaSprite) { const sl=String(p.name).toLowerCase().replace(/\s+/g,'-'), zl=(String(p.name).match(/-Mega-([XYZ])$/i)||[])[1]||''; if (p.shiny) return `https://static.rotomlabs.net/images/sprites/latest/${String(id||0).padStart(4,'0')}-${sl}-shiny.png#b=${id||0}&s=1&n=${sl}`; return `https://serebii.net/legendsz-a/pokemon/${String(id||0).padStart(3,'0')}-m${zl.toLowerCase()}.png#b=${id||0}&s=${p.shiny?1:0}&n=${sl}`; }
     if (id) return p.shiny
         ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`
         : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
@@ -3289,7 +3370,7 @@ function renderWeaknesses() {
                     return `<span style="color:${col};font-weight:700">${t}</span>`;
                 }).join('<span style="color:var(--muted)"> / </span>');
                 card.innerHTML = `<div class="indiv-card-header">
-                    <img src="${sprite(p)}" alt="${p.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
+                    <img src="${sprite(p)}" alt="${p.name}" class="dx-link" title="Open in Dex" onclick="openInDex('${p.name}')" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
                     <div><div class="indiv-name">${p.nickname||p.name}</div><div class="indiv-type">${typeSpans}</div></div>
                 </div>
                 <div class="indiv-chips">
@@ -3523,7 +3604,7 @@ function buildCard(p) {
     const stats=getFinalStats(p);
     wrap.innerHTML=`
 <div class="pokemon-summary">
-    <img src="${sprite(p)}" class="poke-img" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
+    <img src="${sprite(p)}" class="poke-img dx-link" title="Open in Dex" onclick="event.stopPropagation();openInDex('${p.name}')" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
     <div class="summary-info">
         ${p.nickname?`<div style="font-size:.7rem;color:var(--accent)">${p.nickname}</div>`:''}
         <div class="poke-name">${p.name}${dupTag(p)}</div>
@@ -3656,7 +3737,7 @@ function buildExpanded(p, stats) {
     return `
 <div class="exp-header">
     <div class="exp-sprite-box">
-        <img src="${sprite(p)}" alt="${p.name}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
+        <img src="${sprite(p)}" alt="${p.name}" class="dx-link" title="Open in Dex" onclick="openInDex('${p.name}')" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
                <div class="chip-row"><div class="shiny-toggle">
             <input type="checkbox" id="shiny-${p.uid}" ${p.shiny?'checked':''} onchange="updateField('${p.uid}','shiny',this.checked)">
             <label for="shiny-${p.uid}">✨ Shiny</label>
@@ -4153,7 +4234,6 @@ document.addEventListener('mousemove', e => {
     });
 });
 
-async function init() { renderSavedTeams(); loadAllPokemonNames(); }
 init();
 const evoCache = {}; // slug → array of evo slugs (empty = final form)
 async function getEvolutions(slug) {
@@ -4277,6 +4357,7 @@ function autoSave() {
     autoSaveTimer = setTimeout(doAutoSave, 600);
 }
 function doAutoSave() {
+    if (window.__noAutoSave) return;
     if (currentSection !== 'draft') return;
     const nameEl = document.getElementById('teamNameInput');
     if (nameEl) currentTeamName = nameEl.value.trim() || 'Unnamed Team';
@@ -4309,6 +4390,87 @@ function loadNotes() {
 init();
 window.addEventListener('beforeunload', doAutoSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) doAutoSave(); });
+
+/* ===================== BACKUP & RESTORE ===================== */
+const BK_SKIP = /^(dexIdx|dexMv|cxMoveMap)/;   // big caches that rebuild themselves
+function bkCollect() {
+    const data = {};
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (!BK_SKIP.test(k)) data[k] = localStorage.getItem(k); } } catch (e) {}
+    return { app: 'beanspokebuilder', v: 1, saved: new Date().toISOString(), data };
+}
+function bkSummary(o) {
+    const d = (o && o.data) || {}, n = k => { try { const v = JSON.parse(d[k] || '[]'); return Array.isArray(v) ? v.length : Object.keys(v).length; } catch (e) { return 0; } };
+    return `${n('pokeTeams')} builder team${n('pokeTeams') === 1 ? '' : 's'} · ${n('pokeCalcTeams')} calc team${n('pokeCalcTeams') === 1 ? '' : 's'} · ${n('guideDone')} trainer${n('guideDone') === 1 ? '' : 's'} ticked off`;
+}
+function bkParse(text) {
+    try { const o = JSON.parse(String(text || '').trim()); if (o && o.app === 'beanspokebuilder' && o.data && typeof o.data === 'object') return o; } catch (e) {}
+    return null;
+}
+function bkApply(o, mode) {
+    const d = o.data;
+    Object.keys(d).forEach(k => {
+        if (BK_SKIP.test(k) || typeof d[k] !== 'string') return;
+        try {
+            if (mode === 'replace') { localStorage.setItem(k, d[k]); return; }
+            const cur = localStorage.getItem(k);
+            if (cur == null) { localStorage.setItem(k, d[k]); return; }
+            const a = JSON.parse(cur), b = JSON.parse(d[k]);
+            if (Array.isArray(a) && Array.isArray(b)) {          // lists of teams: add the ones this device doesn't have
+                const ids = new Set(a.map(x => x && x.id));
+                b.forEach(x => { if (!(x && ids.has(x.id))) a.push(x); });
+                localStorage.setItem(k, JSON.stringify(a));
+            } else if (a && b && typeof a === 'object' && typeof b === 'object') {   // checklists: combine
+                localStorage.setItem(k, JSON.stringify(Object.assign({}, b, a)));
+            }
+        } catch (e) {}
+    });
+    window.__noAutoSave = true;   // otherwise the page would save its old in-memory teams over the import on reload
+    location.reload();
+}
+function bkOpen() {
+    const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
+    overlay.innerHTML = `<div class="modal-box"><h3>Backup &amp; Restore</h3>
+        <p>Your teams and progress are stored in this browser only. Save a backup to move them to another device or keep them safe.</p>
+        <div class="bk-row"><button type="button" class="pill-btn" data-a="dl">⬇ Download backup file</button><button type="button" class="pill-btn" data-a="cp">⧉ Copy backup text</button></div>
+        <div class="bk-sum">In this browser now: ${bkSummary(bkCollect())}</div>
+        <div class="bk-h">Restore</div>
+        <div class="bk-row"><label class="pill-btn">📂 Choose backup file<input type="file" accept=".json,application/json,text/plain" hidden></label></div>
+        <textarea class="ab-modal-input bk-ta" rows="3" placeholder="…or paste backup text here" spellcheck="false"></textarea>
+        <div class="bk-msg"></div>
+        <div class="bk-row bk-imp" hidden><button type="button" class="pill-btn" data-a="merge">Add to what I have</button><button type="button" class="pill-btn danger" data-a="replace">Replace what I have</button></div>
+        <button class="modal-cancel" type="button">Close</button></div>`;
+    document.body.appendChild(overlay);
+    const msg = overlay.querySelector('.bk-msg'), imp = overlay.querySelector('.bk-imp'), ta = overlay.querySelector('textarea');
+    let pending = null;
+    const say = (t, cls) => { msg.textContent = t; msg.className = 'bk-msg ' + (cls || ''); };
+    const check = text => {
+        pending = bkParse(text); imp.hidden = !pending;
+        if (pending) say(`Found a backup (${bkSummary(pending)}${pending.saved ? ', saved ' + new Date(pending.saved).toLocaleDateString() : ''}).`, 'ok');
+        else say(text && text.trim() ? "That doesn't look like a Bean's PokéBuilder backup." : '', text && text.trim() ? 'bad' : '');
+    };
+    const close = () => overlay.remove();
+    ta.addEventListener('input', () => check(ta.value));
+    overlay.querySelector('input[type=file]').addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0]; if (!f) return;
+        const r = new FileReader(); r.onload = () => { ta.value = ''; check(String(r.result)); }; r.readAsText(f);
+    });
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) return close();
+        const b = e.target.closest('button[data-a]'); if (!b) return;
+        const a = b.dataset.a;
+        if (a === 'dl') {
+            const blob = new Blob([JSON.stringify(bkCollect())], { type: 'application/json' }), url = URL.createObjectURL(blob), el = document.createElement('a');
+            el.href = url; el.download = `beanspokebuilder-backup-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(el); el.click(); el.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 2000); say('Backup file downloaded.', 'ok');
+        } else if (a === 'cp') {
+            const text = JSON.stringify(bkCollect());
+            (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => say('Backup text copied. Paste it into the Restore box on your other device.', 'ok'))
+                .catch(() => { ta.value = text; ta.select(); say('Copy blocked by the browser: the text is in the box below, so copy it from there.', 'bad'); });
+        } else if (pending && a === 'merge') bkApply(pending, 'merge');
+        else if (pending && a === 'replace' && confirm('Replace your current teams and progress with this backup?')) bkApply(pending, 'replace');
+    });
+    overlay.querySelector('.modal-cancel').onclick = close;
+}
 
 /* ===================== GAME TEAMS + LOAD PICKER ===================== */
 /* Trainer format: {c:category, n:name, m:[[species, level, {a:ability,i:item,n:nature,m:[moves]}?], ...]}
@@ -4581,7 +4743,7 @@ window.addEventListener('error', ev => {
     const u = el.src || '', m = u.match(/#b=(\d+)&s=(\d)(?:&n=([^&]*))?/); if (!m) return;
     const sh = m[2] === '1', frag = `#b=${m[1]}&s=${m[2]}&n=${m[3] || ''}`;
     let next = null;
-    if (/serebii\.net\/legendsz-a/.test(u) && m[3]) next = `https://img.pokemondb.net/sprites/home/${sh ? 'shiny' : 'normal'}/${m[3]}.png${frag}`;
+    if (/serebii\.net\/legendsz-a|static\.rotomlabs\.net/.test(u) && m[3]) next = `https://img.pokemondb.net/sprites/home/${sh ? 'shiny' : 'normal'}/${m[3]}.png${frag}`;
     else if (/img\.pokemondb\.net\/sprites\/home/.test(u) && m[3]) next = `https://play.pokemonshowdown.com/sprites/gen5${sh ? '-shiny' : ''}/${m[3].replace(/-mega-([xyz])$/, '-mega$1')}.png${frag}`;
     else if (/play\.pokemonshowdown\.com/.test(u)) next = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${sh ? 'shiny/' : ''}${m[1]}.png`;
     if (next) { ev.stopImmediatePropagation(); el.src = next; }
@@ -4644,7 +4806,7 @@ const guideNoProg = c => /^(Rematch|Other)$/.test(c);
 const guideCap = w => String(w).split('-').map(x => x.charAt(0).toUpperCase() + x.slice(1)).join('-');
 function guideDone() { try { return JSON.parse(localStorage.getItem('guideDone') || '{}'); } catch (e) { return {}; } }
 function guideToggle(k) { const d = guideDone(); if (d[k]) delete d[k]; else d[k] = 1; try { localStorage.setItem('guideDone', JSON.stringify(d)); } catch (e) {} guideRender(); }
-function guideGo(v) { guideState.view = v; if (v === 'guide' && !guideState.game) guideState.game = GAME_TEAMS[cxLoad.game] ? cxLoad.game : Object.keys(GAME_TEAMS)[0]; guideRender(); }
+function guideGo(v) { guideState.view = v; if (typeof dexState !== 'undefined') dexState.ret = null; if (v === 'guide' && !guideState.game) guideState.game = GAME_TEAMS[cxLoad.game] ? cxLoad.game : Object.keys(GAME_TEAMS)[0]; guideRender(); }
 function guideGame(g) { guideState.game = g; guideState.ti = -1; guideState.sx = null; try { localStorage.setItem('cxLastGame', g); } catch (e) {} guideRender(); }
 function guidePick(i) { const st = document.getElementById('guideStrip'); guideState.sx = st ? st.scrollLeft : null; guideState.ti = i; guideRender(); }
 function guideSend(side) { cxLoad.side = side; openSection('calc'); calcLoadGame(guideState.game, guideState.ti); }
@@ -4655,7 +4817,7 @@ function guideRender() {
     const title = `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-map"/></svg> Trainer Guide</h2>`;
     if (guideState.view === 'home') {
         root.style.minHeight = '';
-        root.innerHTML = title + `<div class="guide-choose"><button class="guide-tile" onclick="guideGo('dex')"><b>📖 Dex</b><small>Look up any Pokémon, stats and moves</small></button><button class="guide-tile" onclick="guideGo('guide')"><b>🗺️ Guide</b><small>Navigate regions and trainers</small></button></div>`;
+        root.innerHTML = title + `<div class="guide-choose"><button class="guide-tile" onclick="guideGo('dex')"><b><svg class="h2-svg" aria-hidden="true"><use href="#ico-dex"/></svg> Pokédex</b><small>Look up any Pokémon, stats and moves</small></button><button class="guide-tile" onclick="guideGo('guide')"><b><svg class="h2-svg" aria-hidden="true"><use href="#ico-map"/></svg> Guide</b><small>Navigate regions and trainers</small></button></div>`;
         return;
     }
     if (guideState.view === 'dex') { root.style.minHeight = ''; dexRender(); return; }
@@ -4670,7 +4832,7 @@ function guideRender() {
         const t = g.trainers[i], img = cxSpr(gid, t), d = done[gid + ':' + i], loc = guideLoc(gid, t);
         return `<button class="gs-node${i === guideState.ti ? ' on' : ''}${d ? ' done' : ''}" onclick="guidePick(${i})" title="${calcEsc(t.n)}${loc ? ' — ' + calcEsc(loc[0] + ' · ' + loc[1]) : ''}">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<span class="gs-n">${calcEsc(t.n)}</span>${loc ? `<span class="gs-l">${calcEsc(loc[0])}</span>` : ''}${d ? '<i>✓</i>' : ''}</button>`;
     }).join('')}</div></div>`).join('') + `</div>`;
-    root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideGo('home')">‹ Back</button><select onchange="guideGame(this.value)">${sel}</select>
+    root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideGo('home')"><span class="pb-ico">‹</span>Back</button><select onchange="guideGame(this.value)">${sel}</select>
         <span class="guide-stat">${nDone}/${prog.length} defeated</span>${next ? `<span class="guide-stat">Next: ${calcEsc(next[0].n)}</span><span class="guide-cap">Level cap ${cap(next[0])}</span>${guideLoc(gid, next[0]) ? `<span class="guide-nloc">📍 ${calcEsc(guideLoc(gid, next[0])[0])} · ${calcEsc(guideLoc(gid, next[0])[1])}</span>` : ''}` : '<span class="guide-stat">🏆 Complete!</span>'}</div>
         <div class="guide-prog"><div style="width:${prog.length ? Math.round(nDone / prog.length * 100) : 0}%"></div></div>${strip}<div id="guideDetail"></div>`;
     const st = document.getElementById('guideStrip');
@@ -4678,6 +4840,77 @@ function guideRender() {
     window.scrollTo(0, keepY);
     const dp = guideDetail(), my = _gdTok;
     dp.then(() => { if (my === _gdTok) { window.scrollTo(0, keepY); root.style.minHeight = ''; } });
+}
+/* ===== Is my team ready? (type-based matchup check) ===== */
+let _gcTok = 0;
+async function guideTypesOf(slug) {
+    if (!guideTypeCache[slug]) {
+        try { const r = await fetch('https://pokeapi.co/api/v2/pokemon/' + slug); guideTypeCache[slug] = r.ok ? (await r.json()).types.map(x => x.type.name.charAt(0).toUpperCase() + x.type.name.slice(1)) : []; }
+        catch (e) { guideTypeCache[slug] = []; }
+    }
+    return guideTypeCache[slug];
+}
+function guideMyTeams() {
+    const pick = l => { const a = (l || []).filter(p => p && p.active); return (a.length ? a : (l || []).slice(0, 6)).slice(0, 6); };
+    const ok = l => l.filter(p => p && p._data && p._data.type && p._data.type.length);
+    const out = [];
+    try { if (pokemonList.length) out.push({ key: 'cur', label: 'Current draft team', mons: ok(pick(pokemonList)) }); } catch (e) {}
+    try { savedTeams.forEach(x => { if (x.pokemonList && x.pokemonList.length) out.push({ key: 'b:' + x.id, label: x.name + ' (Team Builder)', mons: ok(pick(x.pokemonList)) }); }); } catch (e) {}
+    try { calcTeams.forEach(x => { if (x.pokemonList && x.pokemonList.length) out.push({ key: 'c:' + x.id, label: x.name + ' (Calc)', mons: ok(pick(x.pokemonList)) }); }); } catch (e) {}
+    return out.filter(t => t.mons.length);
+}
+/* trainer: [{sp, lv, types}], mine: [{name, types, ability, level}], cap: number -> verdict + per-Pokémon answers */
+function guideCheckCalc(trainer, mine, cap) {
+    const defOf = (types, ab) => getTypeDefenseWithAbility(types, ab || '');
+    const mineDef = mine.map(u => defOf(u.types, u.ability));
+    const rows = trainer.map(tm => {
+        if (!tm.types || !tm.types.length) return { sp: tm.sp, lv: tm.lv, types: [], unknown: true, good: [], okay: [] };
+        const tDef = defOf(tm.types, '');
+        const good = [], okay = [];
+        mine.forEach((u, ui) => {
+            const hit = Math.max(...u.types.map(ty => tDef[ty] !== undefined ? tDef[ty] : 1));          // best STAB type of mine vs them
+            const threat = Math.max(...tm.types.map(ty => mineDef[ui][ty] !== undefined ? mineDef[ui][ty] : 1));   // best STAB type of theirs vs me
+            if (hit >= 2 && threat <= 1) good.push(u.name);
+            else if (hit >= 2 || (hit >= 1 && threat < 1)) okay.push(u.name);
+        });
+        return { sp: tm.sp, lv: tm.lv, types: tm.types, good, okay };
+    });
+    const exposed = mine.map((u, ui) => ({ name: u.name, n: trainer.filter(tm => tm.types && tm.types.some(ty => mineDef[ui][ty] >= 2)).length }))
+        .filter(x => x.n >= 2).sort((a, b) => b.n - a.n);
+    const levels = mine.map(u => +u.level || 0), umax = Math.max(...levels), umin = Math.min(...levels);
+    const known = rows.filter(r => !r.unknown), gaps = known.filter(r => !r.good.length).length;
+    const levelWarn = umax > 0 && umax < cap;
+    const bad = gaps + (levelWarn ? 2 : 0) + (exposed.length >= 2 ? 1 : 0);
+    return { rows, exposed, umax, umin, levelWarn, gaps, verdict: bad === 0 ? 'ready' : bad <= 2 ? 'caution' : 'risky' };
+}
+function guideCheckToggle() { guideState.chkOpen = !guideState.chkOpen; guideCheckRender(); }
+function guideCheckPick(k) { guideState.chk = k; guideCheckRender(); }
+async function guideCheckRender() {
+    const box = document.getElementById('guideCheck'); if (!box) return;
+    if (!guideState.chkOpen) { box.innerHTML = ''; return; }
+    const gid = guideState.game, ti = guideState.ti, t = GAME_TEAMS[gid] && GAME_TEAMS[gid].trainers[ti]; if (!t) return;
+    const teams = guideMyTeams();
+    if (!teams.length) { box.innerHTML = '<div class="gc-box"><div class="gc-sum">You don\'t have a team to check yet. Build one in the Draft Pool (or save a team in the Damage Calc), then come back.</div></div>'; return; }
+    if (!teams.some(x => x.key === guideState.chk)) guideState.chk = teams[0].key;
+    const team = teams.find(x => x.key === guideState.chk), tok = ++_gcTok;
+    const sel = `<select onchange="guideCheckPick(this.value)" aria-label="Team to check">${teams.map(x => `<option value="${calcEsc(x.key)}" ${x.key === guideState.chk ? 'selected' : ''}>${calcEsc(x.label)}</option>`).join('')}</select>`;
+    box.innerHTML = `<div class="gc-box"><div class="gc-top">${sel}<span class="gc-sum">Checking…</span></div></div>`;
+    const types = await Promise.all(t.m.map(([sp]) => guideTypesOf(String(sp).toLowerCase())));
+    if (tok !== _gcTok || guideState.ti !== ti || !document.getElementById('guideCheck')) return;
+    const cap = Math.max(...t.m.map(x => x[1]));
+    const r = guideCheckCalc(t.m.map(([sp, lv], i) => ({ sp, lv, types: types[i] })), team.mons.map(p => ({ name: p.nickname || p.name, types: p._data.type, ability: p.ability, level: p.level })), cap);
+    const label = { ready: '✅ Looks ready', caution: '⚠️ A few gaps', risky: '🚨 Risky' }[r.verdict];
+    const tp = ty => `<span class="gc-ty" style="color:${(typeColors[ty] || {}).text || '#aaa'}">${ty}</span>`;
+    const rows = r.rows.map(x => `<div class="gc-row"><div class="gc-t"><b>${calcEsc(guideCap(x.sp))}</b> <small>Lv ${x.lv}</small>${x.types.map(tp).join('')}</div><div>${
+        x.unknown ? '<span class="gc-meh">Types unavailable (offline?)</span>'
+        : x.good.length ? `<span class="gc-ok">✅ ${calcEsc(x.good.slice(0, 3).join(', '))}</span>`
+        : x.okay.length ? `<span class="gc-meh">⚠️ No clean answer. Best bet: ${calcEsc(x.okay.slice(0, 2).join(', '))}</span>`
+        : '<span class="gc-bad">🚨 Nothing on your team hits this well</span>'}</div></div>`).join('');
+    const lv = r.levelWarn ? `<div class="gc-sum gc-bad">Your highest level is ${r.umax} but their top Pokémon is Lv ${cap}. You're under the level cap.</div>`
+        : `<div class="gc-sum">Your levels: ${r.umin === r.umax ? r.umax : r.umin + '–' + r.umax} · their top Pokémon: Lv ${cap}.</div>`;
+    const ex = r.exposed.length ? `<div class="gc-sum gc-meh">Most exposed: ${r.exposed.slice(0, 3).map(e => `${calcEsc(e.name)} (weak to ${e.n} of their Pokémon)`).join(', ')}.</div>` : '';
+    box.innerHTML = `<div class="gc-box"><div class="gc-top">${sel}<span class="gc-v ${r.verdict}">${label}</span></div>${lv}${ex}${rows}
+        <div class="gc-sum">Type-based only: it compares STAB types and abilities, not moves, items or stats. Use the Damage Calc for real numbers.</div></div>`;
 }
 let _gdTok = 0;
 async function guideDetail() {
@@ -4691,13 +4924,15 @@ async function guideDetail() {
     const cards = t.m.map(([sp, lv, x], mi) => {
         x = x || {}; const slug = sp.toLowerCase(), id = pokemonIdMap[slug] || 0;
         const bits = [x.a && 'Ability: ' + cxTitle(x.a), x.i && 'Item: ' + cxTitle(String(x.i).split(':').pop()), x.n && cxTitle(x.n) + ' nature'].filter(Boolean).map(b => `<div>${calcEsc(b)}</div>`).join('');
-        return `<div class="guide-mon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" alt="" onerror="this.style.visibility='hidden'">
-            <div class="gm-name">${calcEsc(guideCap(sp))}${x.mg ? ' (Mega)' : ''} <small>Lv ${lv}</small></div><div class="gm-types" data-sp="${slug}"></div>${bits}<div class="gm-mvs" data-i="${mi}">${(x.m || []).map(m => `<span class="guide-mv">${calcEsc(pretty(m))}</span>`).join('')}</div></div>`;
+        return `<div class="guide-mon"><img class="dx-link" title="Open in Dex" onclick="openInDex('${slug}${x.mg ? '-mega' : ''}')" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" alt="" onerror="this.style.visibility='hidden'">
+            <div class="gm-name dx-link" title="Open in Dex" onclick="openInDex('${slug}${x.mg ? '-mega' : ''}')">${calcEsc(guideCap(sp))}${x.mg ? ' (Mega)' : ''} <small>Lv ${lv}</small></div><div class="gm-types" data-sp="${slug}"></div>${bits}<div class="gm-mvs" data-i="${mi}">${(x.m || []).map(m => `<span class="guide-mv">${calcEsc(pretty(m))}</span>`).join('')}</div></div>`;
     }).join('');
     el.innerHTML = `<div class="guide-head">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<div><div class="gh-name">${calcEsc(t.n)}</div><div class="gh-sub">${calcEsc(GAME_TEAMS[gid].name)} · ${calcEsc(t.c)}</div><div class="gh-row"><span class="guide-cap">Level cap ${cap}</span>${loc ? `<span class="gh-loc">📍 ${calcEsc(loc[0])} · ${calcEsc(loc[1])}</span>` : `<span class="gh-loc none">📍 Location not confirmed</span>`}</div></div>
         <label class="guide-def"><input type="checkbox" ${guideDone()[k] ? 'checked' : ''} onchange="guideToggle('${k}')"> Defeated</label>
-        <button class="guide-send" onclick="guideSend('opp')">⚔️ Load as Opponent</button><button class="guide-send alt" onclick="guideSend('you')">Load as Your Team</button></div>
+        <button class="guide-send" onclick="guideSend('opp')">⚔️ Load as Opponent</button><button class="guide-send alt" onclick="guideSend('you')">Load as Your Team</button><button class="guide-send alt" onclick="guideCheckToggle()">✅ Is my team ready?</button></div>
+        <div id="guideCheck"></div>
         ${full ? '' : needDef ? '<div class="guide-hint">Dashed moves are predicted (last four level-up moves at that level). Items and abilities aren\'t filled in for this trainer yet.</div>' : '<div class="guide-hint">Moves, items and abilities aren\'t filled in for this game yet — only species and levels.</div>'}<div class="guide-team">${cards}</div>`;
+    guideCheckRender();
     if (needDef) t.m.forEach(async ([sp, lv, x], mi) => {
         if (x && x.m) return;
         const dm = await cxDefaultMoves(String(sp).toLowerCase(), lv, gm.vg);
@@ -4712,32 +4947,72 @@ async function guideDetail() {
     });
 }
 
-/* ===== Dex (v1 basis): browse by generation, search Pokémon or a move, stats + learnset ===== */
+/* ===== Dex: browse by generation, search Pokémon or moves, forms (Mega / regional), evolutions, rich learnsets ===== */
 const DEX_GENS = { 1:[1,151,'Kanto'], 2:[152,251,'Johto'], 3:[252,386,'Hoenn'], 4:[387,493,'Sinnoh'], 5:[494,649,'Unova'], 6:[650,721,'Kalos'], 7:[722,809,'Alola'], 8:[810,905,'Galar'], 9:[906,1025,'Paldea'] };
 const DEX_VG = ['red-blue','yellow','gold-silver','crystal','ruby-sapphire','emerald','firered-leafgreen','diamond-pearl','platinum','heartgold-soulsilver','black-white','black-2-white-2','x-y','omega-ruby-alpha-sapphire','sun-moon','ultra-sun-ultra-moon','lets-go-pikachu-lets-go-eevee','sword-shield','brilliant-diamond-and-shining-pearl','legends-arceus','scarlet-violet'];
-const dexState = { gen: 'all', q: '', sel: null, move: null, tab: 'level-up', vg: null, y: 0 };
-const dexCache = { species: null, moves: null, mon: {}, move: {} };
+const DEX_GEN = { 'red-blue':1,'yellow':1,'gold-silver':2,'crystal':2,'ruby-sapphire':3,'emerald':3,'firered-leafgreen':3,'diamond-pearl':4,'platinum':4,'heartgold-soulsilver':4,'black-white':5,'black-2-white-2':5,'x-y':6,'omega-ruby-alpha-sapphire':6,'sun-moon':7,'ultra-sun-ultra-moon':7,'lets-go-pikachu-lets-go-eevee':7,'sword-shield':8,'brilliant-diamond-and-shining-pearl':8,'legends-arceus':8,'scarlet-violet':9 };
+const DEX_M = { 'level-up':['Level','#48c774'], machine:['TM/HM','#7ec8e3'], egg:['Egg','#e991b0'], tutor:['Tutor','#d4a017'], other:['Special','#e74c3c'], older:['Older game','#9aa0b4'] };
+const DEX_STAT = [['hp', 'HP', '#d4a017'], ['attack', 'Atk', '#e74c3c'], ['defense', 'Def', '#2c6fad'], ['special-attack', 'SpA', '#7ec8e3'], ['special-defense', 'SpD', '#e991b0'], ['speed', 'Spe', '#48c774']];
 const DEX_NAMES = { 'ho-oh':'Ho-Oh','porygon-z':'Porygon-Z','nidoran-f':'Nidoran ♀','nidoran-m':'Nidoran ♂','mr-mime':'Mr. Mime','mr-rime':'Mr. Rime','mime-jr':'Mime Jr.','farfetchd':"Farfetch'd",'sirfetchd':"Sirfetch'd",'type-null':'Type: Null','jangmo-o':'Jangmo-o','hakamo-o':'Hakamo-o','kommo-o':'Kommo-o','flabebe':'Flabébé','wo-chien':'Wo-Chien','chien-pao':'Chien-Pao','ting-lu':'Ting-Lu','chi-yu':'Chi-Yu',
     'u-turn':'U-turn','x-scissor':'X-Scissor','will-o-wisp':'Will-O-Wisp','double-edge':'Double-Edge','self-destruct':'Self-Destruct','lock-on':'Lock-On','mud-slap':'Mud-Slap','soft-boiled':'Soft-Boiled','baby-doll-eyes':'Baby-Doll Eyes','v-create':'V-create','trick-or-treat':'Trick-or-Treat','topsy-turvy':'Topsy-Turvy','wake-up-slap':'Wake-Up Slap','power-up-punch':'Power-Up Punch','king-s-shield':"King's Shield",'forest-s-curse':"Forest's Curse",'land-s-wrath':"Land's Wrath",'nature-s-madness':"Nature's Madness" };
+const dexState = { gen: 'all', q: '', sel: null, form: null, move: null, from: null, fromForm: null, tab: 'all', vg: null, y: 0, type: '', sort: 'num', shiny: false, ret: null };
+const dexCache = { species: null, moves: null, mon: {}, spec: {}, evo: {}, move: {} };
 const dexName = s => DEX_NAMES[s] || String(s).split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 const dexNorm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+const dexPad = (n, w) => String(n).padStart(w || 3, '0');
+const dexSpr = id => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (dexState.shiny ? 'shiny/' : '') + id + '.png';
+const dexIdOf = u => +String(u).split('/').filter(Boolean).pop();
+const dexCap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+const dexSpName = id => { const p = (dexCache.species || []).find(x => x.id === id); return p ? dexName(p.n) : '#' + id; };
 async function dexJson(u) { try { const r = await fetch(u); return r.ok ? await r.json() : null; } catch (e) { return null; } }
 async function dexLists() {
-    if (!dexCache.species) { const d = await dexJson('https://pokeapi.co/api/v2/pokemon-species?limit=2000'); if (d) dexCache.species = d.results.map(x => ({ n: x.name, id: +x.url.split('/').filter(Boolean).pop() })).sort((a, b) => a.id - b.id); }
+    if (!dexCache.species) { const d = await dexJson('https://pokeapi.co/api/v2/pokemon-species?limit=2000'); if (d) dexCache.species = d.results.map(x => ({ n: x.name, id: dexIdOf(x.url) })).sort((a, b) => a.id - b.id); }
     if (!dexCache.moves) { const d = await dexJson('https://pokeapi.co/api/v2/move?limit=2000'); if (d) dexCache.moves = d.results.map(x => x.name); }
 }
+const dexMon = k => dexCache.mon[k] ? Promise.resolve(dexCache.mon[k]) : dexJson('https://pokeapi.co/api/v2/pokemon/' + k).then(d => d && (dexCache.mon[k] = d));
+const dexSpec = id => dexCache.spec[id] ? Promise.resolve(dexCache.spec[id]) : dexJson('https://pokeapi.co/api/v2/pokemon-species/' + id).then(d => d && (dexCache.spec[id] = d));
+const dexEvo = u => dexCache.evo[u] ? Promise.resolve(dexCache.evo[u]) : dexJson(u).then(d => d && (dexCache.evo[u] = d));
 function dexInGen(id) { if (dexState.gen === 'all') return true; const r = DEX_GENS[dexState.gen]; return id >= r[0] && id <= r[1]; }
+const dexTypePill = n => { const t = dexCap(n), tc = (typeof typeColors !== 'undefined' && typeColors[t]) || null; return `<span class="cx-mtype" ${tc ? `style="background:${tc.bg};border-color:${tc.border};color:${tc.text}"` : ''}>${calcEsc(t)}</span>`; };
+const dexCatIcon = c => (typeof calcCatIcon === 'function' && c) ? calcCatIcon(dexCap(c)) : '';
+const dexChip = (p, v) => `<button class="dx-chip" onclick="dexOpen(${p.id})"><span class="t"><small>#${dexPad(p.id)}</small>${calcEsc(dexName(p.n))}</span>${v == null ? '' : `<span class="dx-val">${v}</span>`}<img loading="lazy" src="${dexSpr(p.id)}" alt="" onerror="this.style.visibility='hidden'"></button>`;
+
+/* ---- move details (type / category / power / accuracy / PP / effect), cached in memory + localStorage ---- */
+let dexMvStore = null;
+function dexMvGet() { if (!dexMvStore) { try { dexMvStore = JSON.parse(localStorage.getItem('dexMv2') || '{}') || {}; } catch (e) { dexMvStore = {}; } } return dexMvStore; }
+function dexMvSave() { try { localStorage.setItem('dexMv2', JSON.stringify(dexMvStore)); } catch (e) {} }
+const dexFlavor = d => { const f = (d.flavor_text_entries || []).filter(x => x.language && x.language.name === 'en'); return f.length ? String(f[f.length - 1].flavor_text).replace(/[\n\f\r]+/g, ' ').replace(/\s+/g, ' ').trim() : ''; };
+const dexEffText = d => { const e = (d.effect_entries || []).find(x => x.language.name === 'en'), t = e ? (e.short_effect || '').replace('$effect_chance', d.effect_chance).trim() : ''; return t || dexFlavor(d) || 'No description available yet.'; };
+async function dexMoveInfo(n) {
+    const st = dexMvGet(); if (st[n]) return st[n];
+    const d = dexCache.move[n] || (dexCache.move[n] = await dexJson('https://pokeapi.co/api/v2/move/' + n)); if (!d) return null;
+    return (st[n] = { t: d.type.name, c: d.damage_class.name, p: d.power, a: d.accuracy, pp: d.pp, e: dexEffText(d) });
+}
+function dexCells(i) {
+    if (!i) return '<span class="dx-ty">…</span><span></span><span class="dx-n">…</span><span class="dx-n">…</span><span class="dx-n">…</span><span class="dx-ef"></span><span></span>';
+    return `<span class="dx-ty">${dexTypePill(i.t)}</span><span class="dx-ca">${dexCatIcon(i.c)}<small>${{ physical: 'Phys.', special: 'Spec.', status: 'Status' }[i.c] || ''}</small></span><span class="dx-n">${i.p ?? '—'}</span><span class="dx-n">${i.a ?? '—'}</span><span class="dx-n">${i.pp ?? '—'}</span><span class="dx-ef" title="${calcEsc(i.e)}">${calcEsc(i.e)}</span><span class="dx-i" title="${calcEsc(i.e)}">ⓘ</span>`;
+}
+async function dexFillMoves(list) {
+    let k = 0; const st = dexMvGet();
+    const work = async () => { while (k < list.length) { const n = list[k++]; if (st[n]) continue; const i = await dexMoveInfo(n); const el = document.getElementById('dxm-' + n); if (el && i) el.innerHTML = dexCells(i); } };
+    await Promise.all(Array.from({ length: 8 }, work)); dexMvSave();
+}
+
+/* ---- shell + navigation ---- */
 function dexRender() {
     const root = document.getElementById('guideRoot'); if (!root) return;
-    const title = `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-map"/></svg> Pokédex</h2>`;
-    root.innerHTML = title + `<div class="dx-bar"><button class="guide-back" onclick="guideGo('home')">‹ Back</button>
+    const title = `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-dex"/></svg> Pokédex</h2>`;
+    root.innerHTML = title + `<div class="dx-bar"><button class="guide-back" onclick="guideGo('home')"><span class="pb-ico">‹</span>Back</button>
         <select onchange="dexSet('gen',this.value)"><option value="all">All generations</option>${Object.entries(DEX_GENS).map(([g, r]) => `<option value="${g}" ${String(dexState.gen) === g ? 'selected' : ''}>Gen ${g} · ${r[2]}</option>`).join('')}</select>
-        <input id="dxQ" placeholder="Search Pokémon…" value="${calcEsc(dexState.q)}" oninput="dexSet('q',this.value)"></div>
+        <input id="dxQ" placeholder="Search Pokémon…" value="${calcEsc(dexState.q)}" oninput="dexSet('q',this.value)">
+        <select onchange="dexSet('type',this.value)"><option value="">All types</option>${DEX_TYPES.map(t => `<option value="${t}" ${dexState.type === t ? 'selected' : ''}>${dexCap(t)}</option>`).join('')}</select>
+        <select onchange="dexSet('sort',this.value)">${Object.entries(DEX_SORTS).map(([k, l]) => `<option value="${k}" ${dexState.sort === k ? 'selected' : ''}>Sort: ${l}</option>`).join('')}</select>
+        <button class="dx-shinebtn${dexState.shiny ? ' on' : ''}" id="dxShBtn" onclick="dexShiny()" title="Show shiny sprites">✨ Shiny</button></div>
         <div class="dx-move"><input id="dxM" placeholder="Search a move to see who learns it — e.g. Strength Sap" autocomplete="off" value="${dexState.move ? calcEsc(dexName(dexState.move)) : ''}" oninput="dexMoveSug(this.value)" onblur="setTimeout(() => { const b = document.getElementById('dxSug'); if (b) b.style.display = 'none'; }, 180)"><div class="dx-sug" id="dxSug" style="display:none"></div></div>
         <div id="dxBody"><div class="dx-note">Loading…</div></div>`;
     dexLists().then(() => { const b = document.getElementById('dxBody'); if (!dexCache.species) { if (b) b.innerHTML = '<div class="dx-note">Couldn\'t load the Pokédex (check your connection).</div><button class="guide-back" onclick="dexRender()">Retry</button>'; } else dexUpdate(); });
 }
-function dexSet(k, v) { dexState[k] = v; if (k === 'q' || k === 'gen') { dexState.sel = null; } dexUpdate(); }
+function dexSet(k, v) { dexState[k] = v; if (k === 'q' || k === 'gen' || k === 'type' || k === 'sort') { dexState.sel = null; } dexUpdate(); }
 function dexMoveSug(v) {
     const box = document.getElementById('dxSug'); if (!box) return;
     const q = dexNorm(v); if (!q && dexState.move) { dexState.move = null; dexUpdate(); }
@@ -4747,38 +5022,43 @@ function dexMoveSug(v) {
     box.innerHTML = hits.map(m => `<button onclick="dexPickMove('${m}')">${calcEsc(dexName(m))}</button>`).join('');
 }
 function dexPickMove(m) {
-    dexState.move = m; dexState.sel = null;
+    dexState.from = dexState.sel; dexState.fromForm = dexState.form;      // remember the Pokémon we came from
+    dexState.move = m; dexState.sel = null; dexState.q = '';
     const box = document.getElementById('dxSug'); if (box) box.style.display = 'none';
     const inp = document.getElementById('dxM'); if (inp) inp.value = dexName(m);
+    const qi = document.getElementById('dxQ'); if (qi) qi.value = '';
     dexUpdate(); window.scrollTo(0, 0);
 }
-function dexClearMove() { dexState.move = null; const inp = document.getElementById('dxM'); if (inp) inp.value = ''; dexUpdate(); }
-function dexOpen(id) { dexState.y = window.scrollY; dexState.sel = id; dexUpdate(); window.scrollTo(0, 0); }
-function dexNav(id) { dexState.sel = id; dexUpdate(); window.scrollTo(0, 0); }
-function dexBack() { dexState.sel = null; const y = dexState.y || 0; window.scrollTo(0, y); Promise.resolve(dexUpdate()).then(() => window.scrollTo(0, y)); }
+function dexClearMove() { dexState.move = null; dexState.from = null; const inp = document.getElementById('dxM'); if (inp) inp.value = ''; dexUpdate(); }
+function dexOpen(id) { dexState.y = window.scrollY; dexState.sel = id; dexState.form = null; dexUpdate(); window.scrollTo(0, 0); }
+function dexNav(id, form) { dexState.sel = id; dexState.form = form || null; dexUpdate(); window.scrollTo(0, 0); }
+function dexBack() { dexState.sel = null; dexState.ret = null; const y = dexState.y || 0; window.scrollTo(0, y); Promise.resolve(dexUpdate()).then(() => window.scrollTo(0, y)); }
+function dexBackToMon() { dexState.sel = dexState.from; dexState.form = dexState.fromForm; dexUpdate(); window.scrollTo(0, 0); }
 function dexUpdate() {
-    const body = document.getElementById('dxBody'); if (!body) return;
-    if (!dexCache.species) return;
+    const body = document.getElementById('dxBody'); if (!body || !dexCache.species) return;
     if (dexState.sel) return dexDetail(body);
     if (dexState.move) return dexMoveView(body);
-    const q = dexNorm(dexState.q), list = dexCache.species.filter(p => dexInGen(p.id) && (!q || dexNorm(p.n).includes(q) || String(p.id) === q));
-    body.innerHTML = `<div class="dx-note">${list.length} Pokémon — tap one for stats and moves.</div><div class="dx-grid">${list.map(p => `<button class="dx-chip" onclick="dexOpen(${p.id})"><small>#${String(p.id).padStart(3, '0')}</small>${calcEsc(dexName(p.n))}</button>`).join('')}</div>`;
+    return dexList(body);
 }
+
+/* ---- move page: details + every Pokémon that learns it ---- */
 async function dexMoveView(body) {
     const m = dexState.move; body.innerHTML = '<div class="dx-note">Loading move…</div>';
     const d = dexCache.move[m] || (dexCache.move[m] = await dexJson('https://pokeapi.co/api/v2/move/' + m));
     if (dexState.move !== m || dexState.sel) return;
     if (!d) { body.innerHTML = '<div class="dx-note">Couldn\'t load that move.</div>'; return; }
-    const eff = ((d.effect_entries || []).find(e => e.language.name === 'en') || {}).short_effect || '';
-    const ty = dexName(d.type.name), col = (typeColors[ty] || {}).text || '#aaa';
-    const q = dexNorm(dexState.q);
-    const ids = d.learned_by_pokemon.map(p => ({ n: p.name, id: +p.url.split('/').filter(Boolean).pop() })).filter(p => p.id <= 1025 && dexInGen(p.id) && (!q || dexNorm(p.n).includes(q))).sort((a, b) => a.id - b.id);
-    body.innerHTML = `<div class="dx-h"><div><div class="n">${calcEsc(dexName(m))}</div><div class="dx-sub"><span style="color:${col};font-weight:700">${ty}</span> · ${dexName(d.damage_class.name)} · Power ${d.power ?? '—'} · Acc ${d.accuracy ?? '—'} · PP ${d.pp ?? '—'}</div><div class="dx-note">${calcEsc(eff.replace('$effect_chance', d.effect_chance))}</div></div><button class="guide-back" onclick="dexClearMove()">✕ Clear move</button></div>
-        <div class="dx-note">${ids.length} Pokémon can learn this${dexState.gen === 'all' ? '' : ' (Gen ' + dexState.gen + ' only)'} — across any game.</div>
-        <div class="dx-grid">${ids.map(p => `<button class="dx-chip" onclick="dexOpen(${p.id})"><small>#${String(p.id).padStart(3, '0')}</small>${calcEsc(dexName(p.n))}</button>`).join('')}</div>`;
+    const full = (d.effect_entries || []).find(e => e.language.name === 'en'), eff = ((full ? (full.effect || full.short_effect || '').replace('$effect_chance', d.effect_chance) : '').trim()) || dexFlavor(d) || 'No description available yet.';
+    const ids = d.learned_by_pokemon.map(p => ({ n: p.name, id: dexIdOf(p.url) })).filter(p => p.id <= 1025 && dexInGen(p.id)).sort((a, b) => a.id - b.id);
+    const back = dexState.from ? `<button class="guide-back" onclick="dexBackToMon()"><span class="pb-ico">‹</span>Back to ${calcEsc(dexSpName(dexState.from))}</button>` : '';
+    body.innerHTML = `<div class="dx-nav">${back}<span class="sp"></span><button onclick="dexClearMove()"><span class="pb-ico">✕</span>Close move</button></div>
+        <div class="dx-h"><div><div class="n">${calcEsc(dexName(m))}</div>
+        <div class="dx-mvhead">${dexTypePill(d.type.name)}${dexCatIcon(d.damage_class.name)}<span>${dexCap(d.damage_class.name)}</span><span>Power <b>${d.power ?? '—'}</b></span><span>Accuracy <b>${d.accuracy ?? '—'}</b></span><span>PP <b>${d.pp ?? '—'}</b></span>${d.priority ? `<span>Priority <b>${d.priority > 0 ? '+' : ''}${d.priority}</b></span>` : ''}</div>
+        <div class="dx-note dx-effect">${calcEsc(eff)}</div></div></div>
+        <div class="dx-note"><b>${ids.length}</b> Pokémon can learn this${dexState.gen === 'all' ? '' : ' (Gen ' + dexState.gen + ' only — set the generation filter to “All” to see everyone)'} — in at least one game.</div>
+        <div class="dx-grid">${ids.map(p => dexChip(p)).join('')}</div>`;
 }
 
-const DEX_STAT = [['hp', 'HP', '#d4a017'], ['attack', 'Atk', '#e74c3c'], ['defense', 'Def', '#2c6fad'], ['special-attack', 'SpA', '#7ec8e3'], ['special-defense', 'SpD', '#e991b0'], ['speed', 'Spe', '#48c774']];
+/* ---- stat hexagon (200 = outer edge) + equal tiles ---- */
 function dexStatsHtml(stats) {
     const val = {}; stats.forEach(x => { val[x.stat.name] = x.base_stat; });
     const cx = 150, cy = 128, R = 86, MAX = 200, pt = (i, r) => { const a = (-90 + i * 60) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
@@ -4793,31 +5073,265 @@ function dexStatsHtml(stats) {
     const tiles = DEX_STAT.map(([k, l, c]) => `<div class="dx-tile" style="--c:${c}"><span>${l}</span><b>${val[k] ?? '—'}</b></div>`).join('') + `<div class="dx-tile tot"><span>Total</span><b>${total}</b></div>`;
     return `<div class="dx-stats"><svg class="dx-radar" viewBox="0 0 300 256" role="img" aria-label="Base stat hexagon, 200 maximum">${rings}${axes}${ringLbl}<polygon points="${shape}" fill="rgba(160,196,255,.22)" stroke="#a0c4ff" stroke-width="2" stroke-linejoin="round"/>${dots}${labels}</svg><div class="dx-tiles">${tiles}</div></div><div class="dx-note">Hexagon scale: 200 = outer edge (higher stats are clipped at the edge; the numbers are exact).</div>`;
 }
+
+/* ---- forms (Mega, Primal, regional, Gigantamax, other formes) ---- */
+function dexForms(sp) {
+    const base = sp.name, list = [];
+    (sp.varieties || []).forEach(v => {
+        const n = v.pokemon.name, suf = n === base ? '' : n.slice(base.length + 1);
+        if (/cap$|cosplay|rock-star|belle|pop-star|phd|libre|starter|totem/.test(suf)) return;
+        let label;
+        if (!suf) label = 'Base';
+        else if (suf === 'mega') label = 'Mega'; else if (suf === 'mega-x') label = 'Mega X'; else if (suf === 'mega-y') label = 'Mega Y'; else if (suf === 'mega-z') label = 'Mega Z';
+        else if (suf === 'primal') label = 'Primal'; else if (suf === 'gmax') label = 'Gigantamax';
+        else if (suf === 'alola') label = 'Alolan'; else if (suf === 'galar') label = 'Galarian'; else if (suf === 'hisui') label = 'Hisuian';
+        else if (suf.startsWith('paldea')) label = 'Paldean' + (suf.length > 6 ? ' ' + dexName(suf.slice(7)) : '');
+        else label = dexName(suf);
+        if (v.is_default && suf) label = dexName(suf);
+        list.push({ name: n, label, kind: /mega|primal|gmax/.test(suf) ? 'x' : 'f' });
+    });
+    return list;
+}
+/* ---- evolution line (form-aware: Galarian Slowpoke -> Galarian Slowbro, etc.) ---- */
+const DEX_REG_ONLY = { perrserker:'galar', sirfetchd:'galar', cursola:'galar', obstagoon:'galar', 'mr-rime':'galar', runerigus:'galar', overqwil:'hisui', sneasler:'hisui', clodsire:'paldea' };
+const DEX_REGIONS = { alola:'Alolan', galar:'Galarian', hisui:'Hisuian', paldea:'Paldean' };
+const dexRegionOf = (name, base) => { const suf = name === base ? '' : name.slice(base.length + 1), m = suf.match(/^(alola|galar|hisui|paldea)/); return m ? m[1] : ''; };
+function dexVarFor(sp, region) { if (!region || !sp) return null; const v = sp.varieties || []; return v.find(x => x.pokemon.name === sp.name + '-' + region) || v.find(x => dexRegionOf(x.pokemon.name, sp.name) === region) || null; }
+function dexPokeTitle(spName, pn) {
+    const base = dexName(spName); if (pn === spName) return base;
+    const suf = pn.slice(spName.length + 1), m = suf.match(/^(alola|galar|hisui|paldea)(?:-(.*))?$/);
+    if (m) return DEX_REGIONS[m[1]] + ' ' + base + (m[2] ? ' (' + dexName(m[2]) + ')' : '');
+    if (suf === 'mega') return 'Mega ' + base; if (suf === 'mega-x') return 'Mega ' + base + ' X'; if (suf === 'mega-y') return 'Mega ' + base + ' Y'; if (suf === 'mega-z') return 'Mega ' + base + ' Z';
+    if (suf === 'primal') return 'Primal ' + base; if (suf === 'gmax') return 'Gigantamax ' + base;
+    return base + ' ' + dexName(suf);
+}
+function dexEvoCond(details, region) {
+    if (!details || !details.length) return '';
+    let ds = details; const isReg = x => /galarica/.test(JSON.stringify([x.item, x.held_item])), f = region ? ds.filter(isReg) : ds.filter(x => !isReg(x)); if (f.length) ds = f;
+    const groups = new Map();
+    ds.forEach(x => {
+        const t = new Set(), trg = x.trigger ? x.trigger.name : '';
+        if (x.min_level) t.add('Lv ' + x.min_level);
+        if (x.item) t.add(dexName(x.item.name));
+        if (trg === 'trade') t.add('Trade');
+        if (x.held_item) t.add('holding ' + dexName(x.held_item.name));
+        if (x.trade_species) t.add('for ' + dexName(x.trade_species.name));
+        if (x.min_happiness || x.min_affection) t.add('Friendship');
+        if (x.min_beauty) t.add('Beauty');
+        if (x.known_move) t.add('knowing ' + dexName(x.known_move.name));
+        if (x.known_move_type) t.add('knowing a ' + dexName(x.known_move_type.name) + ' move');
+        if (x.time_of_day) t.add(dexCap(x.time_of_day));
+        if (x.gender) t.add(x.gender === 1 ? 'female' : 'male');
+        if (x.party_species) t.add('with ' + dexName(x.party_species.name) + ' in party');
+        if (x.party_type) t.add('with a ' + dexName(x.party_type.name) + ' type in party');
+        if (x.needs_overworld_rain) t.add('in rain');
+        if (x.turn_upside_down) t.add('upside-down');
+        if (x.relative_physical_stats !== null && x.relative_physical_stats !== undefined && x.relative_physical_stats !== '') t.add(x.relative_physical_stats === 1 ? 'Atk > Def' : x.relative_physical_stats === -1 ? 'Def > Atk' : 'Atk = Def');
+        let text = [...t].join(', ');
+        if (!text && trg && trg !== 'level-up' && trg !== 'use-item') text = dexName(trg);
+        if (!text) text = 'Level up';
+        const g = groups.get(text) || []; if (x.location) g.push(dexName(x.location.name)); groups.set(text, g);
+    });
+    return [...groups].map(([text, locs]) => text + (locs.length ? ' at ' + locs.join(', ') : '')).join(' or ');
+}
+function dexEvoBuild(n, region, spm) {
+    const sid = dexIdOf(n.species.url), sp = spm[sid], v = region ? dexVarFor(sp, region) : null;
+    const node = { sid, species: n.species.name, poke: v ? v.pokemon.name : n.species.name, pid: v ? dexIdOf(v.pokemon.url) : sid, form: v ? v.pokemon.name : null, kids: [] };
+    (n.evolves_to || []).forEach(k => {
+        const ksp = spm[dexIdOf(k.species.url)], ro = DEX_REG_ONLY[k.species.name], kv = region ? dexVarFor(ksp, region) : null;
+        if (ro && ro !== region) return;                                                   // e.g. Perrserker only for Galarian Meowth
+        const hasRegional = ksp && (ksp.varieties || []).some(x => dexRegionOf(x.pokemon.name, ksp.name));
+        if (region && !kv && !ro && hasRegional) return;                                  // e.g. Persian when viewing Galarian Meowth
+        node.kids.push({ cond: dexEvoCond(k.evolution_details, region), node: dexEvoBuild(k, region, spm) });
+    });
+    return node;
+}
+function dexEvoRows(node, depth, cond, curPid) {
+    const card = `<button class="dx-ev${node.pid === curPid ? ' on' : ''}" onclick="dexNav(${node.sid}${node.form ? ",'" + node.form + "'" : ''})"><img src="${dexSpr(node.pid)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><span>${calcEsc(dexPokeTitle(node.species, node.poke))}</span></button>`;
+    return `<div class="dx-evr" style="margin-left:${depth * 26}px">${depth ? '<span class="dx-evl">↳</span>' : ''}${card}${cond ? `<span class="dx-evc">${calcEsc(cond)}</span>` : ''}</div>` + node.kids.map(k => dexEvoRows(k.node, depth + 1, k.cond, curPid)).join('');
+}
+async function dexEvoHtml(chain, region, curPid) {
+    const ids = []; (function w(n) { ids.push(dexIdOf(n.species.url)); (n.evolves_to || []).forEach(w); })(chain.chain);
+    const spm = {}; await Promise.all(ids.map(async i => { spm[i] = await dexSpec(i); }));
+    return dexEvoRows(dexEvoBuild(chain.chain, region, spm), 0, '', curPid);
+}
+
+
+/* ---- type matchups for the Dex (same chips + ability logic as the builder) ---- */
+
+const DEX_AB_OVERRIDE = {};   // (builder table now corrected; keep hook for future special cases)
+const DEX_AB_NOTES = {
+    'dry skin': ['Fire moves deal ×1.25', 'Heals from Water moves'],
+    'fluffy': ['Contact moves ×½', 'Fire moves ×2', 'Contact Fire moves (e.g. Flare Blitz) cancel out to ×1'],
+    'water bubble': ['Burn immune', 'Its own Water moves ×2'],
+    'heatproof': ['Burn damage halved'],
+    'thick fat': ['Fire and Ice moves ×½'],
+    'solid rock': ['Super-effective moves ×0.75'], 'filter': ['Super-effective moves ×0.75'], 'prism armor': ['Super-effective moves ×0.75'],
+    'multiscale': ['Damage ×½ while at full HP'], 'shadow shield': ['Damage ×½ while at full HP'],
+    'ice scales': ['Special moves ×½'], 'fur coat': ['Physical moves ×½'], 'punk rock': ['Sound moves ×½'],
+    'wind rider': ['Immune to wind moves (Hurricane, Air Cutter…) and gains +1 Attack'],
+    'purifying salt': ['Status conditions immune'],
+    'earth eater': ['Heals from Ground moves'], 'volt absorb': ['Heals from Electric moves'], 'water absorb': ['Heals from Water moves'], 'well-baked body': ['+2 Defense from Fire moves'], 'sap sipper': ['+1 Attack from Grass moves'], 'lightning rod': ['+1 Sp. Atk from Electric moves'], 'storm drain': ['+1 Sp. Atk from Water moves'], 'motor drive': ['+1 Speed from Electric moves'], 'flash fire': ['Fire moves boost its own Fire moves ×1.5'], 'levitate': ['Also avoids Spikes, Toxic Spikes and Arena Trap']
+};
+function dexChipHtml(t, m) {
+    if (m === 0) return `<span class="indiv-chip indiv-immune">✕ ${t}</span>`;
+    if (m >= 4) return `<span class="indiv-chip indiv-4x">💀 ${t} 4×</span>`;
+    if (m > 1) return `<span class="indiv-chip indiv-2x">⚠ ${t} 2×</span>`;
+    if (m <= 0.25) return `<span class="indiv-chip indiv-quarter">↓↓ ${t} ¼</span>`;
+    return `<span class="indiv-chip indiv-half">↓ ${t} ½</span>`;
+}
+function dexTypeChartHtml(d) {
+    if (typeof getTypeDefenseWithAbility !== 'function') return '';
+    const types = d.types.map(t => dexCap(t.type.name)), base = getTypeDefenseWithAbility(types, '');
+    const groups = [[m => m >= 4, '4×'], [m => m > 1 && m < 4, '2×'], [m => m < 1 && m > 0.25, '½'], [m => m <= 0.25 && m > 0, '¼'], [m => m === 0, 'immune']];
+    const list = mult => Object.keys(mult).filter(t => mult[t] !== 1).sort((a, b) => mult[b] - mult[a]).map(t => dexChipHtml(t, mult[t])).join('');
+    let html = `<div class="indiv-chips dx-tc">${list(base) || '<span class="dx-note">No weaknesses or resistances.</span>'}</div>`;
+    const abil = {}; d.abilities.forEach(a => { abil[a.ability.name] = a.is_hidden; });
+    const rows = Object.keys(abil).map(n => {
+        const nm = dexName(n).toLowerCase(), ov = DEX_AB_OVERRIDE[nm], m = ov ? Object.assign({}, base) : getTypeDefenseWithAbility(types, nm);
+        if (ov) (ov.half || []).forEach(t => { if (m[t] !== undefined) m[t] = base[t] * 0.5; });
+        const ch = Object.keys(m).filter(t => m[t] !== base[t]), notes = DEX_AB_NOTES[nm] || [];
+        if (!ch.length && !notes.length) return '';
+        return `<div class="dx-tcab"><b>${calcEsc(dexName(n))}</b>${abil[n] ? ' <small>(hidden)</small>' : ''}<div class="indiv-chips">${ch.map(t => dexChipHtml(t, m[t])).join('')}${notes.map(t => `<span class="dx-abnote">${calcEsc(t)}</span>`).join('')}</div></div>`;
+    }).filter(Boolean).join('');
+    if (rows) html += `<div class="dx-note">Abilities that change these matchups — solid chips replace the chart above; <span class="dx-abnote">dashed notes</span> are conditional effects (not a plain type change):</div>${rows}`;
+    return html;
+}
+
+/* ---- Pokémon page ---- */
 async function dexDetail(body) {
     const id = dexState.sel; body.innerHTML = '<div class="dx-note">Loading…</div>';
-    const d = dexCache.mon[id] || (dexCache.mon[id] = await dexJson('https://pokeapi.co/api/v2/pokemon/' + id));
+    const [sp, base] = await Promise.all([dexSpec(id), dexMon(id)]);
     if (dexState.sel !== id) return;
-    if (!d) { body.innerHTML = '<button class="guide-back" onclick="dexBack()">‹ Back</button><div class="dx-note">Couldn\'t load this Pokémon (check your connection).</div>'; return; }
-    const vgs = DEX_VG.filter(v => d.moves.some(m => m.version_group_details.some(x => x.version_group.name === v)));
+    if (!sp || !base) { body.innerHTML = '<button class="guide-back" onclick="dexBack()"><span class="pb-ico">‹</span>Back</button><div class="dx-note">Couldn\'t load this Pokémon (check your connection).</div>'; return; }
+    const forms = dexForms(sp);
+    const fname = forms.some(f => f.name === dexState.form) ? dexState.form : base.name;
+    const d = fname === base.name ? base : ((await dexMon(fname)) || base);
+    if (dexState.sel !== id) return;
+    const evo = sp.evolution_chain ? await dexEvo(sp.evolution_chain.url) : null;
+    const evoHtml = evo && evo.chain && evo.chain.evolves_to.length ? await dexEvoHtml(evo, dexRegionOf(d.name, sp.name), d.id) : '';
+    if (dexState.sel !== id) return;
+    const form = forms.find(f => f.name === d.name);
+    const mvSrc = (d.moves && d.moves.length && !/-(mega|primal|gmax)/.test(d.name)) ? d : base;      // Megas / Primals / Gmax use the base form's moves
+    // ---- info table
+    const genus = ((sp.genera || []).find(g => g.language.name === 'en') || {}).genus || '—';
+    const m = d.height / 10, inch = Math.round(m * 39.3701), kg = d.weight / 10;
+    const abil = d.abilities.slice().sort((a, b) => a.slot - b.slot), norm = abil.filter(a => !a.is_hidden);
+    const abilTxt = abil.map(a => a.is_hidden ? `${calcEsc(dexName(a.ability.name))} <small>(hidden ability)</small>` : `${norm.length > 1 ? (norm.indexOf(a) + 1) + '. ' : ''}${calcEsc(dexName(a.ability.name))}`).join('<br>');
+    const oa = d.sprites.other && d.sprites.other['official-artwork'], art = (dexState.shiny ? ((oa && oa.front_shiny) || d.sprites.front_shiny) : '') || (oa && oa.front_default) || d.sprites.front_default || '';
+    const prev = dexCache.species.find(p => p.id === id - 1), next = dexCache.species.find(p => p.id === id + 1);
+    const nav = `<div class="dx-nav">${dexState.ret ? `<button onclick="dexReturn()"><span class="pb-ico">‹</span>Back to ${DEX_RET_LABEL[dexState.ret.sec] || 'app'}</button>` : ''}${dexState.move ? `<button onclick="dexBack()"><span class="pb-ico">‹</span>Back to ${calcEsc(dexName(dexState.move))}</button>` : `<button onclick="dexBack()">‹ List</button>`}<span class="sp"></span>${prev ? `<button onclick="dexNav(${prev.id})">‹ #${dexPad(prev.id)} ${calcEsc(dexName(prev.n))}</button>` : ''}${next ? `<button onclick="dexNav(${next.id})">#${dexPad(next.id)} ${calcEsc(dexName(next.n))} ›</button>` : ''}</div>`;
+    const formRow = forms.length > 1 ? `<div class="dx-forms"><span class="dx-note">Forms</span>${forms.map(f => `<button class="dx-form${f.name === d.name ? ' on' : ''}${f.kind === 'x' ? ' mega' : ''}" onclick="dexState.form='${f.name}';dexUpdate()">${calcEsc(f.label)}</button>`).join('')}</div>` : '';
+    // ---- learnset (selected game)
+    const vgs = DEX_VG.filter(v => mvSrc.moves.some(mm => mm.version_group_details.some(x => x.version_group.name === v)));
     if (!vgs.includes(dexState.vg)) dexState.vg = vgs[vgs.length - 1] || null;
-    const vg = dexState.vg, tab = dexState.tab;
-    const types = d.types.map(t => { const n = dexName(t.type.name); return `<span style="color:${(typeColors[n] || {}).text || '#aaa'};font-weight:700">${n}</span>`; }).join(' / ');
-    const abil = d.abilities.map(a => calcEsc(dexName(a.ability.name)) + (a.is_hidden ? ' <small>(hidden)</small>' : '')).join(' · ');
-    const total = d.stats.reduce((a, x) => a + x.base_stat, 0);
-    const rows = {};   // method -> [[level, move]]
-    d.moves.forEach(m => m.version_group_details.forEach(x => { if (x.version_group.name !== vg) return; (rows[x.move_learn_method.name] = rows[x.move_learn_method.name] || []).push([x.level_learned_at, m.move.name]); }));
-    const tabs = [['level-up', 'Level-up'], ['machine', 'TM / HM'], ['egg', 'Egg'], ['tutor', 'Tutor']];
-    const cur = (rows[tab] || []).slice().sort((a, b) => a[0] - b[0] || a[1].localeCompare(b[1]));
-    const art = (d.sprites.other && d.sprites.other['official-artwork'] && d.sprites.other['official-artwork'].front_default) || d.sprites.front_default || '';
-    const sp = dexCache.species, pv = sp.find(p => p.id === id - 1), nx = sp.find(p => p.id === id + 1);
-    const nav = `<div class="dx-nav"><button onclick="dexBack()">‹ List</button><span class="sp"></span>${pv ? `<button onclick="dexNav(${pv.id})">‹ #${String(pv.id).padStart(3, '0')} ${calcEsc(dexName(pv.n))}</button>` : ''}${nx ? `<button onclick="dexNav(${nx.id})">#${String(nx.id).padStart(3, '0')} ${calcEsc(dexName(nx.n))} ›</button>` : ''}</div>`;
+    const vg = dexState.vg, tab = dexState.tab, vi = DEX_VG.indexOf(vg), KEYS = ['level-up', 'machine', 'egg', 'tutor'];
+    const info = {}, old = {};
+    mvSrc.moves.forEach(mm => mm.version_group_details.forEach(x => {
+        const g = x.version_group.name, k = DEX_VG.indexOf(g); if (k < 0) return;
+        if (g === vg) { const e = info[mm.move.name] || (info[mm.move.name] = { lv: [], m: new Set() }), me = x.move_learn_method.name; e.m.add(KEYS.includes(me) ? me : 'other'); if (me === 'level-up') e.lv.push(x.level_learned_at); }
+        else if (k < vi) (old[mm.move.name] = old[mm.move.name] || new Set()).add(DEX_GEN[g]);
+    }));
+    const names = Object.keys(info), olderOnly = Object.keys(old).filter(n => !info[n]);
+    const minLv = n => info[n].lv.length ? Math.min(...info[n].lv) : 999;
+    const lvTxt = n => [...new Set(info[n].lv)].sort((a, b) => a - b).map(l => l ? 'Lv ' + l : 'Evolve').join(' / ');
+    const pill = (k, t) => `<i class="dx-pill" style="--c:${DEX_M[k][1]}">${t || DEX_M[k][0]}</i>`;
+    const pills = n => KEYS.concat('other').filter(k => info[n].m.has(k)).map(k => pill(k, k === 'level-up' ? lvTxt(n) : '')).join('');
+    const rank = n => info[n].m.has('level-up') ? 0 : info[n].m.has('machine') ? 1 : info[n].m.has('tutor') ? 2 : info[n].m.has('egg') ? 3 : 4;
+    const rows = { all: names.slice().sort((a, b) => rank(a) - rank(b) || minLv(a) - minLv(b) || a.localeCompare(b)) };
+    KEYS.forEach(k => { rows[k] = names.filter(n => info[n].m.has(k)).sort((a, b) => k === 'level-up' ? minLv(a) - minLv(b) || a.localeCompare(b) : a.localeCompare(b)); });
+    rows.older = olderOnly.sort();
+    const tabs = [['all', 'All'], ['level-up', 'Level-up'], ['machine', 'TM / HM'], ['egg', 'Egg'], ['tutor', 'Tutor'], ['older', 'Older games']];
+    const cur = rows[tab] || rows.all, st = dexMvGet();
+    const row = n => `<div class="dx-mv" onclick="dexPickMove('${n}')" title="${calcEsc((st[n] && st[n].e) || 'Tap for full move details')}"><span class="dx-pills">${tab === 'older' ? pill('older') + `<small class="dx-gens">Gen ${[...old[n]].sort((a, b) => a - b).join(', ')}</small>` : pills(n)}</span><span class="dx-mn">${calcEsc(dexName(n))}</span><span class="dx-cells" id="dxm-${n}">${dexCells(st[n])}</span></div>`;
+    const hint = tab === 'older' ? `<div class="dx-note">Moves this Pokémon could learn in earlier games but can't in ${calcEsc(dexName(vg || ''))} (removed, or only available by transfer).</div>` : '';
+    const legend = `<div class="dx-legend"><b>Category</b><span>${dexCatIcon('physical')} Physical — contact / body moves</span><span>${dexCatIcon('special')} Special — energy / elemental moves</span><span>${dexCatIcon('status')} Status — no direct damage</span></div><div class="dx-legend"><b>Method</b>${['level-up', 'machine', 'tutor', 'egg', 'other', 'older'].map(k => `<span><i class="dx-pill" style="--c:${DEX_M[k][1]}">${DEX_M[k][0]}</i> ${{ 'level-up': 'learned by levelling up (Lv)', machine: 'taught by a TM / HM / TR', tutor: 'taught by a move tutor', egg: 'passed down as an egg move', other: 'event / form / special', older: 'only in earlier games' }[k]}</span>`).join('')}<span>Pow. = power · Acc. = accuracy · “—” = no damage / never misses</span></div>`;
+    const head = `<div class="dx-mv dx-mvh"><span>Method</span><span>Move</span><span>Type</span><span>Cat.</span><span class="dx-n">Pow.</span><span class="dx-n">Acc.</span><span class="dx-n">PP</span><span>Effect</span><span></span></div>`;
     body.innerHTML = nav + `
-        <div class="dx-h">${art ? `<img src="${art}" alt="">` : ''}<div><div class="n">${calcEsc(dexName(d.name))} <small style="color:var(--muted)">#${String(d.id).padStart(3, '0')}</small></div><div>${types}</div><div class="dx-sub">${abil}</div><div class="dx-sub">${(d.height / 10).toFixed(1)} m · ${(d.weight / 10).toFixed(1)} kg</div></div></div>
-        <div class="dx-note"><b>Base stats</b> · total ${total}</div>${dexStatsHtml(d.stats)}
+        <div class="dx-h">${art ? `<img src="${art}" alt="">` : ''}<div class="dx-info">
+            <div class="n">${calcEsc(dexPokeTitle(sp.name, d.name))}</div>
+            <div class="dx-row"><span>National №</span><b>${dexPad(sp.id, 4)}</b></div>
+            <div class="dx-row"><span>Type</span><b>${d.types.map(t => dexTypePill(t.type.name)).join(' ')}</b></div>
+            <div class="dx-row"><span>Species</span><b>${calcEsc(genus)}</b></div>
+            <div class="dx-row"><span>Height</span><b>${m.toFixed(1)} m (${Math.floor(inch / 12)}′${String(inch % 12).padStart(2, '0')}″)</b></div>
+            <div class="dx-row"><span>Weight</span><b>${kg.toFixed(1)} kg (${(kg * 2.20462).toFixed(1)} lbs)</b></div>
+            <div class="dx-row"><span>Abilities</span><b>${abilTxt}</b></div>
+        </div></div>${formRow}
+        <div class="dx-note"><b>Base stats</b></div>${dexStatsHtml(d.stats)}
+        <div class="dx-note"><b>Type matchups</b> · damage taken</div>${dexTypeChartHtml(d)}
+        <div class="dx-note"><b>Evolution</b></div>${evoHtml ? `<div class="dx-evo">${evoHtml}</div>` : '<div class="dx-note">Does not evolve.</div>'}
         <div class="dx-tabs">${tabs.map(([k, l]) => `<button class="${k === tab ? 'on' : ''}" onclick="dexState.tab='${k}';dexUpdate()">${l}${rows[k] ? ' (' + rows[k].length + ')' : ''}</button>`).join('')}
             <select onchange="dexState.vg=this.value;dexUpdate()">${vgs.map(v => `<option value="${v}" ${v === vg ? 'selected' : ''}>${dexName(v)}</option>`).join('')}</select></div>
-        ${cur.length ? cur.map(([lv, mv]) => `<div class="dx-mv" onclick="dexPickMove('${mv}')"><b>${tab === 'level-up' ? (lv ? 'Lv ' + lv : '—') : ''}</b><span>${calcEsc(dexName(mv))}</span></div>`).join('') : '<div class="dx-note">No moves of this kind in this game.</div>'}
-        <div class="dx-note">Tap a move to see every Pokémon that learns it.</div>` + nav;
+        ${hint}${cur.length ? legend + head + cur.map(row).join('') : '<div class="dx-note">No moves of this kind in this game.</div>'}
+        <div class="dx-note">Hover a move (or tap ⓘ) for what it does; tap it for full details and every Pokémon that learns it.</div>` + nav;
+    dexFillMoves(cur.slice());
+}
+
+/* ===== Dex extras: type filter, stat sort, shiny toggle ===== */
+const DEX_TYPES = ['normal','fire','water','electric','grass','ice','fighting','poison','ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy'];
+const DEX_SORTS = { num: 'Dex number', name: 'Name (A–Z)', hp: 'HP', attack: 'Attack', defense: 'Defense', 'special-attack': 'Sp. Atk', 'special-defense': 'Sp. Def', speed: 'Speed', bst: 'Base stat total' };
+const DEX_SI = { hp: 0, attack: 1, defense: 2, 'special-attack': 3, 'special-defense': 4, speed: 5 };
+dexCache.typeIds = {};
+let dexIdx = null, dexListTok = 0;
+function dexIdxGet() { if (!dexIdx) { try { dexIdx = JSON.parse(localStorage.getItem('dexIdx1') || '{}') || {}; } catch (e) { dexIdx = {}; } } return dexIdx; }
+async function dexTypeSet(t) {
+    if (dexCache.typeIds[t]) return dexCache.typeIds[t];
+    const d = await dexJson('https://pokeapi.co/api/v2/type/' + t); if (!d) return null;
+    return (dexCache.typeIds[t] = new Set(d.pokemon.map(x => dexIdOf(x.pokemon.url)).filter(i => i <= 1025)));
+}
+async function dexLoadStats(ids, tick) {
+    const st = dexIdxGet(), need = ids.filter(i => !st[i]); let k = 0, done = 0;
+    const work = async () => { while (k < need.length) { const i = need[k++]; const d = await dexJson('https://pokeapi.co/api/v2/pokemon/' + i); if (d) st[i] = d.stats.map(x => x.base_stat); done++; if (tick) tick(done, need.length); } };
+    await Promise.all(Array.from({ length: 10 }, work));
+    try { localStorage.setItem('dexIdx1', JSON.stringify(st)); } catch (e) {}
+}
+async function dexList(body) {
+    const tok = ++dexListTok, q = dexNorm(dexState.q), ty = dexState.type, so = dexState.sort;
+    let list = dexCache.species.filter(p => dexInGen(p.id) && (!q || dexNorm(p.n).includes(q) || String(p.id) === q));
+    if (ty) {
+        body.innerHTML = '<div class="dx-note">Loading…</div>';
+        const set = await dexTypeSet(ty); if (tok !== dexListTok) return;
+        if (!set) { body.innerHTML = '<div class="dx-note">Couldn\'t load that type (check your connection).</div>'; return; }
+        list = list.filter(p => set.has(p.id));
+    }
+    let val = null;
+    if (so === 'name') list = list.slice().sort((a, b) => dexName(a.n).localeCompare(dexName(b.n)));
+    else if (so !== 'num') {
+        const st = dexIdxGet(), need = list.filter(p => !st[p.id]).length;
+        if (need) {
+            body.innerHTML = `<div class="dx-note" id="dxProg">Loading stats… 0 / ${need} (only the first time)</div>`;
+            await dexLoadStats(list.map(p => p.id), (d, n) => { if (tok === dexListTok) { const el = document.getElementById('dxProg'); if (el) el.textContent = `Loading stats… ${d} / ${n} (only the first time)`; } });
+            if (tok !== dexListTok) return;
+        }
+        val = p => { const a = st[p.id]; return a ? (so === 'bst' ? a.reduce((x, y) => x + y, 0) : a[DEX_SI[so]]) : -1; };
+        list = list.slice().sort((a, b) => val(b) - val(a) || a.id - b.id);
+    }
+    body.innerHTML = `<div class="dx-note">${list.length} Pokémon${ty ? ' · ' + dexCap(ty) + ' type' : ''}${val ? ' · highest ' + DEX_SORTS[so] + ' first' : ''} — tap one for stats and moves.</div><div class="dx-grid">${list.map(p => dexChip(p, val ? (val(p) < 0 ? '—' : val(p)) : null)).join('')}</div>`;
+}
+function dexShiny() { dexState.shiny = !dexState.shiny; const b = document.getElementById('dxShBtn'); if (b) b.classList.toggle('on', dexState.shiny); dexUpdate(); }
+
+/* ===== Open any Pokémon in the Dex from the builder, calc or trainer guide ===== */
+const DEX_RET_LABEL = { draft: 'Builder', calc: 'Calc', guide: 'Trainer Guide' };
+async function openInDex(name) {
+    try {
+        await dexLists();
+        if (!dexCache.species) { showToast('Couldn\'t load the Dex (check your connection).'); return; }
+        const slug = String(name).toLowerCase().trim().replace(/\s+/g, '-');
+        let sp = null;
+        for (const s of dexCache.species) if ((slug === s.n || slug.startsWith(s.n + '-')) && (!sp || s.n.length > sp.n.length)) sp = s;
+        if (!sp) { showToast('No Dex page found for ' + name + '.'); return; }
+        dexState.ret = { sec: currentSection || 'draft', view: guideState.view };
+        dexState.move = null; dexState.from = null; dexState.q = '';
+        dexState.sel = sp.id; dexState.form = slug === sp.n ? null : slug;
+        guideState.view = 'dex';
+        openSection('guide');
+    } catch (e) { showToast('Couldn\'t open the Dex.'); }
+}
+function dexReturn() {
+    const r = dexState.ret; dexState.ret = null; dexState.sel = null; dexState.form = null;
+    if (!r) { dexUpdate(); return; }
+    if (r.sec === 'guide') guideState.view = (r.view && r.view !== 'dex') ? r.view : 'home';
+    openSection(r.sec);
 }
 </script>
 </body>
