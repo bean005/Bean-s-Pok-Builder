@@ -1067,6 +1067,11 @@ details.prof-sec[open]{padding-bottom:10px}
 .hc-bimg{width:24px;height:24px;border-radius:50%;object-fit:cover;object-position:top;background:var(--bg4)}
 .prof-stat{font-size:.8rem;color:var(--muted2);margin:4px 0 8px;line-height:1.5}.prof-stat b{color:var(--text)}
 .prof-clr{flex:none;width:38px}
+.prof-box,.sync-box{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:90vh;max-height:90dvh;overflow-y:auto}
+.prof-box input,.prof-box select{font-size:16px}
+#profMsg{min-height:1.3em;margin:2px 0}
+.prof-pick,.prof-slot,.prof-sw{touch-action:manipulation}
+@media (max-width:480px){.prof-sw{width:36px;height:36px}.prof-sixbtns .pill-btn{min-height:40px}}
 .sync-note{margin-top:12px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;font-size:.76rem;line-height:1.5;color:var(--muted2)}.sync-note p{margin:6px 0 0}.sync-note b{color:var(--text)}.sync-note a{color:var(--accent)}
 #sixS.on{background:rgba(250,204,21,.3);border-color:#fde047;color:#fff7b0}#sixS:disabled{opacity:.45}
 .hc-mon.shiny,.prof-slot.shiny{border-color:#fde047;box-shadow:0 0 8px rgba(250,204,21,.5)}
@@ -5147,7 +5152,7 @@ function syncLoadPending() { if (sync.pending) { syncApply(sync.pending); syncRe
 function syncDismiss() { sync.pending = null; syncToast(); }
 function syncOpen() {
     const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal-box" style="max-height:90vh;overflow-y:auto"><h3>☁️ Sync with Google</h3><div id="syncModalBody"></div><button class="modal-cancel" type="button">Close</button></div>';
+    overlay.innerHTML = '<div class="modal-box sync-box"><h3>☁️ Sync with Google</h3><div id="syncModalBody"></div><button class="modal-cancel" type="button">Close</button></div>';
     document.body.appendChild(overlay);
     overlay.querySelector('.modal-cancel').onclick = () => overlay.remove();
     overlay.addEventListener('click', e => { if (e.target === overlay) return overlay.remove(); const b = e.target.closest('button[data-a]'); if (b) syncAct(b.dataset.a); });
@@ -5285,10 +5290,11 @@ function profileOpen() {
     nameIn.value = st.name; shinyIn.checked = st.shiny;
     const SECTIONS = [['Pokémon', PROFILE_POKE.map(i => 'p:' + i)], ['Poké Balls', PROFILE_BALLS.map(n => 'b:' + n)], ['Trainers', PROFILE_TRAINERS.map(n => 't:' + n)], ['Extras', PROFILE_MISC.map(n => 'm:' + n)]];
     const tileSrc = k => profileAv(Object.assign({}, st, { av: k }));
-    const paint = () => {
+    const keep = fn => { const bx = ov.querySelector('.prof-box'), y = bx ? bx.scrollTop : 0; fn(); if (bx) bx.scrollTop = y; };
+    const paint = () => keep(() => {
         const cur = profileAv(st), pv = $('#profPrev'); pv.className = 'zk-' + cur.k; pv.src = cur.src; pv.onerror = function () { this.onerror = null; this.className = 'zk-b'; this.src = PROFILE_BALL; };
         grid.innerHTML = SECTIONS.map(([label, keys]) => `<div class="bk-h">${label}</div><div class="prof-grid">${keys.map(k => { const a = tileSrc(k); return `<button type="button" class="prof-pick${k === cur.key ? ' on' : ''}" data-k="${k}" title="${calcEsc(k.slice(2).replace(/-/g, ' '))}"><img class="zk-${a.k}" src="${a.src}" alt="" loading="lazy" onerror="this.closest('.prof-pick').remove()"></button>`; }).join('')}</div>`).join('');
-    };
+    });
     const commit = () => { profileSave(st); profileRender(); };
     let timer = null; const later = () => { clearTimeout(timer); timer = setTimeout(commit, 250); };
     const close = () => { clearTimeout(timer); commit(); ov.remove(); };
@@ -5311,8 +5317,8 @@ function profileOpen() {
     favIn.addEventListener('change', () => { const n = canon(favIn.value); if (n) { st.fav = n; msg.textContent = ''; msg.className = 'bk-msg'; commit(); } else if (!favIn.value.trim()) { st.fav = ''; commit(); } else { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } });
     $('#profFavX').onclick = () => { st.fav = ''; favIn.value = ''; commit(); };
     regSel.addEventListener('change', () => { st.region = regSel.value; commit(); });
-    const paintSix = () => { const sb = $('#sixS'); if (sb) { sb.classList.toggle('on', !!st.ts[sel]); sb.disabled = !st.top[sel]; } six.innerHTML = st.top.map((n, i) => { const id = profileMonId(n); return `<button type="button" class="prof-slot${i === sel ? ' on' : ''}${st.ts[i] ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(n || 'Empty slot ' + (i + 1))}">${id ? `<img src="${profileImg(id, st.ts[i])}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'">` : '+'}</button>`; }).join(''); };
-    six.addEventListener('click', e => { const b = e.target.closest('.prof-slot'); if (b) { sel = +b.dataset.i; paintSix(); sixIn.focus(); } });
+    const paintSix = () => keep(() => { const sb = $('#sixS'); if (sb) { sb.classList.toggle('on', !!st.ts[sel]); sb.disabled = !st.top[sel]; } six.innerHTML = st.top.map((n, i) => { const id = profileMonId(n); return `<button type="button" class="prof-slot${i === sel ? ' on' : ''}${st.ts[i] ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(n || 'Empty slot ' + (i + 1))}">${id ? `<img src="${profileImg(id, st.ts[i])}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'">` : '+'}</button>`; }).join(''); });
+    six.addEventListener('click', e => { const b = e.target.closest('.prof-slot'); if (b) { sel = +b.dataset.i; paintSix(); } });
     sixIn.addEventListener('change', () => { const n = canon(sixIn.value); if (!n) { if (sixIn.value.trim()) { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } return; }
         msg.textContent = ''; msg.className = 'bk-msg'; st.top[sel] = n; sixIn.value = ''; if (!st.top.some((x, i) => i === sel && x === n)) st.ts[sel] = false; const nx = st.top.findIndex((x, i) => !x && i !== sel); if (nx >= 0) sel = nx; paintSix(); commit(); });
     const mv = d => { const j = sel + d; if (j < 0 || j > 5) return; [st.top[sel], st.top[j]] = [st.top[j], st.top[sel]]; [st.ts[sel], st.ts[j]] = [st.ts[j], st.ts[sel]]; sel = j; paintSix(); commit(); };
