@@ -975,6 +975,36 @@ html{scrollbar-gutter:stable}
 .confirm-yes.ok{background:#1a3a5e;color:#7ec8e3}
 .confirm-yes.ok:hover{background:#245083}
 .all-level [hidden]{display:none}
+
+/* back-style pills (icon on the left): centre the label inside the bubble by balancing the icon with an equal spacer on the right */
+.guide-back:has(.pb-ico:not(:last-child)),.builder-back:has(.pb-ico:not(:last-child)),.dx-nav button:has(.pb-ico:not(:last-child)){padding:0 4px;justify-content:center}
+.guide-back:has(.pb-ico:not(:last-child))::after,.builder-back:has(.pb-ico:not(:last-child))::after,.dx-nav button:has(.pb-ico:not(:last-child))::after{content:'';flex:none;width:20px}
+/* Defeated checkbox: easy to see */
+.guide-def{padding:5px 12px 5px 8px;border:1px solid var(--accent);border-radius:999px;background:var(--bg4)}
+.guide-def input{width:22px;height:22px;border:2px solid var(--accent);background:var(--bg4)}
+.guide-def input:hover{border-color:#fff}
+
+/* V2.52 additions */
+.mode-card.dex-card{border-color:#3a5a8e}.mode-card.dex-card:hover{border-color:#60a5fa;box-shadow:0 12px 40px rgba(96,165,250,.15)}.mode-card.dex-card .mode-badge{background:#60a5fa}
+.home-tools{gap:8px;flex-wrap:wrap}
+.cx-hpf{grid-column:span 2}
+.cx-hprow{display:flex;align-items:center;gap:4px;text-transform:none;letter-spacing:0}
+.cx-hprow input{width:100%;min-width:0;text-align:center}
+.cx-hprow .cx-hp-pct{flex:0 0 46px}.cx-hprow .cx-hp-abs{flex:0 0 58px}
+.cx-hprow b{font-size:.74rem;color:var(--muted);font-weight:600;white-space:nowrap}
+.dx-act{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.dx-cmp{width:100%;border-collapse:collapse;margin:8px 0}
+.dx-cmp th,.dx-cmp td{padding:5px 8px;text-align:center;font-size:.84rem;border-bottom:1px solid var(--border2)}
+.dx-cmp th.l,.dx-cmp td.l{text-align:left;color:var(--muted)}
+.dx-cmp .win{color:#4ade80;font-weight:800}.dx-cmp .bar{height:6px;border-radius:3px;background:var(--accent);margin-top:3px}
+.dx-cmp img{width:72px;height:72px;image-rendering:pixelated}
+.gc-pick{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border2);font-size:.82rem}
+.gc-pick img{width:40px;height:40px;image-rendering:pixelated}
+.sd-ta{width:100%;box-sizing:border-box;font-family:monospace;font-size:.78rem}
+
+/* google drive sync */
+.pill-btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+.sync-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;max-width:92vw;padding:10px 14px;background:var(--bg3);border:1px solid var(--accent);border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.5);font-size:.8rem}
 </style>
 </head>
 <body>
@@ -1020,12 +1050,18 @@ html{scrollbar-gutter:stable}
         <div class="mode-card guide-card" data-section="guide" onclick="openSection('guide')">
             <span class="mode-icon"><svg class="mode-svg" aria-hidden="true"><use href="#ico-map"/></svg></span>
             <div class="mode-title">Trainer Guide</div>
-            <div class="mode-desc">Search gym leaders, Elite Four and champions across the games and Cobblemon, plus a full Pokédex to look up any Pokémon or move.</div>
-            <div class="mode-badge">GUIDE / DEX</div>
+            <div class="mode-desc">Search gym leaders, Elite Four and champions across the games and Cobblemon, with a run tracker, team check and counter-team picker.</div>
+            <div class="mode-badge">GUIDE</div>
+        </div>
+        <div class="mode-card dex-card" data-section="dex" onclick="openSection('dex')">
+            <span class="mode-icon"><svg class="mode-svg" aria-hidden="true"><use href="#ico-dex"/></svg></span>
+            <div class="mode-title">Pokédex</div>
+            <div class="mode-desc">Look up any Pokémon, move or ability. Sort by stats, compare two Pokémon, and add them straight to your Draft Pool.</div>
+            <div class="mode-badge">DEX</div>
         </div>
     </div>
     <div class="scroll-hint">Click a mode above, then scroll down to start building your team</div>
-    <div class="home-tools"><button type="button" class="pill-btn" onclick="bkOpen()">💾 Backup &amp; Restore</button></div>
+    <div class="home-tools"><button type="button" class="pill-btn" id="syncBtn" onclick="syncOpen()">☁️ Sign in to sync</button><button type="button" class="pill-btn" onclick="bkOpen()">💾 Backup &amp; Restore</button><button type="button" class="pill-btn" onclick="sdOpen()">⇄ Showdown</button></div>
     <div id="sectionHost" class="section-host"></div>
 </div>
 
@@ -1531,6 +1567,9 @@ function openSection(name, opts) {
     } else if (name === 'guide') {
         host.innerHTML = `<div class="panel" id="guideRoot"></div>`;
         guideRender();
+    } else if (name === 'dex') {
+        host.innerHTML = `<div class="panel" id="guideRoot"></div>`;
+        dexRender();
     }
     if (!(opts && opts.noScroll)) host.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -1620,8 +1659,9 @@ function calcBuildMon(gen, p) {
         opts.overrides = { types: p._data.type.slice(), baseStats: Object.assign({}, p._data.baseStats) };
     }
     let mon = new calc.Pokemon(gen, sp.name, opts);
-    if (p.cHP < 100) {
-        opts.curHP = Math.max(1, Math.floor(mon.maxHP() * p.cHP / 100));
+    if (p.cHP < 100 || p.cHPabs != null) {
+        const mx = mon.maxHP();
+        opts.curHP = Math.min(mx, p.cHPabs != null ? Math.max(1, p.cHPabs) : Math.max(1, Math.floor(mx * p.cHP / 100)));
         mon = new calc.Pokemon(gen, sp.name, opts);
     }
     return mon;
@@ -1724,15 +1764,29 @@ function calcRefresh() {
             const c = document.getElementById(`cxFin-${side}-${i}-${k}`);
             if (c) c.textContent = fin[k];
         });
+        { const mx = fin.hp || 1, cur = calcCurHP(p, mx), a = document.getElementById(`cxHpA-${side}-${i}`), pc = document.getElementById(`cxHpP-${side}-${i}`), m = document.getElementById(`cxHpM-${side}-${i}`);
+          if (a) { a.max = mx; if (document.activeElement !== a) a.value = cur; }
+          if (pc && document.activeElement !== pc) pc.value = p.cHPabs != null ? Math.max(1, Math.min(100, Math.round(cur / mx * 100))) : p.cHP;
+          if (m) m.textContent = '/ ' + mx; }
     }));
     const r = document.getElementById('cxResults');
     if (r) r.innerHTML = calcResultsHTML();
 }
 /* ---- editing one Pokémon (no full re-render, so typing keeps focus) ---- */
+function calcCurHP(p, max) { return p.cHPabs != null ? Math.min(max, Math.max(1, p.cHPabs)) : Math.max(1, Math.floor(max * p.cHP / 100)); }
+function calcHpIn(side, i, kind, val, final) {
+    const p = calcState[side].roster[i]; if (!p) return;
+    if (val === '' && !final) return;                       // let people clear the box while typing
+    const max = calcFinalStats(p).hp || 1;
+    if (kind === 'pct') { p.cHP = Math.max(1, Math.min(100, Math.round(Number(val)) || 100)); delete p.cHPabs; }
+    else { const v = Math.max(1, Math.min(max, Math.round(Number(val)) || max)); if (v >= max) { delete p.cHPabs; p.cHP = 100; } else { p.cHPabs = v; p.cHP = Math.max(1, Math.min(100, Math.round(v / max * 100))); } }
+    calcRefresh();
+    if (final) { const a = document.getElementById(`cxHpA-${side}-${i}`), c = document.getElementById(`cxHpP-${side}-${i}`); if (a) a.value = calcCurHP(p, max); if (c) c.value = p.cHPabs != null ? p.cHP : p.cHP; }
+}
 function calcSet(side, i, field, val) {
     const p = calcState[side].roster[i]; if (!p) return;
     if (field === 'level') p.level = Math.max(1, Math.min(100, Number(val) || 50));
-    else if (field === 'hp') p.cHP = Math.max(1, Math.min(100, Number(val) || 100));
+    else if (field === 'hp') { p.cHP = Math.max(1, Math.min(100, Number(val) || 100)); delete p.cHPabs; }
     else if (field === 'status') p.cStatus = val;
     else if (field === 'tera') p.cTera = !!val;
     else if (field === 'dmax') p.cDmax = !!val;
@@ -1812,7 +1866,7 @@ function calcSaveTeam(side) {
     while (savedTeams.some(t => t.name === name)) { name = `${base} (${n++})`; }
     const list = mons.map(p => {
         const c = JSON.parse(JSON.stringify(p));
-        delete c.cBoosts; delete c.cStatus; delete c.cHP; delete c.cCrit;
+        delete c.cBoosts; delete c.cStatus; delete c.cHP; delete c.cHPabs; delete c.cCrit;
         c.active = true;
         return c;
     });
@@ -2129,7 +2183,7 @@ function calcActiveCard(side, i, p) {
             <label class="cx-f">Nature<select onchange="calcSet('${side}',${i},'nature',this.value)">${natures}</select></label>
             <label class="cx-f">Ability<span class="cx-abwrap"><select onchange="calcAbilityChange('${side}',${i},this)">${sel(abilities, p.ability)}${customAbOptions(p)}</select>${customAbIcons(p, `calcRemoveCustomAbility('${side}',${i})`)}</span></label>
             <label class="cx-f">Status<select onchange="calcSet('${side}',${i},'status',this.value)">${status}</select></label>
-            <label class="cx-f">HP %<input type="number" min="1" max="100" value="${p.cHP}" onchange="calcSet('${side}',${i},'hp',this.value)"></label>
+            <label class="cx-f cx-hpf">HP <span class="cx-hprow"><input type="number" class="cx-hp-pct" id="cxHpP-${side}-${i}" min="1" max="100" value="${p.cHP}" aria-label="HP percent" onfocus="this.select()" oninput="calcHpIn('${side}',${i},'pct',this.value)" onchange="calcHpIn('${side}',${i},'pct',this.value,1)"><b>%</b><input type="number" class="cx-hp-abs" id="cxHpA-${side}-${i}" min="1" max="${fin.hp}" value="${calcCurHP(p, fin.hp || 1)}" aria-label="Current HP" onfocus="this.select()" oninput="calcHpIn('${side}',${i},'abs',this.value)" onchange="calcHpIn('${side}',${i},'abs',this.value,1)"><b id="cxHpM-${side}-${i}">/ ${fin.hp}</b></span></label>
             ${calcState.gen === 8 ? `<div class="cx-tgcell" title="Dynamax / Gigantamax only raises HP (1.5x at Dynamax Lv 0, up to 2x at Lv 10). Atk, Def, Sp. Atk, Sp. Def and Speed don't change.">${cxMonTg(!!p.cDmax, 'D', 'Dynamax', side, i, 'dmax')}</div>` : ''}
             <div class="cx-tgcell">${cxMonTg(!!p.cTera, 'T', 'Terastallized', side, i, 'tera')}</div>
             <label class="cx-f">Tera type<select onchange="calcSet('${side}',${i},'teraType',this.value)">${[...CALC_TYPES, 'Stellar'].map(t => `<option value="${t}" ${p.teraType === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
@@ -2222,7 +2276,7 @@ function calcToSlug(n) { return String(n || '').toLowerCase().replace(/['’.:%]
 function calcSnapshot(side) {
     return calcState[side].roster.filter(Boolean).map(p => {
         const c = JSON.parse(JSON.stringify(p));
-        delete c.cBoosts; delete c.cStatus; delete c.cHP; delete c.cCrit;
+        delete c.cBoosts; delete c.cStatus; delete c.cHP; delete c.cHPabs; delete c.cCrit;
         c.active = true;
         return c;
     });
@@ -4521,7 +4575,7 @@ window.addEventListener('beforeunload', doAutoSave);
 document.addEventListener('visibilitychange', () => { if (document.hidden) doAutoSave(); });
 
 /* ===================== BACKUP & RESTORE ===================== */
-const BK_SKIP = /^(dexIdx|dexMv|cxMoveMap)/;   // big caches that rebuild themselves
+const BK_SKIP = /^(dexIdx|dexMv|cxMoveMap|beanSync)/;   // big caches that rebuild themselves
 function bkCollect() {
     const data = {};
     try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (!BK_SKIP.test(k)) data[k] = localStorage.getItem(k); } } catch (e) {}
@@ -4600,6 +4654,444 @@ function bkOpen() {
     });
     overlay.querySelector('.modal-cancel').onclick = close;
 }
+
+
+/* ===================== V2.52: DEX ADD-TO-POOL + COMPARE ===================== */
+async function dexAddPool(name) {
+    try {
+        showToast('Adding…');
+        if (currentMode !== 'draft' && currentTeamId) { currentTeamId = null; pokemonList = []; }
+        if (!currentTeamId && !pokemonList.length) {
+            const last = savedTeams.filter(t => t.mode === 'draft').sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0))[0];
+            if (last) { currentMode = 'draft'; currentTeamName = last.name; currentTeamId = last.id; pokemonList = JSON.parse(JSON.stringify(last.pokemonList)); ensureUids(); }
+            else { currentMode = 'draft'; currentTeamName = 'My Draft Pool'; }
+        }
+        const max = MAX_POOL[currentMode];
+        if (pokemonList.length >= max) { showToast(`"${currentTeamName}" is full (${max}).`); return; }
+        const p = await fetchPokemonFromAPI(name);
+        if (!p) { showToast('Couldn\'t add that one (check your connection).'); return; }
+        p.uid = newUid(); pokemonList.push(p);
+        prefetchLearnsetMoveData(p); prefetchAbilityData(p);
+        if (!currentTeamId) currentTeamId = Date.now();
+        const obj = buildSaveObj(), ix = savedTeams.findIndex(t => t.id === currentTeamId);
+        if (ix === -1) savedTeams.push(obj); else savedTeams[ix] = obj;
+        localStorage.setItem('pokeTeams', JSON.stringify(savedTeams));
+        showToast(`➕ ${p.name} added to "${currentTeamName}" (${pokemonList.length}/${max})`);
+    } catch (e) { showToast('Couldn\'t add that Pokémon.'); }
+}
+function dexCmpStart(id) { dexState.cmp = { a: id, b: null }; dexUpdate(); }
+function dexCmpClose() { dexState.cmp = null; dexUpdate(); }
+function dexCmpPick(id) { dexState.cmp.b = id; dexUpdate(); }
+function dexCmpSug(v) {
+    const box = document.getElementById('dxCmpSug'); if (!box) return;
+    const q = dexNorm(v); if (!q) { box.style.display = 'none'; return; }
+    const hits = dexCache.species.filter(p => dexNorm(p.n).includes(q) || String(p.id) === q).slice(0, 8);
+    box.style.display = hits.length ? 'block' : 'none';
+    box.innerHTML = hits.map(p => `<button onclick="dexCmpPick(${p.id})">${calcEsc(dexName(p.n))}</button>`).join('');
+}
+async function dexCmpView(body) {
+    const c = dexState.cmp, keepY = window.scrollY, h0 = body.offsetHeight, prevV = body.dataset.v; body.dataset.v = 'cmp';
+    if (h0 && (prevV === 'detail' || prevV === 'cmp')) body.style.minHeight = h0 + 'px';
+    const [a, b] = await Promise.all([dexMon(c.a), c.b ? dexMon(c.b) : null]);
+    if (dexState.cmp !== c) return;
+    if (!a) { body.innerHTML = '<button class="guide-back" onclick="dexCmpClose()"><span class="pb-ico">‹</span>Back</button><div class="dx-note">Couldn\'t load that Pokémon (check your connection).</div>'; return; }
+    const pick = `<div class="dx-move"><input id="dxCmpQ" placeholder="Compare ${calcEsc(dexName(a.name))} with… (search a Pokémon)" autocomplete="off" oninput="dexCmpSug(this.value)"><div class="dx-sug" id="dxCmpSug" style="display:none"></div></div>`;
+    const back = '<button class="guide-back" onclick="dexCmpClose()"><span class="pb-ico">‹</span>Back</button>';
+    if (!b) { body.innerHTML = back + `<div class="dx-note"><b>Compare</b></div>` + pick + '<div class="dx-note">Pick a second Pokémon to see their stats side by side.</div>'; window.scrollTo(0, keepY); return; }
+    const st = d => { const o = {}; d.stats.forEach(x => { o[x.stat.name] = x.base_stat; }); return o; }, sa = st(a), sb = st(b);
+    const tot = s => DEX_STAT.reduce((n, [k]) => n + (s[k] || 0), 0);
+    const col = (x, y) => x > y ? 'win' : '';
+    const rows = DEX_STAT.map(([k, l, clr]) => `<tr><td class="${col(sa[k], sb[k])}">${sa[k]}<div class="bar" style="width:${Math.min(100, sa[k] / 2)}%;background:${clr}"></div></td><th class="l" style="text-align:center">${l}</th><td class="${col(sb[k], sa[k])}">${sb[k]}<div class="bar" style="width:${Math.min(100, sb[k] / 2)}%;background:${clr}"></div></td></tr>`).join('')
+        + `<tr><td class="${col(tot(sa), tot(sb))}"><b>${tot(sa)}</b></td><th class="l" style="text-align:center">Total</th><td class="${col(tot(sb), tot(sa))}"><b>${tot(sb)}</b></td></tr>`;
+    const ab = d => d.abilities.map(x => dexName(x.ability.name) + (x.is_hidden ? ' (H)' : '')).join(', ');
+    body.innerHTML = back + pick + `<table class="dx-cmp"><tr><td><img src="${dexSpr(a.id)}" alt=""><div><b>${calcEsc(dexName(a.name))}</b></div><div>${a.types.map(t => dexTypePill(t.type.name)).join(' ')}</div></td><td></td><td><img src="${dexSpr(b.id)}" alt=""><div><b>${calcEsc(dexName(b.name))}</b></div><div>${b.types.map(t => dexTypePill(t.type.name)).join(' ')}</div></td></tr>${rows}<tr><td>${calcEsc(ab(a))}</td><th class="l" style="text-align:center">Abilities</th><td>${calcEsc(ab(b))}</td></tr></table><div class="dx-note">Base stats; the higher number in each row is green.</div>`;
+    window.scrollTo(0, keepY);
+}
+
+/* ===================== V2.52: COUNTER TEAM ===================== */
+function guideCounterPools() {
+    const ok = l => (l || []).map((p, i) => ({ p, i })).filter(x => x.p && x.p._data && x.p._data.type && x.p._data.type.length);
+    const out = [];
+    if (pokemonList.length) out.push({ key: 'cur', label: `${currentTeamName || 'Current team'} (open in builder, ${pokemonList.length})`, mons: ok(pokemonList) });
+    savedTeams.forEach(x => { if (x.pokemonList && x.pokemonList.length && x.id !== currentTeamId) out.push({ key: 'b:' + x.id, label: `${x.name} (${x.pokemonList.length})`, mons: ok(x.pokemonList) }); });
+    return out.filter(t => t.mons.length);
+}
+function guideCounterScore(tms, mons) {
+    const defOf = (ty, ab) => getTypeDefenseWithAbility(ty, ab || '');
+    const known = tms.filter(t => t.types && t.types.length);
+    const per = mons.map(({ p }) => { const ud = defOf(p._data.type, p.ability); return known.map(tm => {
+        const td = defOf(tm.types, '');
+        const hit = Math.max(...p._data.type.map(ty => td[ty] !== undefined ? td[ty] : 1));
+        const threat = Math.max(...tm.types.map(ty => ud[ty] !== undefined ? ud[ty] : 1));
+        let v = hit >= 2 ? (threat <= 1 ? 3 : 2) : (hit >= 1 && threat < 1) ? 1 : hit < 1 ? -1 : 0;
+        if (threat >= 2) v -= 1;
+        return v; }); });
+    const chosen = [], covered = known.map(() => -5), k = Math.min(6, mons.length);
+    while (chosen.length < k) {
+        let best = -1, bg = -1e9;
+        mons.forEach((m, ix) => { if (chosen.includes(ix)) return;
+            let g = 0; known.forEach((_, t) => { g += Math.max(covered[t], per[ix][t]) - covered[t]; });
+            g += 0.05 * per[ix].reduce((a, b) => a + b, 0) + 0.002 * (+m.p.level || 0);
+            if (g > bg) { bg = g; best = ix; } });
+        chosen.push(best); known.forEach((_, t) => { covered[t] = Math.max(covered[t], per[best][t]); });
+    }
+    const answers = known.map((tm, t) => ({ tm, by: chosen.filter(ix => per[ix][t] >= 2).map(ix => mons[ix]) }));
+    return { chosen: chosen.map(ix => mons[ix]), answers };
+}
+let _gcnTok = 0;
+function guideCounterToggle() { guideState.cntOpen = !guideState.cntOpen; guideCounterRender(); }
+function guideCounterPickPool(k) { guideState.cnt = k; guideCounterRender(); }
+async function guideCounterRender() {
+    const box = document.getElementById('guideCounter'); if (!box) return;
+    if (!guideState.cntOpen) { box.innerHTML = ''; return; }
+    const gid = guideState.game, ti = guideState.ti, t = GAME_TEAMS[gid] && GAME_TEAMS[gid].trainers[ti]; if (!t) return;
+    const pools = guideCounterPools();
+    if (!pools.length) { box.innerHTML = '<div class="gc-box"><div class="gc-sum">You don\'t have a pool yet. Build one in the Draft Pool, then come back.</div></div>'; return; }
+    if (!pools.some(x => x.key === guideState.cnt)) guideState.cnt = (pools.slice().sort((a, b) => b.mons.length - a.mons.length)[0]).key;
+    const pool = pools.find(x => x.key === guideState.cnt), tok = ++_gcnTok;
+    const sel = `<select onchange="guideCounterPickPool(this.value)" aria-label="Pool to pick from">${pools.map(x => `<option value="${calcEsc(x.key)}" ${x.key === guideState.cnt ? 'selected' : ''}>${calcEsc(x.label)}</option>`).join('')}</select>`;
+    { const h = box.offsetHeight, y = window.scrollY; if (h) box.style.minHeight = h + 'px'; box.innerHTML = `<div class="gc-box"><div class="gc-top">${sel}<span class="gc-sum">Picking…</span></div></div>`; window.scrollTo(0, y); }
+    const types = await Promise.all(t.m.map(([sp]) => guideTypesOf(String(sp).toLowerCase())));
+    if (tok !== _gcnTok || guideState.ti !== ti || !document.getElementById('guideCounter')) return;
+    const r = guideCounterScore(t.m.map(([sp, lv], i) => ({ sp, lv, types: types[i] })), pool.mons);
+    guideState._cnt = { key: pool.key, idx: r.chosen.map(m => m.i) };
+    const tp = ty => `<span class="gc-ty" style="color:${(typeColors[ty] || {}).text || '#aaa'}">${ty}</span>`;
+    const picks = r.chosen.map(({ p }) => {
+        const mine = r.answers.filter(a => a.by.some(m => m.p === p)).map(a => guideCap(a.tm.sp));
+        return `<div class="gc-pick"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p._data.id}.png" alt="" onerror="this.style.visibility='hidden'"><div><b>${calcEsc(p.nickname || p.name)}</b> <small>Lv ${p.level}</small> ${p._data.type.map(tp).join('')}<div class="gc-sum">${mine.length ? 'Answers: ' + calcEsc(mine.join(', ')) : 'Backup / bulk'}</div></div></div>`; }).join('');
+    const gaps = r.answers.filter(a => !a.by.length && a.tm.types && a.tm.types.length).map(a => guideCap(a.tm.sp));
+    const cap = Math.max(...t.m.map(x => x[1])), top = Math.max(...r.chosen.map(m => +m.p.level || 0)), keepY = window.scrollY;
+    box.innerHTML = `<div class="gc-box"><div class="gc-top">${sel}<span class="gc-v ready">🎯 Best ${r.chosen.length} for ${calcEsc(t.n)}</span></div>${picks}
+        ${gaps.length ? `<div class="gc-sum gc-meh">No clean answer in this pool for: ${calcEsc(gaps.join(', '))}.</div>` : '<div class="gc-sum">Every Pokémon on their team has an answer.</div>'}
+        ${top < cap ? `<div class="gc-sum gc-bad">Your highest level here is ${top}; their top Pokémon is Lv ${cap}.</div>` : ''}
+        <div class="bk-row"><button type="button" class="pill-btn" onclick="guideCounterApply()">✔ Set these as my active team</button></div>
+        <div class="gc-sum">Type-based, same logic as Is my team ready?: STAB types and abilities, not moves, items or stats.</div></div>`;
+    window.scrollTo(0, keepY); box.style.minHeight = '';
+}
+function guideCounterApply() {
+    const c = guideState._cnt; if (!c) return;
+    const list = c.key === 'cur' ? pokemonList : ((savedTeams.find(x => 'b:' + x.id === c.key) || {}).pokemonList);
+    if (!list) return;
+    list.forEach((p, i) => { p.active = c.idx.includes(i); });
+    if (c.key === 'cur') { if (currentTeamId) { const ix = savedTeams.findIndex(t => t.id === currentTeamId); if (ix !== -1) savedTeams[ix] = buildSaveObj(); } }
+    try { localStorage.setItem('pokeTeams', JSON.stringify(savedTeams)); } catch (e) {}
+    showToast('🎯 Active team updated');
+}
+
+/* ===================== V2.52: SHOWDOWN EXPORT / IMPORT ===================== */
+const SD_EV = [['hp', 'HP'], ['atk', 'Atk'], ['def', 'Def'], ['spa', 'SpA'], ['spd', 'SpD'], ['spe', 'Spe']];
+function sdSpecies(n) { const m = { 'Mr-Mime': 'Mr. Mime', 'Mime-Jr': 'Mime Jr.', 'Mr-Rime': 'Mr. Rime', 'Type-Null': 'Type: Null', 'Ho-Oh': 'Ho-Oh', 'Porygon-Z': 'Porygon-Z' }; return m[n] || n; }
+function sdExport(list) {
+    return list.map(p => {
+        const sp = sdSpecies(p.name), head = (p.nickname && p.nickname !== p.name ? `${p.nickname} (${sp})` : sp) + (p.item ? ` @ ${p.item}` : '');
+        const L = [head];
+        if (p.ability) L.push('Ability: ' + p.ability);
+        if (p.level && +p.level !== 100) L.push('Level: ' + p.level);
+        if (p.shiny) L.push('Shiny: Yes');
+        if (p.teraType) L.push('Tera Type: ' + p.teraType);
+        const ev = SD_EV.filter(([k]) => p.evs && p.evs[k]).map(([k, l]) => `${p.evs[k]} ${l}`);
+        if (ev.length) L.push('EVs: ' + ev.join(' / '));
+        if (p.nature) L.push(p.nature + ' Nature');
+        const iv = SD_EV.filter(([k]) => p.ivs && p.ivs[k] !== undefined && p.ivs[k] !== 31).map(([k, l]) => `${p.ivs[k]} ${l}`);
+        if (iv.length) L.push('IVs: ' + iv.join(' / '));
+        (p.moves || []).filter(Boolean).forEach(m => L.push('- ' + m));
+        return L.join('\n');
+    }).join('\n\n');
+}
+function sdParse(text) {
+    return String(text || '').replace(/\r/g, '').split(/\n\s*\n/).map(b => b.trim()).filter(Boolean).map(b => {
+        const lines = b.split('\n').map(l => l.trim()).filter(Boolean); if (!lines.length) return null;
+        let head = lines[0], item = '';
+        const at = head.indexOf(' @ '); if (at > -1) { item = head.slice(at + 3).trim(); head = head.slice(0, at).trim(); }
+        head = head.replace(/\s*\((M|F)\)\s*$/, '');
+        let nick = '', species = head; const m = head.match(/^(.*)\(([^()]+)\)\s*$/); if (m) { nick = m[1].trim(); species = m[2].trim(); }
+        const o = { nick, species, item, moves: [], evs: {}, ivs: {} };
+        lines.slice(1).forEach(l => {
+            let x;
+            if (/^-/.test(l)) { if (o.moves.length < 4) o.moves.push(l.replace(/^-\s*/, '').trim()); }
+            else if ((x = l.match(/^Ability:\s*(.+)$/i))) o.ability = x[1].trim();
+            else if ((x = l.match(/^Level:\s*(\d+)/i))) o.level = Math.max(1, Math.min(100, +x[1]));
+            else if ((x = l.match(/^Tera Type:\s*(.+)$/i))) o.tera = x[1].trim();
+            else if (/^Shiny:\s*Yes/i.test(l)) o.shiny = true;
+            else if ((x = l.match(/^(EVs|IVs):\s*(.+)$/i))) {
+                const tgt = /^evs/i.test(x[1]) ? o.evs : o.ivs;
+                x[2].split('/').forEach(s => { const mm = s.trim().match(/^(\d+)\s*(\w+)$/); if (!mm) return; const key = ({ hp: 'hp', atk: 'atk', def: 'def', spa: 'spa', spd: 'spd', spe: 'spe' })[mm[2].toLowerCase()]; if (key) tgt[key] = +mm[1]; });
+            }
+            else if ((x = l.match(/^(\w+)\s+Nature$/i))) o.nature = x[1];
+        });
+        return o;
+    }).filter(o => o && o.species);
+}
+async function sdImport(text, name, say) {
+    const mons = sdParse(text); if (!mons.length) { say('Couldn\'t find any Pokémon in that text.', 'bad'); return false; }
+    const out = []; let fail = [];
+    for (let k = 0; k < mons.length; k++) {
+        const o = mons[k]; say(`Importing ${k + 1} / ${mons.length}…`);
+        const slug = o.species.toLowerCase().replace(/[.'’:]/g, '').replace(/\s+/g, '-');
+        const p = await fetchPokemonFromAPI(slug);
+        if (!p) { fail.push(o.species); continue; }
+        p.uid = newUid(); if (o.nick) p.nickname = o.nick;
+        if (o.item) p.item = (itemCache.find(n => cxId(n) === cxId(o.item))) || o.item;
+        if (o.ability) { const hit = naturalAbilities(p).find(a => cxId(a) === cxId(o.ability)); p.ability = hit || o.ability; }
+        if (o.level) p.level = o.level;
+        if (o.nature) { const nk = Object.keys(natureData).find(n => n.toLowerCase() === o.nature.toLowerCase()); if (nk) p.nature = nk; }
+        Object.assign(p.evs, o.evs); Object.assign(p.ivs, o.ivs);
+        if (o.tera) { const tk = [...CALC_TYPES].find(t => t.toLowerCase() === o.tera.toLowerCase()); if (tk) p.teraType = tk; }
+        if (o.shiny) p.shiny = true;
+        o.moves.forEach((mv, i) => { p.moves[i] = mv; });
+        out.push(p);
+    }
+    if (!out.length) { say('None of those Pokémon could be loaded (check your connection).', 'bad'); return false; }
+    const mode = out.length > 6 ? 'draft' : 'regular';
+    if (mode === 'regular') out.forEach(p => { p.active = true; });
+    savedTeams.push({ id: Date.now(), name: name || 'Showdown import', mode, savedAt: Date.now(), pokemonList: out });
+    localStorage.setItem('pokeTeams', JSON.stringify(savedTeams));
+    try { renderSavedTeams(); } catch (e) {}
+    say(`Imported ${out.length} Pokémon as a new ${mode === 'regular' ? '6-mon' : 'draft'} team${fail.length ? '. Couldn\'t load: ' + fail.join(', ') : '.'} Find it under Saved Teams.`, 'ok');
+    return true;
+}
+function sdOpen() {
+    const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
+    const teams = savedTeams.slice().reverse();
+    overlay.innerHTML = `<div class="modal-box"><h3>Showdown export &amp; import</h3>
+        <div class="bk-h">Export</div>
+        <div class="bk-row"><select class="ab-modal-input" data-r="team">${teams.length ? teams.map(t => `<option value="${t.id}">${calcEsc(t.name)} (${(t.pokemonList || []).length})</option>`).join('') : '<option value="">No saved teams</option>'}</select>
+        <select class="ab-modal-input" data-r="scope"><option value="active">Active 6 only</option><option value="all">Whole pool</option></select></div>
+        <div class="bk-row"><button type="button" class="pill-btn" data-a="exp">⧉ Copy Showdown text</button></div>
+        <div class="bk-h">Import</div>
+        <input class="ab-modal-input" data-r="name" placeholder="Team name (optional)" style="width:100%;box-sizing:border-box;margin-bottom:6px">
+        <textarea class="ab-modal-input sd-ta" rows="6" placeholder="Paste a Showdown team here" spellcheck="false"></textarea>
+        <div class="bk-row"><button type="button" class="pill-btn" data-a="imp">⬆ Import as new team</button></div>
+        <div class="bk-msg"></div><button class="modal-cancel" type="button">Close</button></div>`;
+    document.body.appendChild(overlay);
+    const msg = overlay.querySelector('.bk-msg'), ta = overlay.querySelector('textarea');
+    const say = (t, c) => { msg.textContent = t; msg.className = 'bk-msg ' + (c || ''); };
+    const close = () => overlay.remove();
+    overlay.addEventListener('click', async e => {
+        if (e.target === overlay) return close();
+        const b = e.target.closest('button[data-a]'); if (!b) return;
+        if (b.dataset.a === 'exp') {
+            const t = savedTeams.find(x => String(x.id) === overlay.querySelector('[data-r=team]').value); if (!t) return say('Save a team first.', 'bad');
+            const all = overlay.querySelector('[data-r=scope]').value === 'all', act = (t.pokemonList || []).filter(p => p.active);
+            const list = all || !act.length ? t.pokemonList : act, text = sdExport(list);
+            (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(text) : Promise.reject())
+                .then(() => say(`Copied ${list.length} Pokémon. Paste into Pokémon Showdown's Teambuilder (Import).`, 'ok'))
+                .catch(() => { ta.value = text; ta.select(); say('Copy blocked by the browser: the text is in the box below, so copy it from there.', 'bad'); });
+        } else if (b.dataset.a === 'imp') {
+            b.disabled = true; await sdImport(ta.value, overlay.querySelector('[data-r=name]').value.trim(), say); b.disabled = false;
+        }
+    });
+    overlay.querySelector('.modal-cancel').onclick = close;
+}
+
+
+/* ===================== V2.53: TRAINING / BREEDING / STAT RANGES ===================== */
+function dexRangeHtml(stats) {
+    const val = {}; stats.forEach(x => { val[x.stat.name] = x.base_stat; });
+    const rows = DEX_STAT.map(([k, l, c]) => { const b = val[k] || 0;
+        const mn = k === 'hp' ? 2 * b + 110 : Math.floor((2 * b + 5) * 0.9), mx = k === 'hp' ? 2 * b + 204 : Math.floor((2 * b + 99) * 1.1);
+        return `<tr><th class="l">${l}</th><td>${b}</td><td>${mn}</td><td>${mx}</td></tr>`; }).join('');
+    return `<div class="dx-note"><b>Stats at Lv 100</b></div><table class="dx-cmp"><tr><th class="l"></th><th>Base</th><th>Min</th><th>Max</th></tr>${rows}</table><div class="dx-note">Min: 0 IVs, 0 EVs, hindering nature. Max: 31 IVs, 252 EVs, beneficial nature. HP has no nature.</div>`;
+}
+function dexInfoBoxes(sp, d) {
+    const row = (a, b) => `<div class="dx-row"><span>${a}</span><b>${b}</b></div>`;
+    const ev = (d.stats || []).filter(x => x.effort).map(x => `${x.effort} ${({ hp: 'HP', attack: 'Attack', defense: 'Defense', 'special-attack': 'Sp. Atk', 'special-defense': 'Sp. Def', speed: 'Speed' })[x.stat.name]}`).join(', ') || '—';
+    const cr = sp.capture_rate;
+    const training = row('EV yield', ev) + row('Catch rate', cr != null ? `${cr} <small>(${(cr / 765 * 100).toFixed(1)}% with Poké Ball, full HP)</small>` : '—')
+        + row('Base friendship', sp.base_happiness != null ? sp.base_happiness : '—') + row('Base Exp.', d.base_experience != null ? d.base_experience : '—') + row('Growth rate', sp.growth_rate ? dexName(sp.growth_rate.name) : '—');
+    const gr = sp.gender_rate, hc = sp.hatch_counter;
+    const gender = gr === -1 ? 'Genderless' : `${(100 - gr / 8 * 100).toFixed(1).replace(/\.0$/, '')}% male, ${(gr / 8 * 100).toFixed(1).replace(/\.0$/, '')}% female`;
+    const breeding = row('Egg groups', (sp.egg_groups || []).map(g => dexName(g.name)).join(', ') || '—') + row('Gender', gender)
+        + row('Egg cycles', hc != null ? `${hc} <small>(${((hc - 1) * 257 + 1).toLocaleString()}–${(hc * 257).toLocaleString()} steps)</small>` : '—');
+    return `<div class="dx-note"><b>Training</b></div><div class="dx-info">${training}</div><div class="dx-note"><b>Breeding</b></div><div class="dx-info">${breeding}</div>`;
+}
+
+/* ===================== GOOGLE DRIVE SYNC =====================
+   Sign in with Google and keep ONE hidden file in the user's own Google Drive (appDataFolder).
+   No server, no passwords, no emails: this page only holds a short-lived access token in memory.
+   Local saving stays the source of truth, so the app works exactly as before when signed out or offline. */
+const BEAN_GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';   // <- paste your own Client ID here (see SETUP_SYNC.md)
+const SYNC_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+const SYNC_FILE = 'beanspokebuilder-sync.json';
+const sync = { token: null, exp: 0, fileId: null, tc: null, cb: null, status: 'off', last: 0, debounce: 5000, timer: null, running: false, firstRun: true, applying: false, pending: null };
+const syncConfigured = () => !/^YOUR_/.test(BEAN_GOOGLE_CLIENT_ID);
+const syncWanted = () => { try { return localStorage.getItem('beanSyncOn') === '1'; } catch (e) { return false; } };
+const _lsSet = Storage.prototype.setItem;
+const syncRaw = (k, v) => { try { _lsSet.call(localStorage, k, v); } catch (e) {} };
+function syncMeta() { try { return JSON.parse(localStorage.getItem('beanSyncMeta') || '{}') || {}; } catch (e) { return {}; } }
+
+/* remember WHEN each saved item last changed on this device (only real changes), and schedule an upload */
+Storage.prototype.setItem = function (k, v) {
+    const ls = this === localStorage; let prev = null;
+    if (ls) { try { prev = this.getItem(k); } catch (e) {} }
+    _lsSet.call(this, k, v);
+    if (ls && !sync.applying && !BK_SKIP.test(k) && prev !== String(v)) { const m = syncMeta(); m[k] = Date.now(); syncRaw('beanSyncMeta', JSON.stringify(m)); syncSchedule(); }
+};
+
+/* ---- merge (pure, no network) ---- */
+function syncMergeValues(a, b, preferA) {
+    try {
+        const A = JSON.parse(a), B = JSON.parse(b), P = preferA ? A : B, O = preferA ? B : A;
+        if (Array.isArray(A) && Array.isArray(B)) {          // lists of teams: keep both sides' teams, the preferred side wins a tie on the same id
+            const out = P.slice(), ids = new Set(P.filter(x => x && x.id !== undefined).map(x => x.id)), seen = new Set(P.map(x => JSON.stringify(x)));
+            O.forEach(x => { if (x && x.id !== undefined) { if (!ids.has(x.id)) out.push(x); } else if (!seen.has(JSON.stringify(x))) out.push(x); });
+            return JSON.stringify(out);
+        }
+        if (A && B && typeof A === 'object' && typeof B === 'object') return JSON.stringify(Object.assign({}, O, P));   // checklists: combine
+    } catch (e) {}
+    return preferA ? a : b;
+}
+/* L, R = {data:{key:string}, meta:{key:ms}}; last = when this device last finished a sync (0 = never) */
+function syncMergeStates(L, R, last) {
+    const data = {}, meta = {}, keys = new Set([...Object.keys(L.data), ...Object.keys(R.data)]);
+    keys.forEach(k => {
+        const lv = L.data[k], rv = R.data[k], lt = +L.meta[k] || 0, rt = +R.meta[k] || 0;
+        if (lv === undefined) { data[k] = rv; meta[k] = rt; return; }
+        if (rv === undefined) { data[k] = lv; meta[k] = lt; return; }
+        if (lv === rv) { data[k] = lv; meta[k] = Math.max(lt, rt); return; }
+        const lc = !last || lt > last, rc = !last || rt > last;           // changed on each side since the last sync?
+        if (lc && rc) { data[k] = syncMergeValues(lv, rv, lt >= rt); meta[k] = Date.now(); }
+        else if (rt > lt) { data[k] = rv; meta[k] = rt; }
+        else { data[k] = lv; meta[k] = lt; }
+    });
+    return { data, meta };
+}
+const syncDiff = (A, B) => Object.keys(A).some(k => A[k] !== B[k]) || Object.keys(B).some(k => !(k in A));
+const syncLocalState = () => ({ data: bkCollect().data, meta: syncMeta() });
+function syncApply(M) {
+    sync.applying = true;
+    try {
+        Object.keys(M.data).forEach(k => { if (localStorage.getItem(k) !== M.data[k]) _lsSet.call(localStorage, k, M.data[k]); });
+        syncRaw('beanSyncMeta', JSON.stringify(Object.assign({}, M.meta, { __last: Date.now() })));
+    } finally { sync.applying = false; }
+}
+function syncReload() {
+    const n = +(sessionStorage.getItem('beanSyncReloads') || 0);
+    if (n >= 3) { syncSet('error'); return; }                       // never loop
+    try { sessionStorage.setItem('beanSyncReloads', String(n + 1)); } catch (e) {}
+    window.__noAutoSave = true; location.reload();                  // so the page doesn't save its old in-memory teams over what we just loaded
+}
+
+/* ---- Google sign-in (token lives in memory only) ---- */
+function syncLoadGIS() {
+    return new Promise((res, rej) => {
+        if (window.google && google.accounts && google.accounts.oauth2) return res();
+        const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client'; s.async = true; s.onload = () => res(); s.onerror = () => rej(new Error('gis'));
+        document.head.appendChild(s);
+    });
+}
+function syncToken(interactive) {
+    if (sync.token && Date.now() < sync.exp - 60000) return Promise.resolve(sync.token);
+    return syncLoadGIS().then(() => new Promise(res => {
+        let done = false; const fin = v => { if (!done) { done = true; sync.cb = null; res(v); } };
+        if (!sync.tc) sync.tc = google.accounts.oauth2.initTokenClient({ client_id: BEAN_GOOGLE_CLIENT_ID, scope: SYNC_SCOPE, callback: r => sync.cb && sync.cb(r), error_callback: () => sync.cb && sync.cb(null) });
+        sync.cb = r => { if (r && r.access_token) { sync.token = r.access_token; sync.exp = Date.now() + (+r.expires_in || 3600) * 1000; fin(sync.token); } else fin(null); };
+        setTimeout(() => fin(null), 20000);
+        try { sync.tc.requestAccessToken({ prompt: interactive ? '' : 'none' }); } catch (e) { fin(null); }   // 'none' = never pop anything up; just try quietly
+    })).catch(() => null);
+}
+
+/* ---- Google Drive (appDataFolder) ---- */
+async function syncApi(url, opts, retried) {
+    const tok = await syncToken(false);
+    if (!tok) throw new Error('auth');
+    const r = await fetch(url, Object.assign({}, opts, { headers: Object.assign({ Authorization: 'Bearer ' + tok }, (opts && opts.headers) || {}) }));
+    if (r.status === 401 && !retried) { sync.token = null; return syncApi(url, opts, true); }
+    if (!r.ok) throw new Error('drive ' + r.status);
+    return r;
+}
+async function syncFind() {
+    const r = await syncApi('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&pageSize=1&fields=files(id)&q=' + encodeURIComponent("name='" + SYNC_FILE + "'"));
+    const j = await r.json(); sync.fileId = j.files && j.files[0] ? j.files[0].id : null; return sync.fileId;
+}
+async function syncDownload() {
+    if (!sync.fileId && !(await syncFind())) return null;
+    let r;
+    try { r = await syncApi('https://www.googleapis.com/drive/v3/files/' + sync.fileId + '?alt=media'); }
+    catch (e) { if (!/404/.test(e.message)) throw e; sync.fileId = null; return null; }     // file was deleted from Drive: treat as "nothing saved yet"
+    try { const o = await r.json(); return o && o.data ? { data: o.data, meta: o.meta || {} } : null; } catch (e) { return null; }
+}
+async function syncUpload(state, again) {
+    const payload = JSON.stringify({ app: 'beanspokebuilder', v: 2, saved: new Date().toISOString(), data: state.data, meta: state.meta });
+    if (sync.fileId) {
+        try { await syncApi('https://www.googleapis.com/upload/drive/v3/files/' + sync.fileId + '?uploadType=media', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: payload }); return; }
+        catch (e) { if (again || !/404/.test(e.message)) throw e; sync.fileId = null; }      // the file was deleted from Drive: make a new one
+    }
+    const b = 'bean' + Math.random().toString(36).slice(2);
+    const body = `--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ name: SYNC_FILE, parents: ['appDataFolder'] })}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${payload}\r\n--${b}--`;
+    const r = await syncApi('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method: 'POST', headers: { 'Content-Type': 'multipart/related; boundary=' + b }, body });
+    sync.fileId = (await r.json()).id;
+}
+
+/* ---- the sync itself ---- */
+async function syncRun(reason) {
+    if (sync.running || !syncConfigured() || location.protocol === 'file:') return;
+    if (reason !== 'signin' && !syncWanted()) return;
+    sync.running = true; syncSet('syncing');
+    try {
+        const tok = await syncToken(reason === 'signin' || reason === 'manual');
+        if (!tok) { if (reason === 'signin') { try { localStorage.removeItem('beanSyncOn'); } catch (e) {} syncSet('off'); } else syncSet('paused'); return; }
+        const L = syncLocalState(), R = (await syncDownload()) || { data: {}, meta: {} }, last = +syncMeta().__last || 0;
+        const M = syncMergeStates(L, R, last);
+        if (syncDiff(M.data, R.data)) await syncUpload(M);
+        if (syncDiff(M.data, L.data)) {
+            if (sync.firstRun || reason === 'signin' || reason === 'manual') { syncApply(M); syncReload(); return; }
+            sync.pending = M; syncToast(); syncSet('idle'); return;                  // don't change teams under someone who is mid-build
+        }
+        syncRaw('beanSyncMeta', JSON.stringify(Object.assign(syncMeta(), { __last: Date.now() })));
+        sync.firstRun = false; sync.last = Date.now(); syncSet('idle');
+    } catch (e) { syncSet(e && e.message === 'auth' ? 'paused' : 'error'); }
+    finally { sync.running = false; }
+}
+function syncSchedule() {
+    if (!syncWanted() || !syncConfigured() || location.protocol === 'file:') return;
+    clearTimeout(sync.timer); sync.timer = setTimeout(() => syncRun('change'), sync.debounce);
+}
+
+/* ---- interface ---- */
+function syncSet(st) { sync.status = st; syncUI(); }
+function syncUI() {
+    const b = document.getElementById('syncBtn');
+    if (b) b.textContent = { off: '☁️ Sign in to sync', syncing: '☁️ Syncing…', idle: '☁️ Synced ✓', paused: '☁️ Reconnect', error: '☁️ Sync problem' }[sync.status] || '☁️ Sign in to sync';
+    const m = document.getElementById('syncModalBody'); if (m) syncModalFill(m);
+}
+function syncToast() {
+    let t = document.getElementById('syncToast');
+    if (!sync.pending) { if (t) t.remove(); return; }
+    if (!t) { t = document.createElement('div'); t.id = 'syncToast'; t.className = 'sync-toast'; document.body.appendChild(t); }
+    t.innerHTML = '<span>Newer teams from another device.</span><button type="button" class="pill-btn" onclick="syncLoadPending()">Load them</button><button type="button" class="pill-btn" onclick="syncDismiss()">Later</button>';
+}
+function syncLoadPending() { if (sync.pending) { syncApply(sync.pending); syncReload(); } }
+function syncDismiss() { sync.pending = null; syncToast(); }
+function syncOpen() {
+    const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal-box"><h3>☁️ Sync with Google</h3><div id="syncModalBody"></div><button class="modal-cancel" type="button">Close</button></div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('.modal-cancel').onclick = () => overlay.remove();
+    overlay.addEventListener('click', e => { if (e.target === overlay) return overlay.remove(); const b = e.target.closest('button[data-a]'); if (b) syncAct(b.dataset.a); });
+    syncModalFill(overlay.querySelector('#syncModalBody'));
+}
+function syncModalFill(el) {
+    const on = syncWanted();
+    const why = !syncConfigured() ? "Sync isn't set up in this copy yet: a Google Client ID needs to be added to the file (see SETUP_SYNC.md)." : location.protocol === 'file:' ? 'Google sign-in only works when the app is opened from its website address, not from a file on your computer.' : '';
+    const stat = { syncing: 'Syncing…', idle: 'Everything is saved to your Google Drive.' + (sync.last ? ' Last synced ' + new Date(sync.last).toLocaleTimeString() + '.' : ''), paused: 'Sync is paused: Google needs you to reconnect.', error: 'Something went wrong talking to Google Drive. Your teams are still safe on this device.' }[sync.status] || '';
+    el.innerHTML = `<p>Sign in with Google to keep your teams, calc teams and trainer progress in sync between your phone and computer. They're stored in a private, hidden app folder in <b>your own Google Drive</b>. This site never sees your password or your email.</p>
+        ${why ? `<div class="bk-msg bad">${why}</div>` : ''}${on && stat ? `<div class="bk-msg ok">${stat}</div>` : ''}
+        <div class="bk-row">${on ? `<button type="button" class="pill-btn" data-a="now">↻ Sync now</button>${sync.status === 'paused' ? '<button type="button" class="pill-btn" data-a="in">Reconnect</button>' : ''}<button type="button" class="pill-btn danger" data-a="out">Sign out</button>` : `<button type="button" class="pill-btn" data-a="in" ${why ? 'disabled' : ''}>Sign in with Google</button>`}</div>
+        <div class="bk-sum">Signing out keeps everything on this device and just stops syncing.</div>`;
+}
+async function syncAct(a) {
+    if (a === 'in') { if (!syncConfigured() || location.protocol === 'file:') return; syncRaw('beanSyncOn', '1'); await syncRun('signin'); }
+    else if (a === 'now') await syncRun('manual');
+    else if (a === 'out') {
+        try { localStorage.removeItem('beanSyncOn'); } catch (e) {}
+        if (sync.token && window.google && google.accounts) { try { google.accounts.oauth2.revoke(sync.token, () => {}); } catch (e) {} }
+        sync.token = null; sync.pending = null; syncToast(); syncSet('off');
+    }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && syncWanted() && !sync.running && Date.now() - sync.last > 60000) syncRun('visible'); });
+if (syncWanted() && syncConfigured() && location.protocol !== 'file:') { sync.status = 'syncing'; setTimeout(() => syncRun('start'), 400); }
+syncUI();
 
 /* ===================== GAME TEAMS + LOAD PICKER ===================== */
 /* Trainer format: {c:category, n:name, m:[[species, level, {a:ability,i:item,n:nature,m:[moves]}?], ...]}
@@ -4941,6 +5433,8 @@ function guideGo(v) {
     if (v === 'guide' && !guideState.game) guideState.game = GAME_TEAMS[cxLoad.game] ? cxLoad.game : Object.keys(GAME_TEAMS)[0];
     guideRender();
 }
+function guideHome() { closeSections(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function dexHome() { if (dexState.ret) { dexReturn(); return; } dexState.sel = null; dexState.cmp = null; closeSections(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 function guideStart(id) { guideState.picked = true; guideState.view = 'guide'; guideGame(id); }
 function guideGame(g) { guideState.game = g; guideState.ti = -1; guideState.sx = null; try { localStorage.setItem('cxLastGame', g); } catch (e) {} guideRender(); }
 function guideScroll(dir) { const st = document.getElementById('guideStrip'); if (st) st.scrollBy({ left: dir * Math.max(240, st.clientWidth * 0.8), behavior: 'smooth' }); }
@@ -4954,6 +5448,7 @@ function guidePick(i) { const st = document.getElementById('guideStrip'); guideS
 function guideSend(side) { cxLoad.side = side; openSection('calc'); calcLoadGame(guideState.game, guideState.ti); }
 function guideRender() {
     const root = document.getElementById('guideRoot'); if (!root) return;
+    if (guideState.view === 'home') guideState.view = 'pick';   // the Dex is its own card now
     const keepY = window.scrollY, keepH = root.offsetHeight;
     if (keepH) root.style.minHeight = keepH + 'px';   // stop the page shrinking (and snapping to top) while it re-renders
     const title = (guideState.view === 'guide' || guideState.view === 'pick') ? `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-journal"/></svg> Guide</h2>` : `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-map"/></svg> Trainer Guide</h2>`;
@@ -4970,7 +5465,7 @@ function guideRender() {
         const cont = last && GAME_TEAMS[last] ? `<button class="guide-tile gp-cont" onclick="guideStart('${last}')"><b>▶ Continue</b><small>${calcEsc(GAME_TEAMS[last].name)}</small></button>` : '';
         const card = ([id, x]) => { const prog = x.trainers.map((t, i) => [t, i]).filter(([t]) => !guideNoProg(t.c)), n = prog.filter(([t, i]) => done[id + ':' + i]).length;
             return `<button class="gp-game" onclick="guideStart('${id}')"><b>${calcEsc(x.name)}</b><small>${n ? n + ' / ' + prog.length + ' beaten' : prog.length + ' trainers'}</small></button>`; };
-        root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideGo('home')"><span class="pb-ico">‹</span>Back</button></div>
+        root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideHome()"><span class="pb-ico">‹</span>Back</button></div>
             <div class="dx-note">Pick a game to open its trainer guide.</div>${cont}
             ${Object.entries(groups).map(([grp, arr]) => `<div class="guide-cat">${calcEsc(grp)}</div><div class="gp-grid">${arr.map(card).join('')}</div>`).join('')}`;
         window.scrollTo(0, 0);
@@ -5084,10 +5579,10 @@ async function guideDetail() {
     }).join('');
     el.innerHTML = `<div class="guide-head">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<div><div class="gh-name">${calcEsc(t.n)}</div><div class="gh-sub">${calcEsc(GAME_TEAMS[gid].name)} · ${calcEsc(t.c)}</div><div class="gh-row"><span class="guide-cap">Level cap ${cap}</span>${loc ? `<span class="gh-loc">📍 ${calcEsc(loc[0])} · ${calcEsc(loc[1])}</span>` : `<span class="gh-loc none">📍 Location not confirmed</span>`}</div></div>
         <label class="guide-def"><input type="checkbox" ${guideDone()[k] ? 'checked' : ''} onchange="guideToggle('${k}')"> Defeated</label>
-        <button class="guide-send" onclick="guideSend('opp')">⚔️ Load as Opponent</button><button class="guide-send alt" onclick="guideSend('you')">Load as Your Team</button><button class="guide-send alt" onclick="guideCheckToggle()">✅ Is my team ready?</button></div>
-        <div id="guideCheck"></div>
+        <button class="guide-send" onclick="guideSend('opp')">⚔️ Load as Opponent</button><button class="guide-send alt" onclick="guideSend('you')">Load as Your Team</button><button class="guide-send alt" onclick="guideCheckToggle()">✅ Is my team ready?</button><button class="guide-send alt" onclick="guideCounterToggle()">🎯 Counter team</button></div>
+        <div id="guideCheck"></div><div id="guideCounter"></div>
         ${full ? '' : needDef ? '<div class="guide-hint">Dashed moves are predicted (last four level-up moves at that level). Items and abilities aren\'t filled in for this trainer yet.</div>' : '<div class="guide-hint">Moves, items and abilities aren\'t filled in for this game yet — only species and levels.</div>'}<div class="guide-team">${cards}</div>`;
-    guideCheckRender();
+    guideCheckRender(); guideCounterRender();
     if (needDef) t.m.forEach(async ([sp, lv, x], mi) => {
         if (x && x.m) return;
         const dm = await cxDefaultMoves(String(sp).toLowerCase(), lv, gm.vg);
@@ -5107,10 +5602,10 @@ const DEX_GENS = { 1:[1,151,'Kanto'], 2:[152,251,'Johto'], 3:[252,386,'Hoenn'], 
 const DEX_VG = ['red-blue','yellow','gold-silver','crystal','ruby-sapphire','emerald','firered-leafgreen','diamond-pearl','platinum','heartgold-soulsilver','black-white','black-2-white-2','x-y','omega-ruby-alpha-sapphire','sun-moon','ultra-sun-ultra-moon','lets-go-pikachu-lets-go-eevee','sword-shield','brilliant-diamond-and-shining-pearl','legends-arceus','scarlet-violet'];
 const DEX_GEN = { 'red-blue':1,'yellow':1,'gold-silver':2,'crystal':2,'ruby-sapphire':3,'emerald':3,'firered-leafgreen':3,'diamond-pearl':4,'platinum':4,'heartgold-soulsilver':4,'black-white':5,'black-2-white-2':5,'x-y':6,'omega-ruby-alpha-sapphire':6,'sun-moon':7,'ultra-sun-ultra-moon':7,'lets-go-pikachu-lets-go-eevee':7,'sword-shield':8,'brilliant-diamond-and-shining-pearl':8,'legends-arceus':8,'scarlet-violet':9 };
 const DEX_M = { 'level-up':['Level','#48c774'], machine:['TM/HM','#7ec8e3'], egg:['Egg','#e991b0'], tutor:['Tutor','#d4a017'], other:['Special','#e74c3c'], older:['Older game','#9aa0b4'] };
-const DEX_STAT = [['hp', 'HP', '#d4a017'], ['attack', 'Atk', '#e74c3c'], ['defense', 'Def', '#2c6fad'], ['special-attack', 'SpA', '#7ec8e3'], ['special-defense', 'SpD', '#e991b0'], ['speed', 'Spe', '#48c774']];
+const DEX_STAT = [['hp', 'HP', '#d4a017'], ['attack', 'Atk', '#e74c3c'], ['defense', 'Def', '#2c6fad'], ['speed', 'Spe', '#48c774'], ['special-defense', 'SpD', '#e991b0'], ['special-attack', 'SpA', '#7ec8e3']];
 const DEX_NAMES = { 'ho-oh':'Ho-Oh','porygon-z':'Porygon-Z','nidoran-f':'Nidoran ♀','nidoran-m':'Nidoran ♂','mr-mime':'Mr. Mime','mr-rime':'Mr. Rime','mime-jr':'Mime Jr.','farfetchd':"Farfetch'd",'sirfetchd':"Sirfetch'd",'type-null':'Type: Null','jangmo-o':'Jangmo-o','hakamo-o':'Hakamo-o','kommo-o':'Kommo-o','flabebe':'Flabébé','wo-chien':'Wo-Chien','chien-pao':'Chien-Pao','ting-lu':'Ting-Lu','chi-yu':'Chi-Yu',
     'u-turn':'U-turn','x-scissor':'X-Scissor','will-o-wisp':'Will-O-Wisp','double-edge':'Double-Edge','self-destruct':'Self-Destruct','lock-on':'Lock-On','mud-slap':'Mud-Slap','soft-boiled':'Soft-Boiled','baby-doll-eyes':'Baby-Doll Eyes','v-create':'V-create','trick-or-treat':'Trick-or-Treat','topsy-turvy':'Topsy-Turvy','wake-up-slap':'Wake-Up Slap','power-up-punch':'Power-Up Punch','king-s-shield':"King's Shield",'forest-s-curse':"Forest's Curse",'land-s-wrath':"Land's Wrath",'nature-s-madness':"Nature's Madness" };
-const dexState = { gen: 'all', q: '', sel: null, form: null, move: null, abil: null, from: null, fromForm: null, tab: 'all', vg: null, y: 0, type: '', sort: 'num', shiny: false, ret: null };
+const dexState = { gen: 'all', q: '', sel: null, form: null, move: null, abil: null, from: null, fromForm: null, tab: 'all', vg: null, y: 0, type: '', sort: 'num', shiny: false, ret: null, cmp: null };
 const dexCache = { species: null, moves: null, mon: {}, spec: {}, evo: {}, move: {} };
 const dexName = s => DEX_NAMES[s] || String(s).split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 const dexNorm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -5166,7 +5661,7 @@ async function dexFillMoves(list) {
 function dexRender() {
     const root = document.getElementById('guideRoot'); if (!root) return;
     const title = `<h2><svg class="h2-svg" aria-hidden="true"><use href="#ico-dex"/></svg> Pokédex</h2>`;
-    root.innerHTML = title + `<div class="dx-bar"><button class="guide-back" onclick="guideGo('home')"><span class="pb-ico">‹</span>Back</button>
+    root.innerHTML = title + `<div class="dx-bar"><button class="guide-back" onclick="dexHome()"><span class="pb-ico">‹</span>Back</button>
         <select onchange="dexSet('gen',this.value)"><option value="all">All generations</option>${Object.entries(DEX_GENS).map(([g, r]) => `<option value="${g}" ${String(dexState.gen) === g ? 'selected' : ''}>Gen ${g} · ${r[2]}</option>`).join('')}</select>
         <input id="dxQ" placeholder="Search Pokémon…" value="${calcEsc(dexState.q)}" oninput="dexSet('q',this.value)">
         <select onchange="dexSet('type',this.value)"><option value="">All types</option>${DEX_TYPES.map(t => `<option value="${t}" ${dexState.type === t ? 'selected' : ''}>${dexCap(t)}</option>`).join('')}</select>
@@ -5177,7 +5672,7 @@ function dexRender() {
         <div id="dxBody"><div class="dx-note">Loading…</div></div>`;
     dexLists().then(() => { const b = document.getElementById('dxBody'); if (!dexCache.species) { if (b) b.innerHTML = '<div class="dx-note">Couldn\'t load the Pokédex (check your connection).</div><button class="guide-back" onclick="dexRender()">Retry</button>'; } else dexUpdate(); });
 }
-function dexSet(k, v) { dexState[k] = v; if (k === 'q' || k === 'gen' || k === 'type' || k === 'sort') { dexState.sel = null; } dexUpdate(); }
+function dexSet(k, v) { dexState[k] = v; dexState.cmp = null; if (k === 'q' || k === 'gen' || k === 'type' || k === 'sort') { dexState.sel = null; } dexUpdate(); }
 function dexMoveSug(v) {
     const box = document.getElementById('dxSug'); if (!box) return;
     const q = dexNorm(v); if (!q && dexState.move) { dexState.move = null; dexUpdate(); }
@@ -5217,6 +5712,7 @@ function dexBack() { dexState.sel = null; dexState.ret = null; const y = dexStat
 function dexBackToMon() { dexState.abil = null; { const ia = document.getElementById('dxA'); if (ia) ia.value = ''; } const y = dexState.pickY || 0; dexState.sel = dexState.from; dexState.form = dexState.fromForm; Promise.resolve(dexUpdate()).then(() => window.scrollTo(0, y)); }
 function dexUpdate() {
     const body = document.getElementById('dxBody'); if (!body || !dexCache.species) return;
+    if (dexState.cmp) return dexCmpView(body);
     if (dexState.sel) return dexDetail(body);
     body.style.minHeight = '';
     if (dexState.abil) return dexAbilView(body);
@@ -5307,8 +5803,8 @@ async function openAbilityInDex(name) {
         const slug = String(name).toLowerCase().trim().replace(/\s+/g, '-');
         dexState.ret = { sec: currentSection || 'draft', view: guideState.view };
         dexState.move = null; dexState.from = null; dexState.sel = null; dexState.form = null; dexState.q = '';
-        dexState.abil = slug; guideState.view = 'dex';
-        openSection('guide');
+        dexState.abil = slug;
+        openSection('dex');
     } catch (e) { showToast('Couldn\'t open the Dex.'); }
 }
 
@@ -5485,7 +5981,7 @@ function dexFillAbilities(root) {
     });
 }
 async function dexDetail(body) {
-    const id = dexState.sel, was = body.dataset.v === 'detail', keepY = window.scrollY, h0 = body.offsetHeight;
+    const id = dexState.sel, was = body.dataset.v === 'detail' || body.dataset.v === 'cmp', keepY = window.scrollY, h0 = body.offsetHeight;
     if (h0 && (was || body.dataset.v === 'abil' || body.dataset.v === 'move')) body.style.minHeight = h0 + 'px';          // hold the height while loading so phones don't snap to the top
     body.innerHTML = '<div class="dx-note">Loading…</div>';
     const [sp, base] = await Promise.all([dexSpec(id), dexMon(id)]);
@@ -5551,7 +6047,9 @@ async function dexDetail(body) {
             <div class="dx-row"><span>Weight</span><b>${kg.toFixed(1)} kg (${(kg * 2.20462).toFixed(1)} lbs)</b></div>
             <div class="dx-row dx-rowab"><span>Abilities</span><div class="dx-abs">${dexAbilHtml(abil, norm)}</div></div>
         </div></div>${formRow}
-        <div class="dx-note"><b>Base stats</b></div>${dexStatsHtml(d.stats)}${/-gmax/i.test(d.name) ? DEX_GMAX_NOTE : ''}
+        ${dexInfoBoxes(sp, d)}
+        <div class="dx-act"><button type="button" class="pill-btn" onclick="dexAddPool('${d.name}')">➕ Add to Draft Pool</button><button type="button" class="pill-btn" onclick="dexCmpStart(${d.id})">⚖ Compare</button></div>
+        <div class="dx-note"><b>Base stats</b></div>${dexStatsHtml(d.stats)}${dexRangeHtml(d.stats)}${/-gmax/i.test(d.name) ? DEX_GMAX_NOTE : ''}
         <div class="dx-note"><b>Type matchups</b> · damage taken</div>${dexTypeChartHtml(d)}
         <div class="dx-note"><b>Evolution</b></div>${evoHtml ? `<div class="dx-evo">${evoHtml}</div>` : '<div class="dx-note">Does not evolve.</div>'}
         <div class="dx-tabs">${tabs.map(([k, l]) => `<button class="${k === tab ? 'on' : ''}" onclick="dexState.tab='${k}';dexUpdate()">${l}${rows[k] ? ' (' + rows[k].length + ')' : ''}</button>`).join('')}
@@ -5621,13 +6119,13 @@ async function openInDex(name) {
         dexState.ret = { sec: currentSection || 'draft', view: guideState.view, y: _y, uid: _uid };
         dexState.move = null; dexState.abil = null; dexState.from = null; dexState.q = '';
         dexState.sel = sp.id; dexState.form = slug === sp.n ? null : slug;
-        guideState.view = 'dex';
-        openSection('guide');
+        openSection('dex');
     } catch (e) { showToast('Couldn\'t open the Dex.'); }
 }
 function dexReturn() {
     const r = dexState.ret; dexState.ret = null; dexState.sel = null; dexState.abil = null; dexState.form = null;
     if (!r) { dexUpdate(); return; }
+    if (r.sec === 'dex') { dexUpdate(); return; }
     if (r.sec === 'guide') guideState.view = (r.view && r.view !== 'dex') ? r.view : 'home';
     if ((r.sec === 'draft' || r.sec === 'calc') && r.y != null) {
         openSection(r.sec, { noScroll: true });
