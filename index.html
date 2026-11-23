@@ -1010,7 +1010,7 @@ html{scrollbar-gutter:stable}
 .profile-chip{position:absolute;top:12px;right:14px;z-index:5}
 .prof-btn{display:inline-flex;align-items:center;gap:8px;height:44px;box-sizing:border-box;padding:0 12px 0 4px;background:var(--bg2);border:1px solid var(--border);border-radius:999px;color:var(--text);font-size:.78rem;font-weight:600;font-family:inherit;line-height:1;cursor:pointer;max-width:260px;transition:border-color .15s,background .15s}
 .prof-btn.prof-in{padding:0 15px;color:var(--muted2)}
-.prof-btn:hover{border-color:var(--accent);background:var(--bg3)}
+.prof-btn{border-color:var(--pa,var(--border))}.prof-btn:hover{border-color:var(--pa,var(--accent));background:var(--bg3)}
 .prof-ava{width:36px;height:36px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
 .prof-ava img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .zk-p{transform:scale(1.55);transform-origin:50% 42%}
@@ -1018,7 +1018,7 @@ html{scrollbar-gutter:stable}
 .zk-b{transform:scale(1.2)}
 .prof-pick{overflow:hidden}
 .hc-mon,.prof-slot{overflow:hidden}.hc-mon img,.prof-slot img{transform:scale(1.3)}
-.hc-title{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);font-weight:700}
+.hc-title{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);font-weight:700}
 .hc-region{font-size:1rem;font-weight:700}
 .hc-fav{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted2)}
 .hc-fav b{color:var(--text)}
@@ -1038,7 +1038,7 @@ html{scrollbar-gutter:stable}
 .prof-pick:hover{border-color:var(--accent)}
 .prof-pick.on{border-color:#c084fc;box-shadow:0 0 0 2px rgba(192,132,252,.35)}
 .home-card{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0 auto 14px;padding:10px 14px;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;cursor:pointer}
-.home-card:hover{border-color:var(--accent)}
+.home-card{border-color:var(--pa,var(--border))}.home-card:hover{border-color:var(--pa,var(--accent))}
 .hc-facts{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:.8rem;color:var(--muted2)}
 .hc-facts b{color:var(--text)}
 .hc-six{display:flex;gap:4px;justify-content:center}
@@ -1052,6 +1052,20 @@ html{scrollbar-gutter:stable}
 .prof-slot.on{border-style:solid;border-color:#c084fc;box-shadow:0 0 0 2px rgba(192,132,252,.35)}
 .prof-sixbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .prof-sixbtns .pill-btn{flex:1;min-width:90px}
+details.prof-sec{border:1px solid var(--border2);border-radius:12px;margin:8px 0;padding:0 12px;background:var(--bg3)}
+details.prof-sec>summary{cursor:pointer;padding:11px 0;font-weight:700;font-size:.85rem;list-style:none}
+details.prof-sec>summary::-webkit-details-marker{display:none}
+details.prof-sec>summary::after{content:'▾';float:right;color:var(--muted2)}
+details.prof-sec[open]>summary::after{content:'▴'}
+details.prof-sec[open]>summary{border-bottom:1px solid var(--border2);margin-bottom:6px}
+details.prof-sec[open]{padding-bottom:10px}
+.prof-colors{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.prof-sw{width:30px;height:30px;border-radius:50%;border:2px solid var(--border2);cursor:pointer;padding:0;font-size:.7rem;color:#000;font-weight:800;font-family:inherit}
+.prof-sw.auto{background:var(--bg4);color:var(--muted2)}
+.prof-sw.on{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.35)}
+.hc-line1{font-size:.9rem;font-weight:800;color:var(--pa,var(--accent))}
+.hc-bimg{width:24px;height:24px;border-radius:50%;object-fit:cover;object-position:top;background:var(--bg4)}
+.prof-stat{font-size:.8rem;color:var(--muted2);margin:4px 0 8px;line-height:1.5}.prof-stat b{color:var(--text)}
 .prof-clr{flex:none;width:38px}
 .sync-note{margin-top:12px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;font-size:.76rem;line-height:1.5;color:var(--muted2)}.sync-note p{margin:6px 0 0}.sync-note b{color:var(--text)}.sync-note a{color:var(--accent)}
 #sixS.on{background:rgba(250,204,21,.3);border-color:#fde047;color:#fff7b0}#sixS:disabled{opacity:.45}
@@ -5175,27 +5189,61 @@ const PROFILE_BALL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/s
 function profileGet() {
     try { const o = JSON.parse(localStorage.getItem('beanProfile') || '{}') || {}; const top = Array.isArray(o.top) ? o.top.slice(0, 6).map(x => String(x || '').slice(0, 40)) : []; while (top.length < 6) top.push('');
         const ts = Array.isArray(o.ts) ? o.ts.slice(0, 6).map(Boolean) : []; while (ts.length < 6) ts.push(false);
-        return { ts, name: String(o.name || '').slice(0, 20), id: +o.id || 0, av: String(o.av || '').slice(0, 40), shiny: !!o.shiny, fav: String(o.fav || '').slice(0, 40), region: String(o.region || '').slice(0, 20), top }; }
-    catch (e) { return { ts: [false, false, false, false, false, false], name: '', id: 0, av: '', shiny: false, fav: '', region: '', top: ['', '', '', '', '', ''] }; }
+        return { ts, title: String(o.title || '').slice(0, 30), type: String(o.type || '').slice(0, 12), color: /^#[0-9a-f]{6}$/i.test(o.color) ? o.color : '', badge: String(o.badge || '').slice(0, 40), name: String(o.name || '').slice(0, 20), id: +o.id || 0, av: String(o.av || '').slice(0, 40), shiny: !!o.shiny, fav: String(o.fav || '').slice(0, 40), region: String(o.region || '').slice(0, 20), top }; }
+    catch (e) { return { ts: [false, false, false, false, false, false], title: '', type: '', color: '', badge: '', name: '', id: 0, av: '', shiny: false, fav: '', region: '', top: ['', '', '', '', '', ''] }; }
 }
-function profileSave(p) { try { localStorage.setItem('beanProfile', JSON.stringify({ ts: p.ts || [], name: p.name, id: p.id, av: p.av || '', shiny: p.shiny, fav: p.fav || '', region: p.region || '', top: p.top || [] })); } catch (e) {} try { const b = document.querySelector('.calc-banner'); if (b && typeof calcAvatarHTML === 'function') b.innerHTML = calcAvatarHTML('you') + '<span class="cb-vs">VS</span>' + calcAvatarHTML('opp'); } catch (e) {} }   // saved like everything else, so it syncs too
+function profileSave(p) { try { localStorage.setItem('beanProfile', JSON.stringify({ title: p.title || '', type: p.type || '', color: p.color || '', badge: p.badge || '', ts: p.ts || [], name: p.name, id: p.id, av: p.av || '', shiny: p.shiny, fav: p.fav || '', region: p.region || '', top: p.top || [] })); } catch (e) {} try { const b = document.querySelector('.calc-banner'); if (b && typeof calcAvatarHTML === 'function') b.innerHTML = calcAvatarHTML('you') + '<span class="cb-vs">VS</span>' + calcAvatarHTML('opp'); } catch (e) {} }   // saved like everything else, so it syncs too
 function profileImg(id, shiny) { return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shiny ? 'shiny/' : ''}${id}.png` : PROFILE_BALL; }
+const PROFILE_TITLES = ['Gym Challenger', 'Ace Trainer', 'Pokémon Breeder', 'Bug Catcher', 'Youngster', 'Team Rocket Dropout', 'Hex Maniac', 'Battle Nerd', 'Shiny Hunter', 'Cozy Trainer'];
+const PROFILE_TYPES = { Normal: '#a8a77a', Fire: '#ee8130', Water: '#6390f0', Electric: '#f7d02c', Grass: '#7ac74c', Ice: '#96d9d6', Fighting: '#c22e28', Poison: '#a33ea1', Ground: '#e2bf65', Flying: '#a98ff3', Psychic: '#f95587', Bug: '#a6b91a', Rock: '#b6a136', Ghost: '#735797', Dragon: '#6f35fc', Dark: '#705746', Steel: '#b7b7ce', Fairy: '#d685ad' };
+const PROFILE_COLORS = ['#ef4444', '#f97316', '#facc15', '#4ade80', '#2dd4bf', '#38bdf8', '#818cf8', '#c084fc', '#f472b6'];
+const profileAccent = p => p.color || PROFILE_TYPES[p.type] || '';
+function profileBadges() {   // read from the Guide's "Defeated" ticks; never throws (the game data loads later in the file)
+    const out = { list: [], champs: 0, games: 0, full: 0 };
+    try {
+        const d = guideDone();
+        Object.entries(GAME_TEAMS).forEach(([gid, g]) => {
+            let tot = 0, dn = 0;
+            g.trainers.forEach((t, i) => {
+                if (guideNoProg(t.c)) return; tot++;
+                if (!d[gid + ':' + i]) return; dn++;
+                if (/Gym Leaders$/.test(t.c)) out.list.push({ k: gid + ':' + i, n: t.n, game: g.name, gid, t });
+                if (t.c === 'Champion') out.champs++;
+            });
+            out.games++; if (tot && dn === tot) out.full++;
+        });
+    } catch (e) {}
+    return out;
+}
+function profileRank(b) {
+    if (b.games && b.full === b.games) return 'Master Trainer';
+    if (b.champs) return 'Champion';
+    const n = b.list.length;
+    return n >= 25 ? 'Ace Trainer' : n >= 8 ? 'Badge Collector' : n >= 1 ? 'Gym Challenger' : 'Rookie';
+}
 const PROFILE_REGIONS = ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Hisui', 'Unova', 'Kalos', 'Alola', 'Galar', 'Paldea'];
 function profileMonId(n) { return (n && typeof pokemonIdMap !== 'undefined' && pokemonIdMap[String(n).toLowerCase()]) || 0; }
 function profileCard() {
     const el = document.getElementById('homeCard'); if (!el) return;
-    const p = profileGet(), has = p.fav || p.region || p.top.some(Boolean);
+    const p = profileGet(), B = profileBadges(), fb = B.list.find(x => x.k === p.badge);
+    const has = p.fav || p.region || p.top.some(Boolean) || p.title || fb || B.list.length;
     if (!syncWanted() || !has) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    const acc = profileAccent(p); if (acc) el.style.setProperty('--pa', acc); else el.style.removeProperty('--pa');
+    const rank = profileRank(B), title = p.title || rank;
+    const line1 = `<div class="hc-line1">${rank === 'Master Trainer' && !p.title ? '👑 ' : ''}${calcEsc(title)}${B.list.length ? ` · 🏅 ${B.list.length}` : ''}</div>`;
     const img = (n, i) => { const id = profileMonId(n); return id ? `<span class="hc-mon${p.ts[i] ? ' shiny' : ''}" title="${calcEsc(n)}${p.ts[i] ? ' (shiny)' : ''}"><img src="${profileImg(id, p.ts[i])}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; };
     const six = p.top.some(Boolean) ? `<div class="hc-six">${p.top.map(img).join('')}</div>` : '';
     const fav = p.fav ? `<div class="hc-fav">⭐ Favorite: <b>${calcEsc(p.fav)}</b></div>` : '';
-    el.style.display = ''; el.innerHTML = `<div class="hc-title">My Favorites</div>` + (p.region ? `<div class="hc-region">🗺️ ${calcEsc(p.region)}</div>` : '') + fav + six;
+    const bsrc = fb ? cxSpr(fb.gid, fb.t) : '';
+    const bad = fb ? `<div class="hc-fav">🎖️ Favorite badge: <b>${calcEsc(fb.n)}</b>${bsrc ? `<img class="hc-bimg" src="${bsrc}" data-a="${cxSprAlt(fb.t)}" data-n="${calcEsc(String(fb.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}</div>` : '';
+    el.style.display = ''; el.innerHTML = line1 + `<div class="hc-title">My Favorites</div>` + (p.region ? `<div class="hc-region">🗺️ ${calcEsc(p.region)}</div>` : '') + fav + six + bad;
 }
 function profileRender() {
     profileCard();
     const sub = document.getElementById('homeSub');
     if (sub) sub.textContent = syncWanted() ? 'Welcome back, ' + (profileGet().name || 'Trainer') + '!' : 'Build your team, craft your strategy';
     const el = document.getElementById('profileChip'); if (!el) return;
+    { const ac = profileAccent(profileGet()); if (ac && syncWanted()) el.style.setProperty('--pa', ac); else el.style.removeProperty('--pa'); }
     if (!syncWanted()) { el.innerHTML = '<button type="button" class="prof-btn prof-in" onclick="syncOpen()">☁️ Sign in</button>'; return; }
     const p = profileGet(), dot = { syncing: 'sy', idle: 'ok', paused: 'pa', error: 'er' }[sync.status] || 'ok';
     el.innerHTML = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava"><img class="zk-${profileAv(p).k}" src="${profileAv(p).src}" alt="" onerror="this.onerror=null;this.className='zk-b';this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
@@ -5206,11 +5254,12 @@ function profileOpen() {
     ov.innerHTML = `<div class="modal-box prof-box"><h3>Your profile</h3>
         <div class="prof-top"><span class="prof-ava big"><img id="profPrev" alt=""></span>
             <div class="prof-nmwrap"><label class="bk-h" for="profName">Display name</label><input id="profName" class="ab-modal-input" maxlength="20" placeholder="Trainer" autocomplete="off" spellcheck="false"></div></div>
-        <div class="bk-h">Avatar</div>
-        <div class="prof-grid" id="profGrid"></div>
-        <div class="prof-find"><input id="profFind" class="ab-modal-input" list="profList" placeholder="Search any Pokémon…" autocomplete="off"><label class="prof-shiny"><input type="checkbox" id="profShiny"> Shiny</label></div>
-        <datalist id="profList"></datalist>
         <div class="bk-msg" id="profMsg"></div>
+        <details class="prof-sec"><summary>🎨 Change avatar</summary>
+        <div id="profGrid"></div>
+        <div class="prof-find"><input id="profFind" class="ab-modal-input" list="profList" placeholder="Search any Pokémon…" autocomplete="off"><label class="prof-shiny"><input type="checkbox" id="profShiny"> Shiny</label></div>
+        <datalist id="profList"></datalist></details>
+        <details class="prof-sec"><summary>⭐ Favorites</summary>
         <div class="bk-h">Favorite Pokémon</div>
         <div class="prof-find"><input id="profFav" class="ab-modal-input" list="profList" placeholder="Search a Pokémon…" autocomplete="off"><button type="button" class="pill-btn prof-clr" id="profFavX" title="Clear">✕</button></div>
         <div class="bk-h">Favorite region</div>
@@ -5219,6 +5268,16 @@ function profileOpen() {
         <div class="prof-six" id="profSix"></div>
         <input id="profSixIn" class="ab-modal-input" list="profList" placeholder="Search to fill the selected slot…" autocomplete="off">
         <div class="prof-sixbtns"><button type="button" class="pill-btn" id="sixL">◀ Move</button><button type="button" class="pill-btn" id="sixR">Move ▶</button><button type="button" class="pill-btn" id="sixS">✨ Shiny</button><button type="button" class="pill-btn" id="sixX">Clear slot</button></div>
+        </details>
+        <details class="prof-sec"><summary>🎭 Title &amp; colors</summary>
+        <div class="bk-h">Trainer title</div>
+        <select id="profTitle" class="ab-modal-input prof-sel"><option value="">Auto (my rank)</option>${PROFILE_TITLES.map(t => `<option>${t}</option>`).join('')}</select>
+        <div class="bk-h">Favorite type</div>
+        <select id="profType" class="ab-modal-input prof-sel"><option value="">None</option>${Object.keys(PROFILE_TYPES).map(t => `<option>${t}</option>`).join('')}</select>
+        <div class="bk-h">Accent color <span style="font-weight:400;color:var(--muted)">(Auto uses your type)</span></div>
+        <div class="prof-colors" id="profColors"></div>
+        </details>
+        <details class="prof-sec"><summary>🏅 Badges</summary><div id="profBadges"></div></details>
         <div class="bk-h">Sync</div><div id="syncModalBody"></div>
         <button class="modal-cancel" type="button">Done</button></div>`;
     document.body.appendChild(ov);
@@ -5261,6 +5320,21 @@ function profileOpen() {
     $('#sixS').onclick = () => { if (!st.top[sel]) return; st.ts[sel] = !st.ts[sel]; paintSix(); commit(); };
     $('#sixX').onclick = () => { st.top[sel] = ''; st.ts[sel] = false; paintSix(); commit(); };
     paintSix();
+    const titleSel = $('#profTitle'), typeSel = $('#profType'), cols = $('#profColors');
+    titleSel.value = st.title; typeSel.value = st.type;
+    titleSel.addEventListener('change', () => { st.title = titleSel.value; commit(); });
+    typeSel.addEventListener('change', () => { st.type = typeSel.value; commit(); });
+    const paintCols = () => { cols.innerHTML = `<button type="button" class="prof-sw auto${!st.color ? ' on' : ''}" data-c="" title="Auto">A</button>` + PROFILE_COLORS.map(c => `<button type="button" class="prof-sw${st.color === c ? ' on' : ''}" data-c="${c}" style="background:${c}" title="${c}"></button>`).join(''); };
+    cols.addEventListener('click', e => { const b = e.target.closest('.prof-sw'); if (!b) return; st.color = b.dataset.c; paintCols(); commit(); });
+    paintCols();
+    const B = profileBadges(), bd = $('#profBadges');
+    if (!B.list.length) bd.innerHTML = `<div class="prof-stat">No badges yet. Open the <b>Guide</b>, pick a game, and tick <b>Defeated</b> on gym leaders. They show up here, and you can pick a favorite. Beat every trainer in every game to become a <b>Master Trainer</b>.</div>`;
+    else {
+        const groups = {}; B.list.forEach(x => (groups[x.game] = groups[x.game] || []).push(x));
+        bd.innerHTML = `<div class="prof-stat">Rank: <b>${profileRank(B)}</b><br>🏅 <b>${B.list.length}</b> gym badge${B.list.length === 1 ? '' : 's'} · ${B.full}/${B.games} games complete</div>
+            <div class="bk-h">Favorite badge</div><select id="profBadge" class="ab-modal-input prof-sel"><option value="">None</option>${Object.entries(groups).map(([g, a]) => `<optgroup label="${calcEsc(g)}">${a.map(x => `<option value="${x.k}">${calcEsc(x.n)}</option>`).join('')}</optgroup>`).join('')}</select>`;
+        const bs = $('#profBadge'); bs.value = st.badge; bs.addEventListener('change', () => { st.badge = bs.value; commit(); });
+    }
     $('.modal-cancel').onclick = close;
     syncModalFill($('#syncModalBody'));
 }
@@ -5602,6 +5676,7 @@ const guideState = { view: 'home', game: null, ti: -1 }, guideTypeCache = {};
 const guideNoProg = c => /^(Rematch|Other)$/.test(c);
 const guideCap = w => String(w).split('-').map(x => x.charAt(0).toUpperCase() + x.slice(1)).join('-');
 function guideDone() { try { return JSON.parse(localStorage.getItem('guideDone') || '{}'); } catch (e) { return {}; } }
+try { profileRender(); } catch (e) {}
 function guideToggle(k) { const d = guideDone(); if (d[k]) delete d[k]; else d[k] = 1; try { localStorage.setItem('guideDone', JSON.stringify(d)); } catch (e) {} guideRender(); }
 function guideGo(v) {
     if (v === 'guide' && !guideState.picked) v = 'pick';           // first stop: choose a game
