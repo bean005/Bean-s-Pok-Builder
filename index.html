@@ -1005,6 +1005,50 @@ html{scrollbar-gutter:stable}
 /* google drive sync */
 .pill-btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
 .sync-toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9999;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;max-width:92vw;padding:10px 14px;background:var(--bg3);border:1px solid var(--accent);border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.5);font-size:.8rem}
+/* PROFILE (top-right) */
+#homeScreen{position:relative}
+.profile-chip{position:absolute;top:12px;right:14px;z-index:5}
+.prof-btn{display:inline-flex;align-items:center;gap:8px;height:36px;box-sizing:border-box;padding:0 12px 0 4px;background:var(--bg2);border:1px solid var(--border);border-radius:999px;color:var(--text);font-size:.78rem;font-weight:600;font-family:inherit;line-height:1;cursor:pointer;max-width:260px;transition:border-color .15s,background .15s}
+.prof-btn.prof-in{padding:0 15px;color:var(--muted2)}
+.prof-btn:hover{border-color:var(--accent);background:var(--bg3)}
+.prof-ava{width:28px;height:28px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
+.prof-ava img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.prof-ava.big{width:64px;height:64px}
+.prof-wel{color:var(--muted2);font-weight:500}
+@media (max-width:520px){.prof-wel{display:none}}
+.prof-nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px}
+.prof-dot{width:8px;height:8px;border-radius:50%;flex:none;background:#4ade80}
+.prof-dot.sy{background:#facc15}.prof-dot.pa{background:#fb923c}.prof-dot.er{background:#f87171}
+.prof-box{width:520px;max-height:90vh;overflow-y:auto}
+.prof-top{display:flex;gap:14px;align-items:flex-end;margin-bottom:6px}
+.prof-nmwrap{flex:1;min-width:0}
+.prof-nmwrap .ab-modal-input{margin-bottom:0}
+.prof-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;margin:8px 0}
+.prof-pick{aspect-ratio:1;background:var(--bg3);border:2px solid var(--border2);border-radius:10px;padding:2px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.prof-pick img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.prof-pick:hover{border-color:var(--accent)}
+.prof-pick.on{border-color:#c084fc;box-shadow:0 0 0 2px rgba(192,132,252,.35)}
+.home-card{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0 auto 14px;padding:10px 14px;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:16px;cursor:pointer}
+.home-card:hover{border-color:var(--accent)}
+.hc-facts{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:.8rem;color:var(--muted2)}
+.hc-facts b{color:var(--text)}
+.hc-six{display:flex;gap:4px;justify-content:center}
+.hc-mon{width:48px;height:48px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.hc-mon.empty{opacity:.35}
+.hc-mon img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.prof-sel{width:100%;box-sizing:border-box}
+.prof-six{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:6px 0}
+.prof-slot{aspect-ratio:1;min-width:0;background:var(--bg3);border:2px dashed var(--border2);border-radius:10px;padding:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.1rem;font-family:inherit}
+.prof-slot img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.prof-slot.on{border-style:solid;border-color:#c084fc;box-shadow:0 0 0 2px rgba(192,132,252,.35)}
+.prof-sixbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.prof-sixbtns .pill-btn{flex:1;min-width:90px}
+.prof-clr{flex:none;width:38px}
+@media (max-width:480px){.prof-six{grid-template-columns:repeat(3,1fr)}.hc-mon{width:42px;height:42px}.prof-box{width:auto;max-width:94vw}}
+.prof-find{display:flex;gap:10px;align-items:center;margin-top:4px}
+.prof-find .ab-modal-input{margin-bottom:0;flex:1;min-width:0}
+.prof-shiny{font-size:.78rem;color:var(--muted2);white-space:nowrap;display:flex;gap:6px;align-items:center}
+@media (max-width:768px){#homeScreen{padding-top:62px}.prof-nm{max-width:80px}}
 </style>
 </head>
 <body>
@@ -1032,8 +1076,10 @@ html{scrollbar-gutter:stable}
 </defs></svg>
 <!-- HOME SCREEN -->
 <div id="homeScreen" class="screen active">
+    <div class="profile-chip" id="profileChip"></div>
     <div class="home-logo">Bean's<br><span>PokéBuilder</span></div>
-    <div class="home-subtitle">Build your team, craft your strategy</div>
+    <div class="home-subtitle" id="homeSub">Build your team, craft your strategy</div>
+    <div class="home-card" id="homeCard" style="display:none" onclick="profileOpen()" title="Edit your profile"></div>
         <div class="mode-cards">
         <div class="mode-card calc-card" data-section="calc" onclick="openSection('calc')">
             <span class="mode-icon"><svg class="mode-svg" aria-hidden="true"><use href="#ico-calc"/></svg></span>
@@ -1061,7 +1107,7 @@ html{scrollbar-gutter:stable}
         </div>
     </div>
     <div class="scroll-hint">Click a mode above, then scroll down to start building your team</div>
-    <div class="home-tools"><button type="button" class="pill-btn" id="syncBtn" onclick="syncOpen()">☁️ Sign in to sync</button><button type="button" class="pill-btn" onclick="bkOpen()">💾 Backup &amp; Restore</button><button type="button" class="pill-btn" onclick="sdOpen()">⇄ Showdown</button></div>
+    <div class="home-tools"><button type="button" class="pill-btn" onclick="bkOpen()">💾 Backup &amp; Restore</button><button type="button" class="pill-btn" onclick="sdOpen()">⇄ Showdown</button></div>
     <div id="sectionHost" class="section-host"></div>
 </div>
 
@@ -1148,6 +1194,7 @@ html{scrollbar-gutter:stable}
 <div class="toast" id="toast"></div>
 <script src="https://unpkg.com/@smogon/calc@0.10.0/dist/data/production.min.js"></script>
 <script src="https://unpkg.com/@smogon/calc@0.10.0"></script>
+<script src="config.js"></script>
 <script>
 'use strict';
 
@@ -2222,6 +2269,13 @@ function calcAvatarHTML(side) {
         name = src.name; sub = src.kind === 'c' ? 'Damage Calc team' : 'Team Builder team'; ch = '👤'; has = true;
     } else if (side === 'you') {
         const red = { n: 'Red' }; img = cxSpr('hgss', red); alt = cxSprAlt(red); has = true;
+    }
+    if (side === 'you' && syncWanted()) {   // signed in: always show the sprite you picked
+        const pr = profileGet();
+        if (pr.id) {
+            img = profileImg(pr.id, pr.shiny); alt = ''; has = true;
+            if (!src) { name = pr.name || 'You'; sub = 'Trainer'; }
+        }
     }
     const av = img ? `<img src="${img}" data-a="${alt}" data-n="${calcEsc(ch)}" alt="" onerror="cxSprErr(this)">` : `<span class="cb-ch">${calcEsc(ch)}</span>`;
     return `<div class="cb-side ${side}${has ? ' has' : ''}"><span class="cb-av">${av}</span><div class="cb-txt"><div class="cb-n">${calcEsc(name)}</div><div class="cb-s">${calcEsc(sub)}</div></div></div>`;
@@ -4910,7 +4964,7 @@ function dexInfoBoxes(sp, d) {
    Sign in with Google and keep ONE hidden file in the user's own Google Drive (appDataFolder).
    No server, no passwords, no emails: this page only holds a short-lived access token in memory.
    Local saving stays the source of truth, so the app works exactly as before when signed out or offline. */
-const BEAN_GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';   // <- paste your own Client ID here (see SETUP_SYNC.md)
+const BEAN_GOOGLE_CLIENT_ID = (window.BEAN_CONFIG && window.BEAN_CONFIG.googleClientId) || 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';   // <- paste your own Client ID here, or put it in config.js (see SETUP_SYNC.md)
 const SYNC_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 const SYNC_FILE = 'beanspokebuilder-sync.json';
 const sync = { token: null, exp: 0, fileId: null, tc: null, cb: null, status: 'off', last: 0, debounce: 5000, timer: null, running: false, firstRun: true, applying: false, pending: null };
@@ -5054,6 +5108,7 @@ function syncUI() {
     const b = document.getElementById('syncBtn');
     if (b) b.textContent = { off: '☁️ Sign in to sync', syncing: '☁️ Syncing…', idle: '☁️ Synced ✓', paused: '☁️ Reconnect', error: '☁️ Sync problem' }[sync.status] || '☁️ Sign in to sync';
     const m = document.getElementById('syncModalBody'); if (m) syncModalFill(m);
+    profileRender();
 }
 function syncToast() {
     let t = document.getElementById('syncToast');
@@ -5089,6 +5144,98 @@ async function syncAct(a) {
         sync.token = null; sync.pending = null; syncToast(); syncSet('off');
     }
 }
+/* ===================== PROFILE (top-right: sign in, or your avatar + name) ===================== */
+const PROFILE_PICKS = [25,1,4,7,133,6,9,3,94,143,150,151,448,445,658,282,376,392,395,254,257,260,197,196,130,131,149,59,38,39,52,54,63,92,359,468,609,700,778,887];
+const PROFILE_BALL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';
+function profileGet() {
+    try { const o = JSON.parse(localStorage.getItem('beanProfile') || '{}') || {}; const top = Array.isArray(o.top) ? o.top.slice(0, 6).map(x => String(x || '').slice(0, 40)) : []; while (top.length < 6) top.push('');
+        return { name: String(o.name || '').slice(0, 20), id: +o.id || 0, shiny: !!o.shiny, fav: String(o.fav || '').slice(0, 40), region: String(o.region || '').slice(0, 20), top }; }
+    catch (e) { return { name: '', id: 0, shiny: false, fav: '', region: '', top: ['', '', '', '', '', ''] }; }
+}
+function profileSave(p) { try { localStorage.setItem('beanProfile', JSON.stringify({ name: p.name, id: p.id, shiny: p.shiny, fav: p.fav || '', region: p.region || '', top: p.top || [] })); } catch (e) {} try { const b = document.querySelector('.calc-banner'); if (b && typeof calcAvatarHTML === 'function') b.innerHTML = calcAvatarHTML('you') + '<span class="cb-vs">VS</span>' + calcAvatarHTML('opp'); } catch (e) {} }   // saved like everything else, so it syncs too
+function profileImg(id, shiny) { return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shiny ? 'shiny/' : ''}${id}.png` : PROFILE_BALL; }
+const PROFILE_REGIONS = ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Hisui', 'Unova', 'Kalos', 'Alola', 'Galar', 'Paldea'];
+function profileMonId(n) { return (n && typeof pokemonIdMap !== 'undefined' && pokemonIdMap[String(n).toLowerCase()]) || 0; }
+function profileCard() {
+    const el = document.getElementById('homeCard'); if (!el) return;
+    const p = profileGet(), has = p.fav || p.region || p.top.some(Boolean);
+    if (!syncWanted() || !has) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    const facts = [p.fav ? `<span class="hc-fact">⭐ <b>${calcEsc(p.fav)}</b></span>` : '', p.region ? `<span class="hc-fact">🗺️ <b>${calcEsc(p.region)}</b></span>` : ''].join('');
+    const six = p.top.some(Boolean) ? `<div class="hc-six">${p.top.map(n => { const id = profileMonId(n); return id ? `<span class="hc-mon" title="${calcEsc(n)}"><img src="${profileImg(id, false)}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; }).join('')}</div>` : '';
+    el.style.display = ''; el.innerHTML = (facts ? `<div class="hc-facts">${facts}</div>` : '') + six;
+}
+function profileRender() {
+    profileCard();
+    const sub = document.getElementById('homeSub');
+    if (sub) sub.textContent = syncWanted() ? 'Welcome back, ' + (profileGet().name || 'Trainer') + '!' : 'Build your team, craft your strategy';
+    const el = document.getElementById('profileChip'); if (!el) return;
+    if (!syncWanted()) { el.innerHTML = '<button type="button" class="prof-btn prof-in" onclick="syncOpen()">☁️ Sign in</button>'; return; }
+    const p = profileGet(), dot = { syncing: 'sy', idle: 'ok', paused: 'pa', error: 'er' }[sync.status] || 'ok';
+    el.innerHTML = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava"><img src="${profileImg(p.id, p.shiny)}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
+}
+function profileOpen() {
+    const st = profileGet();
+    const ov = document.createElement('div'); ov.className = 'modal-overlay';
+    ov.innerHTML = `<div class="modal-box prof-box"><h3>Your profile</h3>
+        <div class="prof-top"><span class="prof-ava big"><img id="profPrev" alt=""></span>
+            <div class="prof-nmwrap"><label class="bk-h" for="profName">Display name</label><input id="profName" class="ab-modal-input" maxlength="20" placeholder="Trainer" autocomplete="off" spellcheck="false"></div></div>
+        <div class="bk-h">Avatar</div>
+        <div class="prof-grid" id="profGrid"></div>
+        <div class="prof-find"><input id="profFind" class="ab-modal-input" list="profList" placeholder="Search any Pokémon…" autocomplete="off"><label class="prof-shiny"><input type="checkbox" id="profShiny"> Shiny</label></div>
+        <datalist id="profList"></datalist>
+        <div class="bk-msg" id="profMsg"></div>
+        <div class="bk-h">Favorite Pokémon</div>
+        <div class="prof-find"><input id="profFav" class="ab-modal-input" list="profList" placeholder="Search a Pokémon…" autocomplete="off"><button type="button" class="pill-btn prof-clr" id="profFavX" title="Clear">✕</button></div>
+        <div class="bk-h">Favorite region</div>
+        <select id="profRegion" class="ab-modal-input prof-sel"><option value="">None</option>${PROFILE_REGIONS.map(r => `<option>${r}</option>`).join('')}</select>
+        <div class="bk-h">My top 6 <span style="font-weight:400;color:var(--muted)">(tap a slot, then search)</span></div>
+        <div class="prof-six" id="profSix"></div>
+        <input id="profSixIn" class="ab-modal-input" list="profList" placeholder="Search to fill the selected slot…" autocomplete="off">
+        <div class="prof-sixbtns"><button type="button" class="pill-btn" id="sixL">◀ Move</button><button type="button" class="pill-btn" id="sixR">Move ▶</button><button type="button" class="pill-btn" id="sixX">Clear slot</button></div>
+        <div class="bk-h">Sync</div><div id="syncModalBody"></div>
+        <button class="modal-cancel" type="button">Done</button></div>`;
+    document.body.appendChild(ov);
+    const $ = s => ov.querySelector(s), nameIn = $('#profName'), shinyIn = $('#profShiny'), grid = $('#profGrid'), msg = $('#profMsg');
+    nameIn.value = st.name; shinyIn.checked = st.shiny;
+    const tiles = [0].concat(PROFILE_PICKS);
+    const paint = () => {
+        $('#profPrev').src = profileImg(st.id, st.shiny); $('#profPrev').onerror = function () { this.onerror = null; this.src = PROFILE_BALL; };
+        grid.innerHTML = tiles.map(id => `<button type="button" class="prof-pick${id === st.id ? ' on' : ''}" data-id="${id}" title="${id ? '#' + id : 'Poké Ball'}"><img src="${profileImg(id, st.shiny)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></button>`).join('');
+    };
+    const commit = () => { profileSave(st); profileRender(); };
+    let timer = null; const later = () => { clearTimeout(timer); timer = setTimeout(commit, 250); };
+    const close = () => { clearTimeout(timer); commit(); ov.remove(); };
+    paint();
+    const dl = $('#profList');
+    if (typeof allPokemonNames !== 'undefined' && allPokemonNames.length) dl.innerHTML = allPokemonNames.map(n => `<option value="${calcEsc(n)}"></option>`).join('');
+    nameIn.addEventListener('input', () => { st.name = nameIn.value.trim().slice(0, 20); later(); });
+    shinyIn.addEventListener('change', () => { st.shiny = shinyIn.checked; paint(); commit(); });
+    grid.addEventListener('click', e => { const b = e.target.closest('.prof-pick'); if (!b) return; st.id = +b.dataset.id; msg.textContent = ''; paint(); commit(); });
+    $('#profFind').addEventListener('change', e => {
+        const v = e.target.value.trim().toLowerCase(); if (!v) return;
+        const id = (typeof pokemonIdMap !== 'undefined' && pokemonIdMap[v]) || 0;
+        if (id) { st.id = id; msg.textContent = ''; msg.className = 'bk-msg'; paint(); commit(); }
+        else { msg.textContent = "Pick a name from the list that appears while you type."; msg.className = 'bk-msg bad'; }
+    });
+    ov.addEventListener('click', e => { if (e.target === ov) return close(); const b = e.target.closest('button[data-a]'); if (b) syncAct(b.dataset.a); });
+    const canon = v => { const l = String(v || '').trim().toLowerCase(); return (typeof allPokemonNames !== 'undefined' && allPokemonNames.find(n => n.toLowerCase() === l)) || ''; };
+    const favIn = $('#profFav'), regSel = $('#profRegion'), six = $('#profSix'), sixIn = $('#profSixIn'); let sel = 0;
+    favIn.value = st.fav; regSel.value = st.region;
+    favIn.addEventListener('change', () => { const n = canon(favIn.value); if (n) { st.fav = n; msg.textContent = ''; msg.className = 'bk-msg'; commit(); } else if (!favIn.value.trim()) { st.fav = ''; commit(); } else { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } });
+    $('#profFavX').onclick = () => { st.fav = ''; favIn.value = ''; commit(); };
+    regSel.addEventListener('change', () => { st.region = regSel.value; commit(); });
+    const paintSix = () => { six.innerHTML = st.top.map((n, i) => { const id = profileMonId(n); return `<button type="button" class="prof-slot${i === sel ? ' on' : ''}" data-i="${i}" title="${calcEsc(n || 'Empty slot ' + (i + 1))}">${id ? `<img src="${profileImg(id, false)}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'">` : '+'}</button>`; }).join(''); };
+    six.addEventListener('click', e => { const b = e.target.closest('.prof-slot'); if (b) { sel = +b.dataset.i; paintSix(); sixIn.focus(); } });
+    sixIn.addEventListener('change', () => { const n = canon(sixIn.value); if (!n) { if (sixIn.value.trim()) { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } return; }
+        msg.textContent = ''; msg.className = 'bk-msg'; st.top[sel] = n; sixIn.value = ''; const nx = st.top.findIndex((x, i) => !x && i !== sel); if (nx >= 0) sel = nx; paintSix(); commit(); });
+    const mv = d => { const j = sel + d; if (j < 0 || j > 5) return; [st.top[sel], st.top[j]] = [st.top[j], st.top[sel]]; sel = j; paintSix(); commit(); };
+    $('#sixL').onclick = () => mv(-1); $('#sixR').onclick = () => mv(1);
+    $('#sixX').onclick = () => { st.top[sel] = ''; paintSix(); commit(); };
+    paintSix();
+    $('.modal-cancel').onclick = close;
+    syncModalFill($('#syncModalBody'));
+}
+
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && syncWanted() && !sync.running && Date.now() - sync.last > 60000) syncRun('visible'); });
 if (syncWanted() && syncConfigured() && location.protocol !== 'file:') { sync.status = 'syncing'; setTimeout(() => syncRun('start'), 400); }
 syncUI();
