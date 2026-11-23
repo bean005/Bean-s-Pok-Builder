@@ -1008,12 +1008,21 @@ html{scrollbar-gutter:stable}
 /* PROFILE (top-right) */
 #homeScreen{position:relative}
 .profile-chip{position:absolute;top:12px;right:14px;z-index:5}
-.prof-btn{display:inline-flex;align-items:center;gap:8px;height:36px;box-sizing:border-box;padding:0 12px 0 4px;background:var(--bg2);border:1px solid var(--border);border-radius:999px;color:var(--text);font-size:.78rem;font-weight:600;font-family:inherit;line-height:1;cursor:pointer;max-width:260px;transition:border-color .15s,background .15s}
+.prof-btn{display:inline-flex;align-items:center;gap:8px;height:44px;box-sizing:border-box;padding:0 12px 0 4px;background:var(--bg2);border:1px solid var(--border);border-radius:999px;color:var(--text);font-size:.78rem;font-weight:600;font-family:inherit;line-height:1;cursor:pointer;max-width:260px;transition:border-color .15s,background .15s}
 .prof-btn.prof-in{padding:0 15px;color:var(--muted2)}
 .prof-btn:hover{border-color:var(--accent);background:var(--bg3)}
-.prof-ava{width:28px;height:28px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
+.prof-ava{width:36px;height:36px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
 .prof-ava img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
-.prof-ava.big{width:64px;height:64px}
+.zk-p{transform:scale(1.55);transform-origin:50% 42%}
+.zk-t{transform:scale(2.3);transform-origin:50% 14%}
+.zk-b{transform:scale(1.2)}
+.prof-pick{overflow:hidden}
+.hc-mon,.prof-slot{overflow:hidden}.hc-mon img,.prof-slot img{transform:scale(1.3)}
+.hc-title{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);font-weight:700}
+.hc-region{font-size:1rem;font-weight:700}
+.hc-fav{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted2)}
+.hc-fav b{color:var(--text)}
+.prof-ava.big{width:72px;height:72px}
 .prof-wel{color:var(--muted2);font-weight:500}
 @media (max-width:520px){.prof-wel{display:none}}
 .prof-nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px}
@@ -1044,6 +1053,8 @@ html{scrollbar-gutter:stable}
 .prof-sixbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .prof-sixbtns .pill-btn{flex:1;min-width:90px}
 .prof-clr{flex:none;width:38px}
+#sixS.on{background:rgba(250,204,21,.3);border-color:#fde047;color:#fff7b0}#sixS:disabled{opacity:.45}
+.hc-mon.shiny,.prof-slot.shiny{border-color:#fde047;box-shadow:0 0 8px rgba(250,204,21,.5)}
 @media (max-width:480px){.prof-six{grid-template-columns:repeat(3,1fr)}.hc-mon{width:42px;height:42px}.prof-box{width:auto;max-width:94vw}}
 .prof-find{display:flex;gap:10px;align-items:center;margin-top:4px}
 .prof-find .ab-modal-input{margin-bottom:0;flex:1;min-width:0}
@@ -2270,14 +2281,15 @@ function calcAvatarHTML(side) {
     } else if (side === 'you') {
         const red = { n: 'Red' }; img = cxSpr('hgss', red); alt = cxSprAlt(red); has = true;
     }
+    let zk = '';
     if (side === 'you' && syncWanted()) {   // signed in: always show the sprite you picked
         const pr = profileGet();
-        if (pr.id) {
-            img = profileImg(pr.id, pr.shiny); alt = ''; has = true;
+        if (pr.id || pr.av) {
+            const pa = profileAv(pr); img = pa.src; zk = ' class="zk-' + pa.k + '"'; alt = ''; has = true;
             if (!src) { name = pr.name || 'You'; sub = 'Trainer'; }
         }
     }
-    const av = img ? `<img src="${img}" data-a="${alt}" data-n="${calcEsc(ch)}" alt="" onerror="cxSprErr(this)">` : `<span class="cb-ch">${calcEsc(ch)}</span>`;
+    const av = img ? `<img${zk} src="${img}" data-a="${alt}" data-n="${calcEsc(ch)}" alt="" onerror="cxSprErr(this)">` : `<span class="cb-ch">${calcEsc(ch)}</span>`;
     return `<div class="cb-side ${side}${has ? ' has' : ''}"><span class="cb-av">${av}</span><div class="cb-txt"><div class="cb-n">${calcEsc(name)}</div><div class="cb-s">${calcEsc(sub)}</div></div></div>`;
 }
 /* ===== POKÉMON SEARCH (short dropdown) ===== */
@@ -5145,14 +5157,26 @@ async function syncAct(a) {
     }
 }
 /* ===================== PROFILE (top-right: sign in, or your avatar + name) ===================== */
-const PROFILE_PICKS = [25,1,4,7,133,6,9,3,94,143,150,151,448,445,658,282,376,392,395,254,257,260,197,196,130,131,149,59,38,39,52,54,63,92,359,468,609,700,778,887];
+const PROFILE_POKE = [25,6,133,150,94,448,658,445,282,197,778,143,149,384,1,4,7,39,151,257];   // 20 fan favorites
+const PROFILE_BALLS = ['poke-ball','great-ball','ultra-ball','master-ball','premier-ball','love-ball','luxury-ball','timer-ball','dusk-ball','quick-ball'];
+const PROFILE_TRAINERS = ['red','leaf','ethan','lyra','brendan','may','lucas','dawn','cynthia','steven'];
+const PROFILE_MISC = ['rare-candy','lucky-egg'];
+const PROFILE_ITEM = n => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/' + n + '.png';
+function profileAv(p) {   // -> {key, src, k}: k = p (Pokémon) / b (ball or item) / t (trainer face)
+    const key = p.av || (p.id ? 'p:' + p.id : 'b:poke-ball'), t = key.slice(0, 1), v = key.slice(2);
+    if (t === 'p' && +v) return { key, src: profileImg(+v, p.shiny), k: 'p' };
+    if (t === 't' && /^[a-z0-9-]+$/.test(v)) return { key, src: 'https://play.pokemonshowdown.com/sprites/trainers/' + v + '.png', k: 't' };
+    if ((t === 'b' || t === 'm') && /^[a-z0-9-]+$/.test(v)) return { key, src: PROFILE_ITEM(v), k: 'b' };
+    return { key: 'b:poke-ball', src: PROFILE_BALL, k: 'b' };
+}
 const PROFILE_BALL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png';
 function profileGet() {
     try { const o = JSON.parse(localStorage.getItem('beanProfile') || '{}') || {}; const top = Array.isArray(o.top) ? o.top.slice(0, 6).map(x => String(x || '').slice(0, 40)) : []; while (top.length < 6) top.push('');
-        return { name: String(o.name || '').slice(0, 20), id: +o.id || 0, shiny: !!o.shiny, fav: String(o.fav || '').slice(0, 40), region: String(o.region || '').slice(0, 20), top }; }
-    catch (e) { return { name: '', id: 0, shiny: false, fav: '', region: '', top: ['', '', '', '', '', ''] }; }
+        const ts = Array.isArray(o.ts) ? o.ts.slice(0, 6).map(Boolean) : []; while (ts.length < 6) ts.push(false);
+        return { ts, name: String(o.name || '').slice(0, 20), id: +o.id || 0, av: String(o.av || '').slice(0, 40), shiny: !!o.shiny, fav: String(o.fav || '').slice(0, 40), region: String(o.region || '').slice(0, 20), top }; }
+    catch (e) { return { ts: [false, false, false, false, false, false], name: '', id: 0, av: '', shiny: false, fav: '', region: '', top: ['', '', '', '', '', ''] }; }
 }
-function profileSave(p) { try { localStorage.setItem('beanProfile', JSON.stringify({ name: p.name, id: p.id, shiny: p.shiny, fav: p.fav || '', region: p.region || '', top: p.top || [] })); } catch (e) {} try { const b = document.querySelector('.calc-banner'); if (b && typeof calcAvatarHTML === 'function') b.innerHTML = calcAvatarHTML('you') + '<span class="cb-vs">VS</span>' + calcAvatarHTML('opp'); } catch (e) {} }   // saved like everything else, so it syncs too
+function profileSave(p) { try { localStorage.setItem('beanProfile', JSON.stringify({ ts: p.ts || [], name: p.name, id: p.id, av: p.av || '', shiny: p.shiny, fav: p.fav || '', region: p.region || '', top: p.top || [] })); } catch (e) {} try { const b = document.querySelector('.calc-banner'); if (b && typeof calcAvatarHTML === 'function') b.innerHTML = calcAvatarHTML('you') + '<span class="cb-vs">VS</span>' + calcAvatarHTML('opp'); } catch (e) {} }   // saved like everything else, so it syncs too
 function profileImg(id, shiny) { return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shiny ? 'shiny/' : ''}${id}.png` : PROFILE_BALL; }
 const PROFILE_REGIONS = ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Hisui', 'Unova', 'Kalos', 'Alola', 'Galar', 'Paldea'];
 function profileMonId(n) { return (n && typeof pokemonIdMap !== 'undefined' && pokemonIdMap[String(n).toLowerCase()]) || 0; }
@@ -5160,9 +5184,10 @@ function profileCard() {
     const el = document.getElementById('homeCard'); if (!el) return;
     const p = profileGet(), has = p.fav || p.region || p.top.some(Boolean);
     if (!syncWanted() || !has) { el.innerHTML = ''; el.style.display = 'none'; return; }
-    const facts = [p.fav ? `<span class="hc-fact">⭐ <b>${calcEsc(p.fav)}</b></span>` : '', p.region ? `<span class="hc-fact">🗺️ <b>${calcEsc(p.region)}</b></span>` : ''].join('');
-    const six = p.top.some(Boolean) ? `<div class="hc-six">${p.top.map(n => { const id = profileMonId(n); return id ? `<span class="hc-mon" title="${calcEsc(n)}"><img src="${profileImg(id, false)}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; }).join('')}</div>` : '';
-    el.style.display = ''; el.innerHTML = (facts ? `<div class="hc-facts">${facts}</div>` : '') + six;
+    const img = (n, i) => { const id = profileMonId(n); return id ? `<span class="hc-mon${p.ts[i] ? ' shiny' : ''}" title="${calcEsc(n)}${p.ts[i] ? ' (shiny)' : ''}"><img src="${profileImg(id, p.ts[i])}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; };
+    const six = p.top.some(Boolean) ? `<div class="hc-six">${p.top.map(img).join('')}</div>` : '';
+    const fav = p.fav ? `<div class="hc-fav">⭐ Favorite: <b>${calcEsc(p.fav)}</b></div>` : '';
+    el.style.display = ''; el.innerHTML = `<div class="hc-title">My Favorites</div>` + (p.region ? `<div class="hc-region">🗺️ ${calcEsc(p.region)}</div>` : '') + fav + six;
 }
 function profileRender() {
     profileCard();
@@ -5171,7 +5196,7 @@ function profileRender() {
     const el = document.getElementById('profileChip'); if (!el) return;
     if (!syncWanted()) { el.innerHTML = '<button type="button" class="prof-btn prof-in" onclick="syncOpen()">☁️ Sign in</button>'; return; }
     const p = profileGet(), dot = { syncing: 'sy', idle: 'ok', paused: 'pa', error: 'er' }[sync.status] || 'ok';
-    el.innerHTML = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava"><img src="${profileImg(p.id, p.shiny)}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
+    el.innerHTML = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava"><img class="zk-${profileAv(p).k}" src="${profileAv(p).src}" alt="" onerror="this.onerror=null;this.className='zk-b';this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
 }
 function profileOpen() {
     const st = profileGet();
@@ -5191,16 +5216,17 @@ function profileOpen() {
         <div class="bk-h">My top 6 <span style="font-weight:400;color:var(--muted)">(tap a slot, then search)</span></div>
         <div class="prof-six" id="profSix"></div>
         <input id="profSixIn" class="ab-modal-input" list="profList" placeholder="Search to fill the selected slot…" autocomplete="off">
-        <div class="prof-sixbtns"><button type="button" class="pill-btn" id="sixL">◀ Move</button><button type="button" class="pill-btn" id="sixR">Move ▶</button><button type="button" class="pill-btn" id="sixX">Clear slot</button></div>
+        <div class="prof-sixbtns"><button type="button" class="pill-btn" id="sixL">◀ Move</button><button type="button" class="pill-btn" id="sixR">Move ▶</button><button type="button" class="pill-btn" id="sixS">✨ Shiny</button><button type="button" class="pill-btn" id="sixX">Clear slot</button></div>
         <div class="bk-h">Sync</div><div id="syncModalBody"></div>
         <button class="modal-cancel" type="button">Done</button></div>`;
     document.body.appendChild(ov);
     const $ = s => ov.querySelector(s), nameIn = $('#profName'), shinyIn = $('#profShiny'), grid = $('#profGrid'), msg = $('#profMsg');
     nameIn.value = st.name; shinyIn.checked = st.shiny;
-    const tiles = [0].concat(PROFILE_PICKS);
+    const SECTIONS = [['Pokémon', PROFILE_POKE.map(i => 'p:' + i)], ['Poké Balls', PROFILE_BALLS.map(n => 'b:' + n)], ['Trainers', PROFILE_TRAINERS.map(n => 't:' + n)], ['Extras', PROFILE_MISC.map(n => 'm:' + n)]];
+    const tileSrc = k => profileAv(Object.assign({}, st, { av: k }));
     const paint = () => {
-        $('#profPrev').src = profileImg(st.id, st.shiny); $('#profPrev').onerror = function () { this.onerror = null; this.src = PROFILE_BALL; };
-        grid.innerHTML = tiles.map(id => `<button type="button" class="prof-pick${id === st.id ? ' on' : ''}" data-id="${id}" title="${id ? '#' + id : 'Poké Ball'}"><img src="${profileImg(id, st.shiny)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></button>`).join('');
+        const cur = profileAv(st), pv = $('#profPrev'); pv.className = 'zk-' + cur.k; pv.src = cur.src; pv.onerror = function () { this.onerror = null; this.className = 'zk-b'; this.src = PROFILE_BALL; };
+        grid.innerHTML = SECTIONS.map(([label, keys]) => `<div class="bk-h">${label}</div><div class="prof-grid">${keys.map(k => { const a = tileSrc(k); return `<button type="button" class="prof-pick${k === cur.key ? ' on' : ''}" data-k="${k}" title="${calcEsc(k.slice(2).replace(/-/g, ' '))}"><img class="zk-${a.k}" src="${a.src}" alt="" loading="lazy" onerror="this.closest('.prof-pick').remove()"></button>`; }).join('')}</div>`).join('');
     };
     const commit = () => { profileSave(st); profileRender(); };
     let timer = null; const later = () => { clearTimeout(timer); timer = setTimeout(commit, 250); };
@@ -5210,11 +5236,11 @@ function profileOpen() {
     if (typeof allPokemonNames !== 'undefined' && allPokemonNames.length) dl.innerHTML = allPokemonNames.map(n => `<option value="${calcEsc(n)}"></option>`).join('');
     nameIn.addEventListener('input', () => { st.name = nameIn.value.trim().slice(0, 20); later(); });
     shinyIn.addEventListener('change', () => { st.shiny = shinyIn.checked; paint(); commit(); });
-    grid.addEventListener('click', e => { const b = e.target.closest('.prof-pick'); if (!b) return; st.id = +b.dataset.id; msg.textContent = ''; paint(); commit(); });
+    grid.addEventListener('click', e => { const b = e.target.closest('.prof-pick'); if (!b) return; st.av = b.dataset.k; st.id = st.av.slice(0, 2) === 'p:' ? +st.av.slice(2) : 0; msg.textContent = ''; paint(); commit(); });
     $('#profFind').addEventListener('change', e => {
         const v = e.target.value.trim().toLowerCase(); if (!v) return;
         const id = (typeof pokemonIdMap !== 'undefined' && pokemonIdMap[v]) || 0;
-        if (id) { st.id = id; msg.textContent = ''; msg.className = 'bk-msg'; paint(); commit(); }
+        if (id) { st.id = id; st.av = 'p:' + id; msg.textContent = ''; msg.className = 'bk-msg'; paint(); commit(); }
         else { msg.textContent = "Pick a name from the list that appears while you type."; msg.className = 'bk-msg bad'; }
     });
     ov.addEventListener('click', e => { if (e.target === ov) return close(); const b = e.target.closest('button[data-a]'); if (b) syncAct(b.dataset.a); });
@@ -5224,13 +5250,14 @@ function profileOpen() {
     favIn.addEventListener('change', () => { const n = canon(favIn.value); if (n) { st.fav = n; msg.textContent = ''; msg.className = 'bk-msg'; commit(); } else if (!favIn.value.trim()) { st.fav = ''; commit(); } else { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } });
     $('#profFavX').onclick = () => { st.fav = ''; favIn.value = ''; commit(); };
     regSel.addEventListener('change', () => { st.region = regSel.value; commit(); });
-    const paintSix = () => { six.innerHTML = st.top.map((n, i) => { const id = profileMonId(n); return `<button type="button" class="prof-slot${i === sel ? ' on' : ''}" data-i="${i}" title="${calcEsc(n || 'Empty slot ' + (i + 1))}">${id ? `<img src="${profileImg(id, false)}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'">` : '+'}</button>`; }).join(''); };
+    const paintSix = () => { const sb = $('#sixS'); if (sb) { sb.classList.toggle('on', !!st.ts[sel]); sb.disabled = !st.top[sel]; } six.innerHTML = st.top.map((n, i) => { const id = profileMonId(n); return `<button type="button" class="prof-slot${i === sel ? ' on' : ''}${st.ts[i] ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(n || 'Empty slot ' + (i + 1))}">${id ? `<img src="${profileImg(id, st.ts[i])}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'">` : '+'}</button>`; }).join(''); };
     six.addEventListener('click', e => { const b = e.target.closest('.prof-slot'); if (b) { sel = +b.dataset.i; paintSix(); sixIn.focus(); } });
     sixIn.addEventListener('change', () => { const n = canon(sixIn.value); if (!n) { if (sixIn.value.trim()) { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } return; }
-        msg.textContent = ''; msg.className = 'bk-msg'; st.top[sel] = n; sixIn.value = ''; const nx = st.top.findIndex((x, i) => !x && i !== sel); if (nx >= 0) sel = nx; paintSix(); commit(); });
-    const mv = d => { const j = sel + d; if (j < 0 || j > 5) return; [st.top[sel], st.top[j]] = [st.top[j], st.top[sel]]; sel = j; paintSix(); commit(); };
+        msg.textContent = ''; msg.className = 'bk-msg'; st.top[sel] = n; sixIn.value = ''; if (!st.top.some((x, i) => i === sel && x === n)) st.ts[sel] = false; const nx = st.top.findIndex((x, i) => !x && i !== sel); if (nx >= 0) sel = nx; paintSix(); commit(); });
+    const mv = d => { const j = sel + d; if (j < 0 || j > 5) return; [st.top[sel], st.top[j]] = [st.top[j], st.top[sel]]; [st.ts[sel], st.ts[j]] = [st.ts[j], st.ts[sel]]; sel = j; paintSix(); commit(); };
     $('#sixL').onclick = () => mv(-1); $('#sixR').onclick = () => mv(1);
-    $('#sixX').onclick = () => { st.top[sel] = ''; paintSix(); commit(); };
+    $('#sixS').onclick = () => { if (!st.top[sel]) return; st.ts[sel] = !st.ts[sel]; paintSix(); commit(); };
+    $('#sixX').onclick = () => { st.top[sel] = ''; st.ts[sel] = false; paintSix(); commit(); };
     paintSix();
     $('.modal-cancel').onclick = close;
     syncModalFill($('#syncModalBody'));
