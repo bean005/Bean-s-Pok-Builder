@@ -1053,6 +1053,7 @@ html{scrollbar-gutter:stable}
 .prof-sixbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .prof-sixbtns .pill-btn{flex:1;min-width:90px}
 .prof-clr{flex:none;width:38px}
+.sync-note{margin-top:12px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;font-size:.76rem;line-height:1.5;color:var(--muted2)}.sync-note p{margin:6px 0 0}.sync-note b{color:var(--text)}.sync-note a{color:var(--accent)}
 #sixS.on{background:rgba(250,204,21,.3);border-color:#fde047;color:#fff7b0}#sixS:disabled{opacity:.45}
 .hc-mon.shiny,.prof-slot.shiny{border-color:#fde047;box-shadow:0 0 8px rgba(250,204,21,.5)}
 @media (max-width:480px){.prof-six{grid-template-columns:repeat(3,1fr)}.hc-mon{width:42px;height:42px}.prof-box{width:auto;max-width:94vw}}
@@ -5132,7 +5133,7 @@ function syncLoadPending() { if (sync.pending) { syncApply(sync.pending); syncRe
 function syncDismiss() { sync.pending = null; syncToast(); }
 function syncOpen() {
     const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal-box"><h3>☁️ Sync with Google</h3><div id="syncModalBody"></div><button class="modal-cancel" type="button">Close</button></div>';
+    overlay.innerHTML = '<div class="modal-box" style="max-height:90vh;overflow-y:auto"><h3>☁️ Sync with Google</h3><div id="syncModalBody"></div><button class="modal-cancel" type="button">Close</button></div>';
     document.body.appendChild(overlay);
     overlay.querySelector('.modal-cancel').onclick = () => overlay.remove();
     overlay.addEventListener('click', e => { if (e.target === overlay) return overlay.remove(); const b = e.target.closest('button[data-a]'); if (b) syncAct(b.dataset.a); });
@@ -5145,7 +5146,8 @@ function syncModalFill(el) {
     el.innerHTML = `<p>Sign in with Google to keep your teams, calc teams and trainer progress in sync between your phone and computer. They're stored in a private, hidden app folder in <b>your own Google Drive</b>. This site never sees your password or your email.</p>
         ${why ? `<div class="bk-msg bad">${why}</div>` : ''}${on && stat ? `<div class="bk-msg ok">${stat}</div>` : ''}
         <div class="bk-row">${on ? `<button type="button" class="pill-btn" data-a="now">↻ Sync now</button>${sync.status === 'paused' ? '<button type="button" class="pill-btn" data-a="in">Reconnect</button>' : ''}<button type="button" class="pill-btn danger" data-a="out">Sign out</button>` : `<button type="button" class="pill-btn" data-a="in" ${why ? 'disabled' : ''}>Sign in with Google</button>`}</div>
-        <div class="bk-sum">Signing out keeps everything on this device and just stops syncing.</div>`;
+        <div class="bk-sum">Signing out keeps everything on this device and just stops syncing.</div>
+        <div class="sync-note"><b>🔒 Please read</b><p>This site is a hobby team builder. It is <b>not designed to store personal or sensitive information</b>. It never asks for or keeps your email or password, and you shouldn't type passwords, personal details or anything private into team names, notes or your profile.</p><p>Your data is only saved in your browser and, if you sign in, in a hidden app folder in <b>your own</b> Google Drive. You can sign out, or remove access at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>, at any time. <a href="privacy.html" target="_blank" rel="noopener">Read the privacy policy</a>.</p></div>`;
 }
 async function syncAct(a) {
     if (a === 'in') { if (!syncConfigured() || location.protocol === 'file:') return; syncRaw('beanSyncOn', '1'); await syncRun('signin'); }
