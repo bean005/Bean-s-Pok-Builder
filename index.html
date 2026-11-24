@@ -736,7 +736,105 @@ body { overflow-x:hidden; }
 .guide-tile{flex:1 1 240px;text-align:left;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:16px;color:var(--text);cursor:pointer}
 .guide-tile:hover:not(.off){border-color:var(--accent);background:#1a4a7a}
 .guide-tile.off{opacity:.5;cursor:default;border-style:dashed}
-.gp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:6px 0 12px}
+.rg-btn{position:absolute;top:62px;right:14px;z-index:5;height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--border);background:var(--bg2);color:var(--muted2);font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit}
+.rg-btn:hover{border-color:var(--accent);color:var(--text)}
+.rg-roam{touch-action:manipulation}
+.rg-ov{padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.rg-cv{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.rg-x{width:44px;height:44px}.rg-roam{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.rg-hint{margin-top:8px;text-align:center;font-size:.74rem;font-weight:700;color:#ffe9a8;background:rgba(0,0,0,.32);border-radius:10px;padding:7px 9px;line-height:1.35}.rg-hint small{font-weight:600;color:#cfe0ff;font-size:.66rem}
+.rg-btn{display:inline-flex;align-items:center;gap:5px}.rg-ico{width:18px;height:18px;flex:none}
+body.rg-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
+.rg-ov{position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(5,10,25,.86);overscroll-behavior:contain;touch-action:none}
+.rg-box{position:relative;width:min(380px,100%);max-height:100%;overflow:auto;box-sizing:border-box;border-radius:16px;border:2px solid var(--border2);padding:12px;color:#fff;background:linear-gradient(160deg,var(--rg1,#16264a),var(--rg2,#0b1530));touch-action:none}
+.rg-x{position:absolute;top:6px;right:6px;z-index:3;width:40px;height:40px;border-radius:50%;border:none;background:rgba(0,0,0,.45);color:#fff;font-size:1.3rem;cursor:pointer;line-height:1}
+.rg-hd{font-size:.8rem;font-weight:800;margin:0 46px 8px 2px}.rg-hd small{display:block;color:#cfe0ff;font-weight:600;font-size:.66rem}
+.rg-bars{display:grid;gap:5px;margin-bottom:8px}.rg-bar{height:10px;border-radius:6px;background:rgba(0,0,0,.4);overflow:hidden}.rg-bar i{display:block;height:100%;width:100%}
+#rgHp i{background:linear-gradient(90deg,#e53935,#ff8a65)}#rgTm i{background:linear-gradient(90deg,#4fc3f7,#81c784)}
+.rg-cv{display:block;width:100%;aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.25);touch-action:none;cursor:crosshair}
+.rg-res{text-align:center;padding:14px 6px}.rg-res h3{margin:0 0 6px;font-size:1.1rem}.rg-btn2{background:#ffd54f;color:#2b2000;border:none;border-radius:999px;padding:9px 22px;font-weight:800;cursor:pointer;min-height:40px;margin-top:8px}.rg-btn2:disabled{opacity:.4}
+.rg-roam{position:fixed;left:0;will-change:transform;z-index:9000;width:56px;height:56px;cursor:pointer;image-rendering:pixelated;filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));-webkit-tap-highlight-color:transparent}
+.rg-roam.run{animation:rgRun 10s linear forwards}.rg-roam.peek{animation:rgPeek 10s ease-in-out forwards}
+@keyframes rgRun{from{transform:translate3d(-80px,0,0)}to{transform:translate3d(calc(100vw + 80px),0,0)}}
+@keyframes rgPeek{0%{transform:translate3d(0,0,0)}12%,88%{transform:translate3d(-34px,0,0)}100%{transform:translate3d(0,0,0)}}
+.rg-win{width:min(440px,100%);max-height:92vh;touch-action:pan-y}
+.rg-tabs{display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap}.rg-tab{background:rgba(0,0,0,.3);border:1px solid var(--border2);color:#cfe0ff;border-radius:999px;padding:6px 12px;font-size:.72rem;font-weight:700;cursor:pointer}.rg-tab.on{background:#1a4a7a;color:#fff;border-color:var(--accent)}
+.rg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:5px}
+.rg-cell{position:relative;aspect-ratio:1;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1rem;color:#7f93b8;padding:0;cursor:pointer}
+.rg-cell img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}.rg-cell.fav{border-color:#ffd54f;box-shadow:0 0 0 1px #ffd54f}.rg-cell b{position:absolute;right:1px;top:0;font-size:.6rem}
+.rg-stats{display:flex;gap:10px;flex-wrap:wrap;font-size:.74rem;color:#dbe7ff;margin-bottom:8px}
+.rg-win p,.rg-win li{font-size:.78rem;line-height:1.45;color:#e6eefc}.rg-win ul{padding-left:18px;margin:6px 0}
+.rg-sw{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;cursor:pointer}
+.gcpop-ov{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,10,25,.82);animation:gcFade .25s ease-out}
+.gcpop-conf{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.gcpop-conf i{position:absolute;top:-12px;width:8px;height:14px;border-radius:2px;animation:gcFall linear infinite}
+.gcpop-box{position:relative;width:min(420px,100%);box-sizing:border-box;text-align:center;padding:22px 18px 18px;border-radius:18px;border:2px solid color-mix(in srgb,var(--g1) 70%,#fff);background:linear-gradient(160deg,color-mix(in srgb,var(--g1) 45%,#0b1530),color-mix(in srgb,var(--g2) 35%,#0b1530));box-shadow:0 20px 60px rgba(0,0,0,.6);animation:gcPop .45s cubic-bezier(.2,1.4,.4,1)}
+.gcpop-tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ffe9a8;background:rgba(0,0,0,.35);padding:4px 12px;border-radius:999px}
+.gcpop-mons{display:flex;justify-content:center;align-items:flex-end;min-height:96px;margin:10px 0 2px}
+.gcpop-mons img{height:96px;width:auto;image-rendering:pixelated;margin:0 -8px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.5));animation:gcBob 1.6s ease-in-out infinite}
+.gcpop-mons img:nth-child(2n){animation-delay:.25s}
+.gcpop-box h3{margin:6px 0 4px;font-size:1.3rem;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+.gcpop-box p{margin:0 0 14px;font-size:.82rem;color:#eef3fb;line-height:1.35}
+.gcpop-new{margin:-4px 0 12px;font-size:.8rem;color:#ffe9a8;background:rgba(0,0,0,.3);border-radius:10px;padding:7px 10px}.gcpop-new b{color:#fff}.ttl{font-weight:800}.ttl-grad{-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.gcpop-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.gcpop-btn{background:#ffd54f;color:#2b2000;border:none;border-radius:999px;padding:10px 30px;font-size:.9rem;font-weight:800;cursor:pointer;min-height:44px}
+.gcpop-btn.eq+.gcpop-btn{background:rgba(255,255,255,.15);color:#fff}
+@keyframes gcFade{from{opacity:0}to{opacity:1}}
+@keyframes gcPop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes gcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes gcFall{to{top:105%;transform:translateX(30px) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){.gcpop-conf{display:none}.gcpop-box,.gcpop-mons img,.gcpop-ov{animation:none}}
+.gp-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 10px}
+.gp-toptxt b{display:block;font-size:.85rem}.gp-toptxt small,.gp-lab small{color:var(--muted);font-size:.62rem}
+.gp-lab{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}.gp-lab .guide-cat{margin:0}
+.gp-ring{position:relative;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--bg4) 0);flex:none}
+.gp-ring::before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--bg2)}
+.gp-ring b{position:relative;font-size:.52rem;font-weight:800}
+.gq-wrap{position:relative;flex:1 1 220px;min-width:180px;max-width:420px}
+.gq-in{width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);border-radius:999px;padding:7px 14px;color:var(--text);font-size:.8rem}
+.gq-res{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;display:flex;flex-direction:column;background:var(--bg2);border-radius:10px;max-height:300px;overflow-y:auto}
+.gq-res:not(:empty){border:1px solid var(--border2);box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.gq-hit{text-align:left;background:none;border:none;border-bottom:1px solid var(--border2);padding:7px 12px;color:var(--text);cursor:pointer}.gq-hit:hover{background:var(--bg3)}
+.gq-hit b{font-size:.82rem;margin-right:8px}.gq-hit small,.gq-more{color:var(--muted);font-size:.7rem}.gq-more{padding:7px 12px}
+.gs-tools{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin:6px 0}
+.gs-chips{display:flex;gap:6px;flex-wrap:wrap}
+.gs-chip{background:var(--bg3);border:1px solid var(--border2);border-radius:999px;padding:4px 11px;font-size:.7rem;font-weight:700;color:var(--muted2);cursor:pointer}
+.gs-chip.on{border-color:var(--accent);color:var(--text);background:#1a4a7a}.gs-chip.next{border-color:#e0a020;color:#f4d03f}.gs-chip:disabled{opacity:.4;cursor:default}
+.gc-capbox{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin:4px 0 6px;font-size:.74rem}
+.gc-ok{color:#48c774}.gc-bad{color:#ff8a80;font-weight:700}.gc-dim{color:var(--muted)}.gc-capbox select{max-width:200px}
+.gw-strip{display:flex;flex-direction:column;gap:5px;margin:8px 0;min-height:52px}
+.gw-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.72rem}.gw-row>b{color:var(--muted2);margin-right:2px}
+.gw-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid;border-radius:999px;padding:2px 9px;font-size:.7rem;font-weight:800}.gw-chip i{font-style:normal;opacity:.75;font-weight:600}
+.gn-box{margin:6px 0}.gn-box label{display:block;font-size:.7rem;color:var(--muted2);margin-bottom:3px;font-weight:700}
+.gn-box textarea{width:100%;box-sizing:border-box;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);font:inherit;font-size:.8rem;resize:vertical}
+.gp-row{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;align-items:center;margin:0 0 8px}
+.gp-row .guide-cat{margin:0;overflow-wrap:anywhere}
+.gp-grid{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;padding:2px 2px 6px;scroll-snap-type:x proximity;scrollbar-width:thin}
+.gp-grid .gp-game{flex:0 0 auto;width:196px;scroll-snap-align:start}
+.gp-game{position:relative;overflow:hidden;min-height:78px;display:flex;align-items:center;background:linear-gradient(90deg,rgba(0,0,0,.38),rgba(0,0,0,0) 72%),linear-gradient(115deg,color-mix(in srgb,var(--g1) 42%,var(--bg3)),color-mix(in srgb,var(--g2) 30%,var(--bg3)))!important;border-color:color-mix(in srgb,var(--g1) 55%,var(--border2))!important}
+.gp-txt{position:relative;z-index:1;max-width:60%}.gp-game .gp-txt b{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.85)}
+.gp-game .gp-txt small{display:block;color:#f1f5fb;text-shadow:0 1px 2px rgba(0,0,0,.9);font-size:.72rem}
+.gp-game .gp-txt small.gp-yr{color:#ffe9a8;font-weight:700;font-size:.7rem}
+.gp-mons{position:absolute;right:2px;bottom:0;display:flex;align-items:flex-end;pointer-events:none}
+.gp-mons img{height:62px;width:auto;image-rendering:pixelated;margin-left:-26px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+@media (hover:hover){.gp-game:hover{filter:brightness(1.18);border-color:var(--accent)!important}}
+.gp-game{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.gp-bar{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);z-index:2}
+@media (max-width:560px){
+.gp-row{grid-template-columns:54px minmax(0,1fr);gap:6px;align-items:start}
+.gp-grid .gp-game{width:176px}
+.gp-top{gap:8px}.gp-top .gq-wrap{flex:1 1 100%;max-width:none}
+.gq-in,.gn-box textarea,.gc-capbox select,.gs-tools select{font-size:16px}
+.gq-in{padding:10px 14px}
+.gq-hit{min-height:44px;display:flex;flex-direction:column;justify-content:center}
+.gq-res{max-height:55vh}
+.gs-tools{gap:8px}.gs-tools .gq-wrap{flex:1 1 100%;max-width:none}
+.gs-chip{padding:8px 12px;min-height:36px;font-size:.74rem}
+.gc-capbox select{max-width:100%;width:100%}
+.gw-row{font-size:.74rem}.gw-chip{padding:3px 10px}
+.stb-pin,.stb-del{padding:8px 9px}
+.guide-bar select{max-width:100%}
+}
 .gp-game{text-align:left;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;color:var(--text);cursor:pointer;transition:border-color .15s,background-color .15s}
 .gp-game:hover{border-color:var(--accent);background:#1a4a7a}.gp-game b{display:block;font-size:.9rem}.gp-game small{color:var(--muted);font-size:.72rem}
 .gp-cont{display:block;width:100%;max-width:420px;margin:8px 0 6px;border-color:var(--accent)}
@@ -1018,11 +1116,18 @@ html{scrollbar-gutter:stable}
 .zk-b{transform:scale(1.2)}
 .prof-pick{overflow:hidden}
 .hc-mon,.prof-slot{overflow:hidden}.hc-mon img,.prof-slot img{transform:scale(1.3)}
+.stb-pin{background:none;border:none;cursor:pointer;font-size:1rem;padding:4px 6px;opacity:.3;filter:grayscale(1)}.stb-pin:hover{opacity:.7}.stb-pin.on{opacity:1;filter:none}
+.saved-team-btn.pinned{border-color:var(--accent)}
+.stb-pin{margin-left:auto}.stb-pin+.stb-del{margin-left:0}
 .hc-title{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);font-weight:700}
 .hc-region{font-size:1rem;font-weight:700}
 .hc-fav{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted2)}
 .hc-fav b{color:var(--text)}
 .prof-ava.big{width:72px;height:72px}
+.prof-ava.bk{background:#000}.prof-ava.wh{background:#fff}
+.prof-avwrap{position:relative;display:inline-flex;flex:none}
+.prof-bd{position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;padding:0;border-radius:50%;border:1px solid var(--border2);background:var(--bg3);color:var(--muted2);font-size:12px;line-height:1;cursor:pointer;opacity:.55;display:flex;align-items:center;justify-content:center}
+.prof-bd:hover,.prof-bd:focus-visible{opacity:1}
 .prof-wel{color:var(--muted2);font-weight:500}
 @media (max-width:520px){.prof-wel{display:none}}
 .prof-nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px}
@@ -1112,6 +1217,7 @@ details.prof-sec[open]{padding-bottom:10px}
 <!-- HOME SCREEN -->
 <div id="homeScreen" class="screen active">
     <div class="profile-chip" id="profileChip"></div>
+    <button type="button" class="rg-btn" id="rgBtn" onclick="rgOpen()" aria-label="Rangers"><svg class="rg-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="48 15" transform="rotate(-50 12 12)"/><path d="M17.2 2.6 21.6 3.4 19.6 7.4z" fill="#38bdf8"/><circle cx="12" cy="12" r="5.6" fill="#fff" stroke="#0f172a" stroke-width="1.4"/><path d="M6.4 12a5.6 5.6 0 0 1 11.2 0z" fill="#ef4444"/><path d="M6.4 12h11.2" stroke="#0f172a" stroke-width="1.4"/><circle cx="12" cy="12" r="1.9" fill="#fff" stroke="#0f172a" stroke-width="1.2"/></svg><span>Rangers</span></button>
     <div class="home-logo">Bean's<br><span>PokéBuilder</span></div>
     <div class="home-subtitle" id="homeSub">Build your team, craft your strategy</div>
     <div class="home-card" id="homeCard" style="display:none" onclick="profileOpen()" title="Edit your profile"></div>
@@ -2292,7 +2398,7 @@ const CALC_RIVALS = [['rb','Blue'],['gsc','Silver'],['dp','Barry'],['bw','Cheren
 function calcRival() { if (!calcState.rival) calcState.rival = CALC_RIVALS[Math.floor(Math.random() * CALC_RIVALS.length)]; return calcState.rival; }
 function calcAvatarHTML(side) {
     const src = calcState[side].src;
-    let img = '', alt = '', name = side === 'you' ? 'You' : 'Opponent', sub = side === 'you' ? 'Trainer' : 'Load a trainer to face', ch = side === 'you' ? 'R' : '?', has = false;
+    let subT = false, img = '', alt = '', name = side === 'you' ? 'You' : 'Opponent', sub = side === 'you' ? 'Trainer' : 'Load a trainer to face', ch = side === 'you' ? 'R' : '?', has = false;
     if (src && src.kind === 'g') {
         const parts = String(src.id).split(':'), g = GAME_TEAMS[parts[0]], t = g && g.trainers[+parts[1]];
         if (t) { img = cxSpr(parts[0], t); alt = cxSprAlt(t); name = t.n; sub = g.name; ch = String(t.n).charAt(0); has = true; calcState.rival = null; }
@@ -2310,11 +2416,11 @@ function calcAvatarHTML(side) {
         const pr = profileGet();
         if (pr.id || pr.av) {
             const pa = profileAv(pr); img = pa.src; zk = ' class="zk-' + pa.k + '"'; alt = ''; has = true;
-            if (!src) { name = pr.name || 'You'; sub = 'Trainer'; }
+            if (!src) { name = pr.name || 'You'; subT = !!pr.title; sub = pr.title || (function () { try { return profileRank(profileBadges()); } catch (e) { return 'Trainer'; } })(); }
         }
     }
     const av = img ? `<img${zk}${zk ? ' onload="profileFit(this)"' : ''} src="${img}" data-a="${alt}" data-n="${calcEsc(ch)}" alt="" onerror="cxSprErr(this)">` : `<span class="cb-ch">${calcEsc(ch)}</span>`;
-    return `<div class="cb-side ${side}${has ? ' has' : ''}"><span class="cb-av">${av}</span><div class="cb-txt"><div class="cb-n">${calcEsc(name)}</div><div class="cb-s">${calcEsc(sub)}</div></div></div>`;
+    return `<div class="cb-side ${side}${has ? ' has' : ''}"><span class="cb-av">${av}</span><div class="cb-txt"><div class="cb-n">${calcEsc(name)}</div><div class="cb-s">${subT ? profileTitleHTML(sub) : calcEsc(sub)}</div></div></div>`;
 }
 /* ===== POKÉMON SEARCH (short dropdown) ===== */
 function calcPokeMatches(q) {
@@ -2509,8 +2615,8 @@ function calcClearSide(side) { calcState[side].roster = [null,null,null,null,nul
 
 function calcSideHTML(side, title, n) {
     const roster = calcState[side].roster, src = calcState[side].src;
-    const bt = savedTeams.map(t => `<option value="b:${t.id}">${calcEsc(t.name)}</option>`).join('');
-    const ct = calcTeams.map(t => `<option value="c:${t.id}">${calcEsc(t.name)}</option>`).join('');
+    const bt = teamsSorted().map(t => `<option value="b:${t.id}">${t.pinned ? '📌 ' : ''}${calcEsc(t.name)}</option>`).join('');
+    const ct = calcTeams.slice().sort((a, b) => (b.savedAt || b.id || 0) - (a.savedAt || a.id || 0)).map(t => `<option value="c:${t.id}">${calcEsc(t.name)}</option>`).join('');
     const teams = (ct ? `<optgroup label="Damage Calc teams">${ct}</optgroup>` : '') + (bt ? `<optgroup label="Team Builder teams">${bt}</optgroup>` : '');
     const pk = calcState.picked && calcState.picked.side === side ? roster[calcState.picked.idx] : null;
     return `<div class="calc-side"><h3>${title}</h3>
@@ -2598,7 +2704,7 @@ function saveCurrentTeam() {
 }
 function buildSaveObj() {
     const old = savedTeams.find(t => t.id === currentTeamId);
-    return { id:currentTeamId, name:currentTeamName, mode:currentMode, savedAt:Date.now(), notes: old ? old.notes : undefined, pokemonList:JSON.parse(JSON.stringify(pokemonList)) };
+    return { id:currentTeamId, name:currentTeamName, mode:currentMode, savedAt:Date.now(), notes: old ? old.notes : undefined, pinned: old ? !!old.pinned : false, pokemonList:JSON.parse(JSON.stringify(pokemonList)) };
 }
 function deleteTeam(id, e) {
     e.stopPropagation();
@@ -2609,17 +2715,29 @@ function deleteTeam(id, e) {
         renderSavedTeams();
     });
 }
+function teamsSorted() {   // pinned first, then most recently used/edited
+    return savedTeams.slice().sort((a, b) => (!!b.pinned - !!a.pinned) || ((b.savedAt || 0) - (a.savedAt || 0)));
+}
+function togglePin(id, e) {
+    if (e) e.stopPropagation();
+    const t = savedTeams.find(x => x.id === id); if (!t) return;
+    t.pinned = !t.pinned;
+    localStorage.setItem('pokeTeams', JSON.stringify(savedTeams));
+    renderSavedTeams();
+    showToast(t.pinned ? 'Pinned 📌' : 'Unpinned');
+}
 function renderSavedTeams() {
     const container = document.getElementById('savedTeamList'); if (!container) return;
     let html;
     if (savedTeams.length === 0) html = '<div class="home-no-teams">No saved teams yet — build your first one!</div>';
-    else html = savedTeams.slice().reverse().map(t => {
+    else html = teamsSorted().map(t => {
         const active = t.pokemonList ? t.pokemonList.filter(p=>p.active).length : 0;
         const total = t.pokemonList ? t.pokemonList.length : 0;
         const date = new Date(t.savedAt).toLocaleDateString();
-        return `<div class="saved-team-btn" onclick="loadTeamById(${t.id})">
-            <div class="stb-info"><div class="stb-name">${t.name}</div><div class="stb-meta">${active}/6 active · ${total} Pokémon · ${date}</div></div>
+        return `<div class="saved-team-btn${t.pinned ? ' pinned' : ''}" onclick="loadTeamById(${t.id})">
+            <div class="stb-info"><div class="stb-name">${t.pinned ? '📌 ' : ''}${t.name}</div><div class="stb-meta">${active}/6 active · ${total} Pokémon · ${date}</div></div>
             <span class="stb-mode">${t.mode==='draft'?'DRAFT':'REGULAR'}</span>
+            <button class="stb-pin${t.pinned ? ' on' : ''}" onclick="togglePin(${t.id},event)" title="${t.pinned ? 'Unpin' : 'Pin to top'}" aria-label="Pin team">📌</button>
             <button class="stb-del" onclick="deleteTeam(${t.id},event)" title="Delete">🗑</button>
         </div>`;
     }).join('');
@@ -5208,10 +5326,10 @@ const PROFILE_BALL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/s
 function profileGet() {
     try { const o = JSON.parse(localStorage.getItem('beanProfile') || '{}') || {}; const top = Array.isArray(o.top) ? o.top.slice(0, 6).map(x => String(x || '').slice(0, 40)) : []; while (top.length < 6) top.push('');
         const ts = Array.isArray(o.ts) ? o.ts.slice(0, 6).map(Boolean) : []; while (ts.length < 6) ts.push(false);
-        return { ts, title: String(o.title || '').slice(0, 30), type: String(o.type || '').slice(0, 12), color: /^#[0-9a-f]{6}$/i.test(o.color) ? o.color : '', badge: String(o.badge || '').slice(0, 40), name: String(o.name || '').slice(0, 20), id: +o.id || 0, av: String(o.av || '').slice(0, 40), shiny: !!o.shiny, fav: String(o.fav || '').slice(0, 40), region: String(o.region || '').slice(0, 20), top }; }
-    catch (e) { return { ts: [false, false, false, false, false, false], title: '', type: '', color: '', badge: '', name: '', id: 0, av: '', shiny: false, fav: '', region: '', top: ['', '', '', '', '', ''] }; }
+        return { ts, title: String(o.title || '').slice(0, 30), type: String(o.type || '').slice(0, 12), color: /^#[0-9a-f]{6}$/i.test(o.color) ? o.color : '', badge: String(o.badge || '').slice(0, 40), name: String(o.name || '').slice(0, 20), id: +o.id || 0, av: String(o.av || '').slice(0, 40), shiny: !!o.shiny, bd: o.bd === 'w' ? 'w' : '', fav: String(o.fav || '').slice(0, 40), region: String(o.region || '').slice(0, 20), top }; }
+    catch (e) { return { ts: [false, false, false, false, false, false], title: '', type: '', color: '', badge: '', name: '', id: 0, av: '', shiny: false, bd: '', fav: '', region: '', top: ['', '', '', '', '', ''] }; }
 }
-function profileSave(p) { try { localStorage.setItem('beanProfile', JSON.stringify({ title: p.title || '', type: p.type || '', color: p.color || '', badge: p.badge || '', ts: p.ts || [], name: p.name, id: p.id, av: p.av || '', shiny: p.shiny, fav: p.fav || '', region: p.region || '', top: p.top || [] })); } catch (e) {} try { const b = document.querySelector('.calc-banner'); if (b && typeof calcAvatarHTML === 'function') b.innerHTML = calcAvatarHTML('you') + '<span class="cb-vs">VS</span>' + calcAvatarHTML('opp'); } catch (e) {} }   // saved like everything else, so it syncs too
+function profileSave(p) { try { localStorage.setItem('beanProfile', JSON.stringify({ title: p.title || '', type: p.type || '', color: p.color || '', badge: p.badge || '', ts: p.ts || [], name: p.name, id: p.id, av: p.av || '', shiny: p.shiny, bd: p.bd === 'w' ? 'w' : '', fav: p.fav || '', region: p.region || '', top: p.top || [] })); } catch (e) {} try { const b = document.querySelector('.calc-banner'); if (b && typeof calcAvatarHTML === 'function') b.innerHTML = calcAvatarHTML('you') + '<span class="cb-vs">VS</span>' + calcAvatarHTML('opp'); } catch (e) {} }   // saved like everything else, so it syncs too
 function profileImg(id, shiny) { return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shiny ? 'shiny/' : ''}${id}.png` : PROFILE_BALL; }
 const PROFILE_TITLES = ['Ace Trainer', 'Admin', 'Baron', 'Baroness', 'Battle Nerd', 'Boss', 'Bug Catcher', 'Cameraman', 'Chef', 'Cozy Trainer', 'Duchess', 'Duke', 'Fisher', 'Gambler', 'Grunt', 'Gym Challenger', 'Hex Maniac', 'Painter', 'Pokémaniac', 'Pokémon Breeder', 'Pokémon Ranger', 'Professor', 'Rival', 'Shiny Hunter', 'Team Rocket Dropout', 'Youngster'];   // A to Z
 const PROFILE_TYPES = { Normal: '#a8a77a', Fire: '#ee8130', Water: '#6390f0', Electric: '#f7d02c', Grass: '#7ac74c', Ice: '#96d9d6', Fighting: '#c22e28', Poison: '#a33ea1', Ground: '#e2bf65', Flying: '#a98ff3', Psychic: '#f95587', Bug: '#a6b91a', Rock: '#b6a136', Ghost: '#735797', Dragon: '#6f35fc', Dark: '#705746', Steel: '#b7b7ce', Fairy: '#d685ad' };
@@ -5262,7 +5380,7 @@ function profileRank(b) {
 }
 // small hand adjustments on top of the automatic centring: [right %, down %, zoom x]. Avatars only (not the top-6 tiles).
 const PROFILE_NUDGE = { 'p:384': [-8, 0, 1.15], 'p:199': [0, 8, 1.15], 'p:1017': [8, 8, 1.15], 'p:778': [8, 0, 1.15], 'p:149': [8, 8, 1.15], 'p:25': [8, 8, 1.15], 'p:282': [8, 8, 1.15],
-    't:iris': [0, -10, 1], 't:alder': [0, -10, 1], 't:giovanni': [0, 6, 1], 't:cynthia': [0, 6, 1], 't:n': [0, 6, 1], 't:wallace': [0, -10, 1] };
+    't:iris': [0, -22, 1], 't:alder': [0, -22, 1], 't:giovanni': [0, 11, 1], 't:leon': [-10, 0, 1], 't:brock': [8, -12, 1], 't:cynthia': [0, 6, 1], 't:n': [0, 6, 1], 't:wallace': [0, -28, 1] };
 const PROFILE_BB = {};
 function profileBBox(src, cb) {   // finds where the sprite's pixels actually are, so every avatar can be centred and fitted
     if (src in PROFILE_BB) return cb(PROFILE_BB[src]);
@@ -5314,12 +5432,14 @@ function profileCard() {
     if (!syncWanted() || !has) { el.innerHTML = ''; el.style.display = 'none'; return; }
     const acc = profileAccent(p); if (acc) el.style.setProperty('--pa', acc); else el.style.removeProperty('--pa');
     const rank = profileRank(B), title = p.title || rank;
-    const line1 = `<div class="hc-line1">${rank === 'Master Trainer' && !p.title ? '👑 ' : ''}${calcEsc(title)}${B.list.length ? ` · 🏅 ${B.list.length}` : ''}</div>`;
+    const line1 = `<div class="hc-line1">${rank === 'Master Trainer' && !p.title ? '👑 ' : ''}${profileTitleHTML(title)}${B.list.length ? ` · 🏅 ${B.list.length}` : ''}</div>`;
     const img = (n, i) => { const id = profileMonId(n); return id ? `<span class="hc-mon${p.ts[i] ? ' shiny' : ''}" title="${calcEsc(n)}${p.ts[i] ? ' (shiny)' : ''}"><img class="zk-p" onload="profileFit(this)" src="${profileImg(id, p.ts[i])}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; };
     const six = p.top.some(Boolean) ? `<div class="hc-six">${p.top.map(img).join('')}</div>` : '';
-    const fav = p.fav ? `<div class="hc-fav">⭐ Favorite: <b>${calcEsc(p.fav)}</b></div>` : '';
-    const bad = fb ? `<div class="hc-fav hc-badge"><img class="hc-bimg" src="${profileBadgeImg(fb)}" alt="" onerror="this.style.display='none'"><span>🎖️ Favorite badge: <b>${calcEsc(profileBadgeName(fb))}</b></span></div>` : '';
-    el.style.display = ''; el.innerHTML = line1 + `<div class="hc-title">My Favorites</div>` + (p.region ? `<div class="hc-region">🗺️ ${calcEsc(p.region)}</div>` : '') + fav + six + bad;
+    const fav = p.fav ? `<div class="hc-fav">Pokémon: <b>${calcEsc(p.fav)}</b></div>` : '';
+    const bad = fb ? `<div class="hc-fav hc-badge"><span>Badge: <b>${calcEsc(profileBadgeName(fb))}</b></span><img class="hc-bimg" src="${profileBadgeImg(fb)}" alt="" onerror="this.style.display='none'"></div>` : '';
+    const html = line1 + `<div class="hc-title">My Favorites</div>` + (p.region ? `<div class="hc-fav">Region: <b>${calcEsc(p.region)}</b></div>` : '') + fav + six + bad;
+    el.style.display = '';
+    if (el._sig !== html) { el._sig = html; el.innerHTML = html; }   // only touch the DOM when something changed, so nothing reloads/jitters
 }
 function profileRender() {
     profileCard();
@@ -5327,15 +5447,16 @@ function profileRender() {
     if (sub) sub.textContent = syncWanted() ? 'Welcome back, ' + (profileGet().name || 'Trainer') + '!' : 'Build your team, craft your strategy';
     const el = document.getElementById('profileChip'); if (!el) return;
     { const ac = profileAccent(profileGet()); if (ac && syncWanted()) el.style.setProperty('--pa', ac); else el.style.removeProperty('--pa'); }
-    if (!syncWanted()) { el.innerHTML = '<button type="button" class="prof-btn prof-in" onclick="syncOpen()">☁️ Sign in</button>'; return; }
+    if (!syncWanted()) { el._sig = ''; el.innerHTML = '<button type="button" class="prof-btn prof-in" onclick="syncOpen()">☁️ Sign in</button>'; return; }
     const p = profileGet(), dot = { syncing: 'sy', idle: 'ok', paused: 'pa', error: 'er' }[sync.status] || 'ok';
-    el.innerHTML = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava"><img class="zk-${profileAv(p).k}" onload="profileFit(this)" src="${profileAv(p).src}" alt="" onerror="this.onerror=null;this.className='zk-b';this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
+    const chipHtml = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava ${p.bd === 'w' ? 'wh' : 'bk'}"><img class="zk-${profileAv(p).k}" onload="profileFit(this)" src="${profileAv(p).src}" alt="" onerror="this.onerror=null;this.className='zk-b';this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
+    if (el._sig !== chipHtml) { el._sig = chipHtml; el.innerHTML = chipHtml; }
 }
 function profileOpen() {
     const st = profileGet();
     const ov = document.createElement('div'); ov.className = 'modal-overlay';
     ov.innerHTML = `<div class="modal-box prof-box"><h3>Your profile</h3>
-        <div class="prof-top"><span class="prof-ava big"><img id="profPrev" alt=""></span>
+        <div class="prof-top"><span class="prof-avwrap"><span class="prof-ava big bk"><img id="profPrev" alt=""></span><button type="button" class="prof-bd" id="profBd" title="Avatar backdrop: black / white" aria-label="Toggle avatar backdrop">◐</button></span>
             <div class="prof-nmwrap"><label class="bk-h" for="profName">Display name</label><input id="profName" class="ab-modal-input" maxlength="20" placeholder="Trainer" autocomplete="off" spellcheck="false"></div></div>
         <div class="bk-msg" id="profMsg"></div>
         <details class="prof-sec"><summary>🎨 Change avatar</summary>
@@ -5354,7 +5475,7 @@ function profileOpen() {
         </details>
         <details class="prof-sec"><summary>🎭 Title &amp; colors</summary>
         <div class="bk-h">Trainer title</div>
-        <select id="profTitle" class="ab-modal-input prof-sel"><option value="">Auto (my rank)</option>${PROFILE_TITLES.map(t => `<option>${t}</option>`).join('')}</select>
+        <select id="profTitle" class="ab-modal-input prof-sel"><option value="">Auto (my rank)</option>${(() => { const cur = st.title, u = guideTitleDefs().filter(x => x.ok || x.t === cur); return (u.length ? `<optgroup label="Unlocked titles">${u.map(x => { const k = guideTitleLook(x.t); return `<option${k && k.color ? ` style="color:${k.color}"` : ''}>${x.t}</option>`; }).join('')}</optgroup>` : '') + `<optgroup label="Titles">${PROFILE_TITLES.map(t => `<option>${t}</option>`).join('')}</optgroup>`; })()}</select>
         <div class="bk-h">Favorite type</div>
         <select id="profType" class="ab-modal-input prof-sel"><option value="">None</option>${Object.keys(PROFILE_TYPES).map(t => `<option>${t}</option>`).join('')}</select>
         <div class="bk-h">Accent color <span style="font-weight:400;color:var(--muted)">(Auto uses your type)</span></div>
@@ -5370,13 +5491,16 @@ function profileOpen() {
     const tileSrc = k => profileAv(Object.assign({}, st, { av: k }));
     const keep = fn => { const bx = ov.querySelector('.prof-box'), y = bx ? bx.scrollTop : 0; fn(); if (bx) bx.scrollTop = y; };
     const paint = () => keep(() => {
-        const cur = profileAv(st), pv = $('#profPrev'); pv.className = 'zk-' + cur.k; pv.style.transform = ''; pv.onload = () => profileFit(pv); pv.src = cur.src; pv.onerror = function () { this.onerror = null; this.className = 'zk-b'; this.src = PROFILE_BALL; };
+        const cur = profileAv(st), pv = $('#profPrev'); pv.className = 'zk-' + cur.k; pv.parentNode.className = 'prof-ava big ' + (st.bd === 'w' ? 'wh' : 'bk'); pv.style.transform = ''; pv.onload = () => profileFit(pv); pv.src = cur.src; pv.onerror = function () { this.onerror = null; this.className = 'zk-b'; this.src = PROFILE_BALL; };
+        if (grid.dataset.shiny === String(!!st.shiny) && grid.firstChild) { grid.querySelectorAll('.prof-pick').forEach(b => b.classList.toggle('on', b.dataset.k === cur.key)); return; }
+        grid.dataset.shiny = String(!!st.shiny);
         grid.innerHTML = SECTIONS.map(([label, keys]) => `<div class="bk-h">${label}</div><div class="prof-grid">${keys.map(k => { const a = tileSrc(k); return `<button type="button" class="prof-pick${k === cur.key ? ' on' : ''}" data-k="${k}" title="${calcEsc(k.slice(2).replace(/-/g, ' '))}"><img class="zk-${a.k}" onload="profileFit(this)" src="${a.src}" alt="" loading="lazy" onerror="this.closest('.prof-pick').remove()"></button>`; }).join('')}</div>`).join('');
     });
     const commit = () => { profileSave(st); profileRender(); };
     let timer = null; const later = () => { clearTimeout(timer); timer = setTimeout(commit, 250); };
     const close = () => { clearTimeout(timer); commit(); ov.remove(); };
     paint();
+    $('#profBd').onclick = () => { st.bd = st.bd === 'w' ? '' : 'w'; paint(); commit(); };
     const dl = $('#profList');
     if (typeof allPokemonNames !== 'undefined' && allPokemonNames.length) dl.innerHTML = allPokemonNames.map(n => `<option value="${calcEsc(n)}"></option>`).join('');
     nameIn.addEventListener('input', () => { st.name = nameIn.value.trim().slice(0, 20); later(); });
@@ -5396,7 +5520,7 @@ function profileOpen() {
     $('#profFavX').onclick = () => { st.fav = ''; favIn.value = ''; commit(); };
     regSel.addEventListener('change', () => { st.region = regSel.value; commit(); });
     const paintSix = () => keep(() => { const sb = $('#sixS'); if (sb) { sb.classList.toggle('on', !!st.ts[sel]); sb.disabled = !st.top[sel]; } six.innerHTML = st.top.map((n, i) => { const id = profileMonId(n); return `<button type="button" class="prof-slot${i === sel ? ' on' : ''}${st.ts[i] ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(n || 'Empty slot ' + (i + 1))}">${id ? `<img class="zk-p" onload="profileFit(this)" src="${profileImg(id, st.ts[i])}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'">` : '+'}</button>`; }).join(''); });
-    six.addEventListener('click', e => { const b = e.target.closest('.prof-slot'); if (b) { sel = +b.dataset.i; paintSix(); } });
+    six.addEventListener('click', e => { const b = e.target.closest('.prof-slot'); if (b) { sel = +b.dataset.i; six.querySelectorAll('.prof-slot').forEach(x => x.classList.toggle('on', +x.dataset.i === sel)); const sb = $('#sixS'); if (sb) { sb.classList.toggle('on', !!st.ts[sel]); sb.disabled = !st.top[sel]; } } });
     sixIn.addEventListener('change', () => { const n = canon(sixIn.value); if (!n) { if (sixIn.value.trim()) { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } return; }
         msg.textContent = ''; msg.className = 'bk-msg'; st.top[sel] = n; sixIn.value = ''; if (!st.top.some((x, i) => i === sel && x === n)) st.ts[sel] = false; const nx = st.top.findIndex((x, i) => !x && i !== sel); if (nx >= 0) sel = nx; paintSix(); commit(); });
     const mv = d => { const j = sel + d; if (j < 0 || j > 5) return; [st.top[sel], st.top[j]] = [st.top[j], st.top[sel]]; [st.ts[sel], st.ts[j]] = [st.ts[j], st.ts[sel]]; sel = j; paintSix(); commit(); };
@@ -5762,12 +5886,145 @@ function guideLoc(gid, t) {
     if (t.c === 'Champion') return [f[0], "Champion's room"];
     return f;
 }
+// per-game look on the game picker: two colours (the version colours) + the cover legendaries (Pokédex numbers)
+const GAME_META = { rb: ['#e53935', '#1e66d0', [6, 9]], y: ['#f5c518', '#e53935', [25]], frlg: ['#ef6c2f', '#43a047', [6, 3]],
+    gsc: ['#d4a82a', '#9aa9bd', [250, 249, 245]], hgss: ['#d4a82a', '#9aa9bd', [250, 249]], rs: ['#d32f2f', '#1976d2', [383, 382]],
+    e: ['#2e9e5b', '#1b5e3c', [384]], oras: ['#d32f2f', '#1976d2', [383, 382]], dp: ['#7aa7e6', '#e8a0c8', [483, 484]],
+    pt: ['#8e99ab', '#4d5870', [487]], bdsp: ['#7aa7e6', '#e8a0c8', [483, 484]], bw: ['#37474f', '#cfd8dc', [644, 643]],
+    b2w2: ['#37474f', '#cfd8dc', [646]], xy: ['#2f80d0', '#d32f2f', [716, 717]], sm: ['#f59e0b', '#6d4ac2', [791, 792]],
+    usum: ['#f59e0b', '#6d4ac2', [800]], swsh: ['#2b8fd6', '#d32f4f', [888, 889]], sv: ['#e5412d', '#7e3fc8', [1007, 1008]] };
+const GAME_YEAR = { rb: 1996, y: 1998, frlg: 2004, gsc: 1999, hgss: 2009, rs: 2002, e: 2004, oras: 2014, dp: 2006, pt: 2008, bdsp: 2021,
+    bw: 2010, b2w2: 2012, xy: 2013, sm: 2016, usum: 2017, swsh: 2019, sv: 2022 };   // first release (Japan)
 const guideState = { view: 'home', game: null, ti: -1 }, guideTypeCache = {};
 const guideNoProg = c => /^(Rematch|Other)$/.test(c);
+const guideIsGym = c => /gym|trial/i.test(c);
+const GUIDE_REGION = { 'Gen 1': 'Kanto', 'Gen 2': 'Johto', 'Gen 3': 'Hoenn', 'Gen 4': 'Sinnoh', 'Gen 5': 'Unova', 'Gen 6': 'Kalos', 'Gen 7': 'Alola', 'Gen 8': 'Galar', 'Gen 9': 'Paldea' };
+guideState.flt = 'all';
+function guideNotesAll() { try { return JSON.parse(localStorage.getItem('guideNotes') || '{}') || {}; } catch (e) { return {}; } }
+let _gnT = null;
+function guideNoteSave(v) {
+    clearTimeout(_gnT); const k = guideState.game + ':' + guideState.ti;
+    _gnT = setTimeout(() => { const o = guideNotesAll(); if (String(v).trim()) o[k] = String(v).slice(0, 600); else delete o[k]; try { localStorage.setItem('guideNotes', JSON.stringify(o)); } catch (e) {} }, 300);
+}
+function guideSetFilter(f) { guideState.flt = f; guideState.sx = null; guideRender(); }
+function guideJumpNext() {
+    const g = GAME_TEAMS[guideState.game], done = guideDone();
+    const idx = g.trainers.findIndex((t, i) => !guideNoProg(t.c) && !done[guideState.game + ':' + i]);
+    if (idx < 0) { showToast('Everything in this game is beaten 🏆'); return; }
+    guideState.ti = idx; guideState.sx = null; guideRender();
+}
+function guideProgOf(id) { const g = GAME_TEAMS[id], d = guideDone(); const p = g.trainers.map((t, i) => [t, i]).filter(([t]) => !guideNoProg(t.c)); return [p.filter(([t, i]) => d[id + ':' + i]).length, p.length]; }
+function guideRing(pct, title) { return `<span class="gp-ring" style="--p:${pct}" title="${calcEsc(title || '')}"><b>${pct}%</b></span>`; }
+/* search any trainer in any game */
+function guideSearchBox() { return `<div class="gq-wrap"><input type="search" id="guideQ" class="gq-in" placeholder="🔍 Find a trainer in any game… (e.g. Cynthia)" autocomplete="off" value="${calcEsc(guideState.gq || '')}" oninput="guideSearch(this.value)"><div id="guideSrch" class="gq-res"></div></div>`; }
+function guideSearch(q) {
+    guideState.gq = q; const box = document.getElementById('guideSrch'); if (!box) return;
+    const ql = String(q || '').trim().toLowerCase(); if (ql.length < 2) { box.innerHTML = ''; return; }
+    const hits = [], done = guideDone();
+    Object.entries(GAME_TEAMS).forEach(([id, g]) => g.trainers.forEach((t, i) => { if (String(t.n).toLowerCase().includes(ql)) hits.push([id, g, i, t]); }));
+    hits.sort((a, b) => (String(a[3].n).toLowerCase().startsWith(ql) ? 0 : 1) - (String(b[3].n).toLowerCase().startsWith(ql) ? 0 : 1));
+    box.innerHTML = hits.length ? hits.slice(0, 30).map(([id, g, i, t]) => `<button type="button" class="gq-hit" onclick="guideSearchGo('${id}',${i})"><b>${calcEsc(t.n)}</b><small>${calcEsc(g.name)} · ${calcEsc(t.c)}${done[id + ':' + i] ? ' · ✓' : ''}</small></button>`).join('') + (hits.length > 30 ? `<div class="gq-more">+${hits.length - 30} more, keep typing</div>` : '') : '<div class="gq-more">No trainer found</div>';
+}
+function guideSearchGo(id, i) { guideState.picked = true; guideState.view = 'guide'; guideState.game = id; guideState.ti = i; guideState.sx = null; guideState.gq = ''; try { localStorage.setItem('cxLastGame', id); } catch (e) {} guideRender(); }
+/* level cap tracker: next unbeaten gym leader's top level vs. your team */
+function guideCapPick(v) { guideState.chk = v; guideCapRender(); }
+function guideCapRender() {
+    const box = document.getElementById('guideCap'); if (!box) return;
+    const gid = guideState.game, g = GAME_TEAMS[gid], done = guideDone();
+    let gi = g.trainers.findIndex((t, i) => guideIsGym(t.c) && !guideNoProg(t.c) && !done[gid + ':' + i]);
+    if (gi < 0) { box.innerHTML = ''; return; }
+    const t = g.trainers[gi], cap = Math.max(...t.m.map(x => x[1]));
+    const teams = guideMyTeams(); let tm = teams.find(x => x.key === guideState.chk) || teams[0];
+    let msg;
+    if (!tm) msg = '<span class="gc-dim">Build a team to see who is over the cap.</span>';
+    else {
+        const over = tm.mons.filter(p => (+p.level || 0) > cap);
+        msg = over.length ? `<span class="gc-bad">⚠️ Over the cap: ${over.map(p => `${calcEsc(p.nickname || p.name)} Lv ${+p.level}`).join(', ')}</span>` : '<span class="gc-ok">✅ Whole team is at or under the cap</span>';
+    }
+    const sel = teams.length > 1 ? `<select onchange="guideCapPick(this.value)" aria-label="Team for level cap">${teams.map(x => `<option value="${calcEsc(x.key)}" ${tm && x.key === tm.key ? 'selected' : ''}>${calcEsc(x.label)}</option>`).join('')}</select>` : '';
+    box.innerHTML = `<div class="gc-capbox"><span class="guide-cap">📈 Next gym: ${calcEsc(t.n)} · cap Lv ${cap}</span>${msg}${sel}</div>`;
+}
+/* what to bring: which types hit this trainer's team hardest */
+async function guideWeakRender(t, tok) {
+    const box = document.getElementById('guideWeak'); if (!box) return;
+    const rows = await Promise.all(t.m.map(m => guideTypesOf(String(m[0]).toLowerCase())));
+    if (tok !== _gdTok || !document.getElementById('guideWeak')) return;
+    const mons = rows.filter(x => x && x.length); if (!mons.length) { box.innerHTML = ''; return; }
+    const defs = mons.map(ty => getTypeDefenseWithAbility(ty, ''));
+    const stats = ALL_TYPES.map(ty => ({ ty, w: defs.filter(d => d[ty] > 1).length, r: defs.filter(d => d[ty] < 1).length }));
+    const best = stats.filter(x => x.w > 0).sort((a, b) => (b.w - b.r) - (a.w - a.r) || b.w - a.w).slice(0, 6);
+    const avoid = stats.filter(x => x.r >= 2 && x.r > x.w).sort((a, b) => (b.r - b.w) - (a.r - a.w)).slice(0, 4);
+    const chip = (x, n) => { const c = typeColors[x.ty] || {}; return `<span class="gw-chip" style="background:${c.bg || '#333'};border-color:${c.border || '#888'};color:${c.text || '#ddd'}">${x.ty}<i>${n}</i></span>`; };
+    box.innerHTML = `<div class="gw-row"><b>🎯 Bring</b>${best.map(x => chip(x, x.w + '/' + mons.length)).join('') || '<span class="gc-dim">no clear weakness</span>'}</div>${avoid.length ? `<div class="gw-row"><b>🛡️ Weak attacks</b>${avoid.map(x => chip(x, x.r + '/' + mons.length)).join('')}</div>` : ''}`;
+}
 const guideCap = w => String(w).split('-').map(x => x.charAt(0).toUpperCase() + x.slice(1)).join('-');
 function guideDone() { try { return JSON.parse(localStorage.getItem('guideDone') || '{}'); } catch (e) { return {}; } }
 try { profileRender(); } catch (e) {}
-function guideToggle(k) { const d = guideDone(); if (d[k]) delete d[k]; else d[k] = 1; try { localStorage.setItem('guideDone', JSON.stringify(d)); } catch (e) {} guideRender(); }
+function guideGameFull(id) { const p = guideProgOf(id); return p[1] > 0 && p[0] === p[1]; }
+function guideGroupIds(grp) { return Object.keys(GAME_TEAMS).filter(id => GAME_TEAMS[id].grp === grp); }
+function guideGroupFull(grp) { const ids = guideGroupIds(grp); return ids.length > 0 && ids.every(guideGameFull); }
+const guideGameTitleName = id => String(GAME_TEAMS[id].name).replace(/\s*\(.*\)\s*$/, '').split(' / ')[0];
+function guideTitleDefs() {   // every unlockable title: one per game, one per region, plus Pokémon Master
+    const out = [];
+    try {
+        Object.entries(GAME_TEAMS).forEach(([id, g]) => { if (GAME_YEAR[id]) out.push({ t: guideGameTitleName(id) + ' Master', kind: 'game', id, ok: guideGameFull(id), hint: 'beat ' + g.name }); });
+        Object.entries(GUIDE_REGION).forEach(([grp, reg]) => out.push({ t: reg + ' Master', kind: 'region', grp, ok: guideGroupFull(grp), hint: 'beat every ' + reg + ' game' }));
+        out.push({ t: 'Pokémon Master', kind: 'all', ok: guideAllFull(), hint: 'beat every game' });
+    } catch (e) {}
+    try { out.push(...rgTitleDefs()); } catch (e) {}
+    return out;
+}
+const guideUnlockTitles = guideTitleDefs;
+function guideTitleColor(c) { const n = parseInt(String(c).slice(1), 16), l = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * l(n >> 16) + .7152 * l((n >> 8) & 255) + .0722 * l(n & 255); }
+function guideTitleLook(t) {   // game title = that game's colour; region = gradient of its games; Pokémon Master = gold-to-rainbow
+    const d = guideTitleDefs().find(x => x.t === t); if (!d) return null;
+    if (d.kind === 'ranger') return d.grad ? { grad: d.grad } : { color: d.color };
+    if (d.kind === 'game') { const m = GAME_META[d.id] || ['#8ab4ff', '#8ab4ff']; const c = guideTitleColor(m[0]) >= .1 ? m[0] : m[1]; return { color: `color-mix(in srgb, ${c} 78%, #fff)` }; }
+    if (d.kind === 'region') { let cols = []; guideGroupIds(d.grp).forEach(id => { const m = GAME_META[id]; if (m) { cols.push(m[0]); } }); cols = cols.filter((c, i) => cols.indexOf(c) === i); if (cols.length < 2) { const m = GAME_META[guideGroupIds(d.grp)[0]] || ['#8ab4ff', '#fff']; cols = [m[0], m[1]]; } return { grad: `linear-gradient(90deg, ${cols.map(c => `color-mix(in srgb, ${c} 70%, #fff)`).join(', ')})` }; }
+    return { grad: 'linear-gradient(90deg,#ffd54f,#ff8a65,#f06292,#ba68c8,#4fc3f7)' };
+}
+function profileTitleHTML(t) {
+    try { const k = guideTitleLook(t); if (k) return k.grad ? `<span class="ttl ttl-grad" style="background-image:${k.grad}">${calcEsc(t)}</span>` : `<span class="ttl" style="color:${k.color}">${calcEsc(t)}</span>`; } catch (e) {}
+    return calcEsc(t);
+}
+try { profileRender(); } catch (e) {}   // now that the title colours are defined, redraw the home card
+function guideEquipTitle(t) { const p = profileGet(); p.title = t; profileSave(p); profileRender(); showToast('Title set: ' + t); }
+function guideAllFull() { return Object.keys(GAME_TEAMS).every(guideGameFull); }
+function guideToggle(k) {
+    const gid = k.split(':')[0], grp = GAME_TEAMS[gid] && GAME_TEAMS[gid].grp;
+    const was = { game: guideGameFull(gid), grp: grp ? guideGroupFull(grp) : false, all: guideAllFull() };
+    const d = guideDone(); if (d[k]) delete d[k]; else d[k] = 1; try { localStorage.setItem('guideDone', JSON.stringify(d)); } catch (e) {} guideRender();
+    if (!d[k] || !GAME_TEAMS[gid]) return;
+    if (!was.all && guideAllFull()) guideCelebrate('all', gid);
+    else if (grp && !was.grp && guideGroupFull(grp)) guideCelebrate('region', gid);
+    else if (!was.game && guideGameFull(gid)) guideCelebrate('game', gid);
+}
+function guideFanfare() {
+    try {
+        const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; const ac = new AC(), t0 = ac.currentTime;
+        [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5].forEach((f, i) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = 'square'; o.frequency.value = f;
+            const t = t0 + i * 0.13; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.06, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + (i > 3 ? 0.4 : 0.14));
+            o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + 0.45); });
+        setTimeout(() => { try { ac.close(); } catch (e) {} }, 1600);
+    } catch (e) {}
+}
+function guideCelebrate(kind, gid) {
+    const g = GAME_TEAMS[gid], grp = g.grp, region = GUIDE_REGION[grp] || grp, meta = GAME_META[gid] || ['#3b82c4', '#1e3a5f', []];
+    let mons = meta[2], title, sub, tag, unlock = '';
+    if (kind === 'all') { unlock = 'Pokémon Master'; tag = '👑 Master Trainer'; title = 'You beat every game!'; sub = `All ${Object.keys(GAME_TEAMS).length} games cleared. Nothing left to prove.`; mons = Object.keys(GAME_TEAMS).map(i => (GAME_META[i] || [0, 0, []])[2][0]).filter(Boolean).slice(0, 5); }
+    else if (kind === 'region') { unlock = region + ' Master'; tag = '🏆 Region cleared'; title = `${calcEsc(region)} complete!`; sub = `Every ${calcEsc(grp)} game is done: ` + guideGroupIds(grp).map(i => GAME_TEAMS[i].name).join(', '); mons = [].concat(...guideGroupIds(grp).map(i => (GAME_META[i] || [0, 0, []])[2])).filter((m, i, a) => m && a.indexOf(m) === i).slice(0, 4); }
+    else { unlock = guideGameTitleName(gid) + ' Master'; const p = guideProgOf(gid); tag = '🎉 Game complete'; title = g.name; sub = `All ${p[1]} trainers beaten${GAME_YEAR[gid] ? ' · Released ' + GAME_YEAR[gid] : ''}`; }
+    const old = document.getElementById('gcPop'); if (old) old.remove();
+    const cols = ['#ffd54f', '#ff8a65', '#4fc3f7', '#ba68c8', '#81c784', '#fff'];
+    const conf = Array.from({ length: 44 }, () => `<i style="left:${Math.random() * 100}%;background:${cols[(Math.random() * cols.length) | 0]};animation-delay:${(Math.random() * 1.2).toFixed(2)}s;animation-duration:${(2.2 + Math.random() * 1.8).toFixed(2)}s;transform:rotate(${(Math.random() * 360) | 0}deg)"></i>`).join('');
+    const ov = document.createElement('div'); ov.id = 'gcPop'; ov.className = 'gcpop-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+    ov.innerHTML = `<div class="gcpop-conf" aria-hidden="true">${conf}</div><div class="gcpop-box" style="--g1:${meta[0]};--g2:${meta[1]}"><div class="gcpop-tag">${tag}</div><div class="gcpop-mons">${mons.map(m => `<img src="${profileImg(m)}" alt="" onerror="this.remove()">`).join('')}</div><h3>${title}</h3><p>${sub}</p>${unlock ? `<div class="gcpop-new">🔓 New title unlocked: <b>${profileTitleHTML(unlock)}</b></div>` : ''}<div class="gcpop-btns">${unlock ? `<button type="button" class="gcpop-btn eq" data-t="${calcEsc(unlock)}">Equip title</button>` : ''}<button type="button" class="gcpop-btn">${unlock ? 'Later' : 'Nice!'}</button></div></div>`;
+    const close = () => { ov.remove(); document.removeEventListener('keydown', esc); }, esc = e => { if (e.key === 'Escape') close(); };
+    ov.addEventListener('click', e => { const b = e.target.closest && e.target.closest('.gcpop-btn'); if (b && b.dataset.t) guideEquipTitle(b.dataset.t); if (e.target === ov || b) close(); });
+    document.addEventListener('keydown', esc);
+    document.body.appendChild(ov); guideFanfare();
+    const fb = ov.querySelector('.gcpop-btn'); if (fb) fb.focus({ preventScroll: true });
+}
 function guideGo(v) {
     if (v === 'guide' && !guideState.picked) v = 'pick';           // first stop: choose a game
     guideState.view = v; if (typeof dexState !== 'undefined') dexState.ret = null;
@@ -5804,12 +6061,16 @@ function guideRender() {
         const done = guideDone(), groups = {}; Object.entries(GAME_TEAMS).forEach(([id, x]) => (groups[x.grp] = groups[x.grp] || []).push([id, x]));
         let last = guideState.game; if (!last) { try { last = localStorage.getItem('cxLastGame'); } catch (e) {} }
         const cont = last && GAME_TEAMS[last] ? `<button class="guide-tile gp-cont" onclick="guideStart('${last}')"><b>▶ Continue</b><small>${calcEsc(GAME_TEAMS[last].name)}</small></button>` : '';
+        let allN = 0, allT = 0; Object.keys(GAME_TEAMS).forEach(id => { const [a, b] = guideProgOf(id); allN += a; allT += b; });
+        const grpPct = arr => { let a = 0, b = 0; arr.forEach(([id]) => { const p = guideProgOf(id); a += p[0]; b += p[1]; }); return b ? Math.round(100 * a / b) : 0; };
         const card = ([id, x]) => { const prog = x.trainers.map((t, i) => [t, i]).filter(([t]) => !guideNoProg(t.c)), n = prog.filter(([t, i]) => done[id + ':' + i]).length;
-            return `<button class="gp-game" onclick="guideStart('${id}')"><b>${calcEsc(x.name)}</b><small>${n ? n + ' / ' + prog.length + ' beaten' : prog.length + ' trainers'}</small></button>`; };
+            const mt = GAME_META[id] || ['#3b82c4', '#1e3a5f', []], pct = prog.length ? Math.round(100 * n / prog.length) : 0;
+            const mons = mt[2].map(m => `<img src="${profileImg(m)}" alt="" loading="lazy" onerror="this.remove()">`).join('');
+            return `<button class="gp-game" style="--g1:${mt[0]};--g2:${mt[1]}" onclick="guideStart('${id}')"><span class="gp-txt"><b>${calcEsc(x.name)}</b><small>${n ? n + ' / ' + prog.length + ' beaten' : prog.length + ' trainers'}</small>${GAME_YEAR[id] ? `<small class="gp-yr">Released ${GAME_YEAR[id]}</small>` : ''}</span><span class="gp-mons">${mons}</span><i class="gp-bar" style="width:${pct}%"></i></button>`; };
         root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideHome()"><span class="pb-ico">‹</span>Back</button></div>
-            <div class="dx-note">Pick a game to open its trainer guide.</div>${cont}
-            ${Object.entries(groups).map(([grp, arr]) => `<div class="guide-cat">${calcEsc(grp)}</div><div class="gp-grid">${arr.map(card).join('')}</div>`).join('')}`;
-        window.scrollTo(0, 0);
+            <div class="gp-top">${guideRing(allT ? Math.round(100 * allN / allT) : 0, 'Overall progress')}<div class="gp-toptxt"><b>Overall</b><small>${allN} / ${allT} trainers beaten</small></div>${guideSearchBox()}</div>${cont}
+            ${Object.entries(groups).map(([grp, arr]) => `<div class="gp-row"><div class="gp-lab"><div class="guide-cat">${calcEsc(grp)}</div>${guideRing(grpPct(arr), grpPct(arr) + '% of ' + (GUIDE_REGION[grp] || grp) + ' done')}${GUIDE_REGION[grp] ? `<small>${GUIDE_REGION[grp]}</small>` : ''}</div><div class="gp-grid">${arr.map(card).join('')}</div></div>`).join('')}`;
+        window.scrollTo(0, 0); guideSearch(guideState.gq);
         return;
     }
     const gid = guideState.game, g = GAME_TEAMS[gid], done = guideDone();
@@ -5818,14 +6079,18 @@ function guideRender() {
     const prog = g.trainers.map((t, i) => [t, i]).filter(([t]) => !guideNoProg(t.c));
     const nDone = prog.filter(([t, i]) => done[gid + ':' + i]).length, next = prog.find(([t, i]) => !done[gid + ':' + i]);
     const cap = t => Math.max(...t.m.map(x => x[1])), cats = {};
-    g.trainers.forEach((t, i) => (cats[t.c] = cats[t.c] || []).push(i));
+    const fl = guideState.flt || 'all';
+    g.trainers.forEach((t, i) => { if (fl === 'todo' && (guideNoProg(t.c) || done[gid + ':' + i])) return; if (fl === 'gym' && !guideIsGym(t.c)) return; (cats[t.c] = cats[t.c] || []).push(i); });
     const strip = `<div class="gs-wrap"><button type="button" class="gs-arrow l" aria-label="Scroll left" onclick="guideScroll(-1)">‹</button><div class="guide-strip" id="guideStrip" onscroll="guideScrollUpd()">` + Object.entries(cats).map(([c, idx]) => `<div class="gs-group"><div class="guide-cat">${calcEsc(c)}</div><div class="gs-row">${idx.map(i => {
         const t = g.trainers[i], img = cxSpr(gid, t), d = done[gid + ':' + i], loc = guideLoc(gid, t);
         return `<button class="gs-node${i === guideState.ti ? ' on' : ''}${d ? ' done' : ''}" onclick="guidePick(${i})" title="${calcEsc(t.n)}${loc ? ' — ' + calcEsc(loc[0] + ' · ' + loc[1]) : ''}">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<span class="gs-n">${calcEsc(t.n)}</span>${loc ? `<span class="gs-l">${calcEsc(loc[0])}</span>` : ''}${d ? '<i>✓</i>' : ''}</button>`;
     }).join('')}</div></div>`).join('') + `</div><button type="button" class="gs-arrow r" aria-label="Scroll right" onclick="guideScroll(1)">›</button></div>`;
     root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideGo('pick')"><span class="pb-ico">‹</span>Games</button><select onchange="guideGame(this.value)">${sel}</select>
         <span class="guide-stat">${nDone}/${prog.length} defeated</span>${next ? `<span class="guide-stat">Next: ${calcEsc(next[0].n)}</span><span class="guide-cap">Level cap ${cap(next[0])}</span>${guideLoc(gid, next[0]) ? `<span class="guide-nloc">📍 ${calcEsc(guideLoc(gid, next[0])[0])} · ${calcEsc(guideLoc(gid, next[0])[1])}</span>` : ''}` : '<span class="guide-stat">🏆 Complete!</span>'}</div>
-        <div class="guide-prog"><div style="width:${prog.length ? Math.round(nDone / prog.length * 100) : 0}%"></div></div>${strip}<div id="guideDetail"></div>`;
+        <div class="guide-prog"><div style="width:${prog.length ? Math.round(nDone / prog.length * 100) : 0}%"></div></div>
+        <div class="gs-tools"><div class="gs-chips">${[['all', 'All'], ['todo', 'Not beaten yet'], ['gym', 'Gym leaders']].map(([k, l]) => `<button type="button" class="gs-chip${fl === k ? ' on' : ''}" onclick="guideSetFilter('${k}')">${l}</button>`).join('')}<button type="button" class="gs-chip next" onclick="guideJumpNext()" ${next ? '' : 'disabled'}>⏭ Next unbeaten</button></div>${guideSearchBox()}</div>
+        <div id="guideCap"></div>${Object.keys(cats).length ? strip : '<div class="guide-hint">Nothing matches this filter.</div>'}<div id="guideDetail"></div>`;
+    guideCapRender(); guideSearch(guideState.gq);
     const st = document.getElementById('guideStrip');
     if (st) { const on = st.querySelector('.gs-node.on'); st.scrollLeft = guideState.sx != null ? guideState.sx : (on ? on.offsetLeft - st.clientWidth / 2 + on.clientWidth / 2 : 0); guideScrollUpd(); }
     window.scrollTo(0, keepY);
@@ -5922,7 +6187,9 @@ async function guideDetail() {
         <label class="guide-def"><input type="checkbox" ${guideDone()[k] ? 'checked' : ''} onchange="guideToggle('${k}')"> Defeated</label>
         <button class="guide-send" onclick="guideSend('opp')">⚔️ Load as Opponent</button><button class="guide-send alt" onclick="guideSend('you')">Load as Your Team</button><button class="guide-send alt" onclick="guideCheckToggle()">✅ Is my team ready?</button><button class="guide-send alt" onclick="guideCounterToggle()">🎯 Counter team</button></div>
         <div id="guideCheck"></div><div id="guideCounter"></div>
-        ${full ? '' : needDef ? '<div class="guide-hint">Dashed moves are predicted (last four level-up moves at that level). Items and abilities aren\'t filled in for this trainer yet.</div>' : '<div class="guide-hint">Moves, items and abilities aren\'t filled in for this game yet — only species and levels.</div>'}<div class="guide-team">${cards}</div>`;
+        ${full ? '' : needDef ? '<div class="guide-hint">Dashed moves are predicted (last four level-up moves at that level). Items and abilities aren\'t filled in for this trainer yet.</div>' : '<div class="guide-hint">Moves, items and abilities aren\'t filled in for this game yet — only species and levels.</div>'}<div id="guideWeak" class="gw-strip"></div><div class="gn-box"><label for="guideNote">📝 My notes</label><textarea id="guideNote" rows="2" maxlength="600" placeholder="e.g. bring a Ground type, save before this fight" oninput="guideNoteSave(this.value)"></textarea></div><div class="guide-team">${cards}</div>`;
+    { const nt = el.querySelector('#guideNote'); if (nt) nt.value = guideNotesAll()[k] || ''; }
+    guideWeakRender(t, tok);
     guideCheckRender(); guideCounterRender();
     if (needDef) t.m.forEach(async ([sp, lv, x], mi) => {
         if (x && x.m) return;
@@ -6524,6 +6791,176 @@ function setAllLevels() {
         showToast(`✅ Set ${targets.length} Pokémon to Lv ${lv}`);
     }, 'Set level');
 }
+
+/* ===================== RANGER SIDE GAME ===================== */
+const RG_LEGS = new Set([144,145,146,150,151,243,244,245,249,250,251,377,378,379,380,381,382,383,384,385,386,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,638,639,640,641,642,643,644,645,646,647,648,649,716,717,718,719,720,721,772,773,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801,802,803,804,805,806,807,808,809,888,889,890,891,892,893,894,895,896,897,898,1001,1002,1003,1004,1007,1008,1014,1015,1016,1017,1024,1025]);
+const RG_PSEUDO = new Set([149,248,373,376,445,635,706,784,887,998]);   // Dragonite, Tyranitar, Salamence, Metagross, Garchomp, Hydreigon, Goodra, Kommo-o, Dragapult, Baxcalibur
+const rgTier = id => RG_LEGS.has(id) ? 2 : RG_PSEUDO.has(id) ? 1 : 0;   // 2 = legendary/mythical boss, 1 = mini-boss
+const rgIsBoss = id => rgTier(id) > 0;
+const RG_ENV = { normal:['🌾','Open field','#a8a77a'], fire:['🌋','Volcano','#ee8130'], water:['🌊','Shoreline','#6390f0'], electric:['⚡','Power plant','#f7d02c'], grass:['🌿','Tall grass','#7ac74c'], ice:['❄️','Snowfield','#96d9d6'], fighting:['🥋','Dojo','#c22e28'], poison:['☣️','Swamp','#a33ea1'], ground:['⛰️','Canyon','#e2bf65'], flying:['☁️','Sky','#a98ff3'], psychic:['🔮','Mystic ruins','#f95587'], bug:['🌳','Forest','#a6b91a'], rock:['🪨','Cave','#b6a136'], ghost:['👻','Haunted tower','#735797'], dragon:['🐉','Dragon’s den','#6f35fc'], dark:['🌑','Night alley','#705746'], steel:['⚙️','Iron works','#b7b7ce'], fairy:['🌸','Flower meadow','#d685ad'] };
+const _rgTypes = {};
+const rgTypes = id => _rgTypes[id] || (_rgTypes[id] = fetch('https://pokeapi.co/api/v2/pokemon/' + id).then(r => r.json()).then(d => d.types.map(t => t.type.name)).catch(() => []));
+/* titles for the Trainer Guide's title list; self-contained so it works whenever the profile is drawn */
+function rgTitleDefs() {
+    let c = {}; try { c = JSON.parse(localStorage.getItem('beanRangerCaught') || '{}') || {}; } catch (e) {}
+    const n = Object.keys(c).length, sh = Object.values(c).reduce((a, x) => a + ((x && x[1]) || 0), 0);
+    const T = [[1, 'Fledgling Ranger', '#86efac'], [20, 'Field Ranger', '#7dd3fc'], [50, 'Senior Ranger', '#c4b5fd'], [100, 'Elite Ranger', '#fcd34d'], [150, 'Ranger Captain', '#fda4af'], [200, 'Ranger Commander', '#fdba74']];
+    const out = T.map(([k, t, color]) => ({ t, kind: 'ranger', color, ok: n >= k, hint: 'catch ' + k + ' species with Rangers' }));
+    out.push({ t: 'Shiny Spotter', kind: 'ranger', grad: 'linear-gradient(90deg,#fde68a,#ffffff,#fde68a)', ok: sh >= 1, hint: 'catch a shiny with Rangers' });
+    return out;
+}
+const rgSet = () => { try { return Object.assign({ on: true, fav: [] }, JSON.parse(localStorage.getItem('beanRanger') || '{}')); } catch (e) { return { on: true, fav: [] }; } };
+const rgSetSave = o => { try { localStorage.setItem('beanRanger', JSON.stringify(o)); } catch (e) {} };
+const rgCaught = () => { try { return JSON.parse(localStorage.getItem('beanRangerCaught') || '{}') || {}; } catch (e) { return {}; } };   // {id: [times, shinyTimes, firstTime]}, flat so sync merges per Pokémon
+let _rgRev = null, _rgRevT = 0;
+const rgName = id => { try {
+    if (!_rgRev || (!(id in _rgRev) && Date.now() - _rgRevT > 5000)) { _rgRev = {}; _rgRevT = Date.now(); Object.keys(pokemonIdMap).forEach(k => { if (!(pokemonIdMap[k] in _rgRev)) _rgRev[pokemonIdMap[k]] = k; }); }
+    const k = _rgRev[id]; return k ? k.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join('-') : '#' + id;
+} catch (e) { return '#' + id; } };
+let _rgLock = 0, _rgY = 0;
+function rgLock() { if (_rgLock++) return; _rgY = window.scrollY; document.body.style.top = -_rgY + 'px'; document.body.classList.add('rg-lock'); }
+function rgUnlock() { if (!_rgLock || --_rgLock) return; document.body.classList.remove('rg-lock'); document.body.style.top = ''; const y = _rgY; window.scrollTo({ top: y, left: 0, behavior: 'instant' }); requestAnimationFrame(() => window.scrollTo({ top: y, left: 0, behavior: 'instant' })); }
+const rgBusy = () => !!document.querySelector('.rg-ov,.modal-overlay,.gcpop-ov');
+function rgPick() {
+    const c = rgCaught(), n = Object.keys(c).length;
+    if (n >= 25 && Math.random() < 0.07) { const b = Array.from(RG_LEGS); return b[(Math.random() * b.length) | 0]; }
+    if (n >= 12 && Math.random() < 0.08) { const b = Array.from(RG_PSEUDO); return b[(Math.random() * b.length) | 0]; }
+    for (let t = 0; t < 4; t++) {
+        let lo = 1, hi = 1025; const gm = guideState.view === 'guide' && GAME_TEAMS[guideState.game];
+        if (gm && DEX_GENS[gm.gen] && Math.random() < 0.6) { lo = DEX_GENS[gm.gen][0]; hi = DEX_GENS[gm.gen][1]; }
+        const id = lo + ((Math.random() * (hi - lo + 1)) | 0); if (!rgIsBoss(id) && (!c[id] || t === 3 || Math.random() < 0.3)) return id;
+    }
+    return 25;
+}
+const rgInter = n => !!(n && n.closest && n.closest('a,button,input,select,textarea,label,summary,[role="button"],[onclick]'));
+const rgClear = (x, y) => { try { return !document.elementsFromPoint(x, y).some(rgInter); } catch (e) { return true; } };
+function rgLane(peek) {   // choose a height where the sprite sits over as few buttons/cards as possible, so it never blocks what you want to tap
+    const H = window.innerHeight, W = window.innerWidth; let best = 50, bestHits = 1e9;
+    for (let t = 0; t < 14; t++) {
+        const vh = 28 + Math.random() * 50, y = H * vh / 100 + 28; let hits = 0;
+        (peek ? [W - 14, W - 30] : [60, W * 0.25, W * 0.5, W * 0.75, W - 60]).forEach(x => { if (!rgClear(x, y) || !rgClear(x, y - 22) || !rgClear(x, y + 22)) hits++; });
+        if (hits < bestHits) { bestHits = hits; best = vh; if (!hits) break; }
+    }
+    return best;
+}
+function rgSpawn() {
+    if (!rgSet().on || document.hidden || rgBusy() || document.querySelector('.rg-roam') || /INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) return false;
+    const id = rgPick(), shiny = Math.random() < 1 / 250, el = document.createElement('img');
+    el.className = 'rg-roam ' + (Math.random() < 0.5 ? 'run' : 'peek'); el.src = profileImg(id, shiny); el.alt = ''; el.draggable = false;
+    el.style.top = rgLane(el.classList.contains('peek')) + 'vh';
+    if (el.classList.contains('peek')) { el.style.left = 'auto'; el.style.right = '-22px'; }
+    el.onerror = () => el.remove(); el.onclick = () => { if (rgBusy()) return; el.remove(); rgBattle(id, shiny); };          // never opens on top of another popup
+    el.addEventListener('animationend', () => el.remove()); setTimeout(() => el.remove(), 12000);   // safety: it can never get stuck on screen
+    document.body.appendChild(el); return true;
+}
+let _rgCount = 0;   // at most 12 per visit so it never gets spammy
+function rgSchedule(first) { setTimeout(function tryIt() { if (_rgCount >= 12) return; if (!rgSpawn()) { setTimeout(tryIt, 20000); return; } _rgCount++; rgSchedule(); }, first ? 60000 : (3 + Math.random() * 4) * 60000); }
+function rgRecord(id, shiny) {
+    const c = rgCaught(), had = Object.keys(c).length, e = c[id] || [0, 0, Date.now()]; e[0]++; if (shiny) e[1]++; c[id] = e;
+    try { localStorage.setItem('beanRangerCaught', JSON.stringify(c)); } catch (er) {}
+    const n = Object.keys(c).length, anyShiny = Object.values(c).reduce((a, x) => a + x[1], 0), TT = { 1: 'Fledgling Ranger', 20: 'Field Ranger', 50: 'Senior Ranger', 100: 'Elite Ranger', 150: 'Ranger Captain', 200: 'Ranger Commander' };
+    const out = [];
+    if (shiny && anyShiny === 1) out.push('✨ First shiny caught! Title unlocked: Shiny Spotter.');
+    if (n > had && (n === 1 || n === 20 || n === 50 || (n >= 100 && n % 50 === 0))) out.push('🏅 Ranger milestone: ' + n + ' species caught!' + (TT[n] ? ' Title unlocked: ' + TT[n] + '.' : ''));
+    return out.join(' ');
+}
+function rgBattle(id, shiny) {
+    const tier = rgTier(id), boss = tier > 0, n = Object.keys(rgCaught()).length;
+    const hpMax = tier === 2 ? 6 : tier === 1 ? 5 : 3 + (n >= 40 ? 1 : 0), tMax = tier === 2 ? 40 : tier === 1 ? 35 : 30, r = tier === 2 ? 40 : tier === 1 ? 34 : 28, spd = tier === 2 ? 1.5 : tier === 1 ? 1.25 : 1;
+    const gm = guideState.view === 'guide' && GAME_TEAMS[guideState.game], mt = gm && GAME_META[guideState.game];
+    let seen = { n: 0, b: 0 }; try { seen = Object.assign(seen, JSON.parse(localStorage.getItem('beanRangerSeen') || '{}')); } catch (e) {}
+    const showHint = boss ? seen.b < 2 : seen.n < 2; if (boss) seen.b++; else seen.n++;      // the tip only shows for your first 2 encounters (and first 2 bosses)
+    try { localStorage.setItem('beanRangerSeen', JSON.stringify(seen)); } catch (e) {}
+    const ov = document.createElement('div'); ov.className = 'rg-ov'; rgLock();
+    ov.innerHTML = `<div class="rg-box" style="${mt ? `--rg1:color-mix(in srgb,${mt[0]} 40%,#0b1530);--rg2:color-mix(in srgb,${mt[1]} 30%,#0b1530)` : ''}"><button class="rg-x" aria-label="Let it go">✕</button><div class="rg-hd">${tier === 2 ? '⚠️ Boss: ' : tier === 1 ? '⚠️ Mini-boss: ' : ''}A wild ${shiny ? '✨ shiny ' : ''}${calcEsc(rgName(id))}!<small>${gm ? calcEsc(gm.name) + ' route' : 'Draw loops around it!'}</small></div><div class="rg-bars"><div class="rg-bar" id="rgHp"><i></i></div><div class="rg-bar" id="rgTm"><i></i></div></div><canvas class="rg-cv" width="320" height="320"></canvas>${showHint ? `<div class="rg-hint" id="rgHint">${boss ? '⚠️ Dodge the shockwaves! If a ring touches your line, you lose that loop.' : '👆 Draw a loop around it to catch it.'}<br><small>The timer starts when you touch the screen.</small></div>` : ''}</div>`;
+    document.body.appendChild(ov);
+    const box = ov.querySelector('.rg-box'), sub = ov.querySelector('.rg-hd small'), hpEl = ov.querySelector('#rgHp i'), tmEl = ov.querySelector('#rgTm i');
+    const cv = ov.querySelector('canvas'), cx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), img = new Image(); img.src = profileImg(id, shiny);
+    cv.width = cv.height = Math.round(320 * dpr); cx.setTransform(dpr, 0, 0, dpr, 0, 0);        // sharp lines on retina / phone screens
+    const m = { x: 160, y: 160, vx: 40, vy: 30 }, tv = { x: 40, y: 30 }; let hitW = false, nt = 0, path = [], drawing = false, hp = hpMax, done = false, raf = 0, flash = 0, nextW = 3, waves = [];
+    let elapsed = 0, started = false, last = performance.now();     // the clock starts on your first touch, so you have time to read
+    let closed = false;
+    const close = () => { if (closed) return; closed = true; done = true; cancelAnimationFrame(raf); ov.remove(); document.removeEventListener('keydown', esc); rgUnlock(); }, esc = e => { if (e.key === 'Escape') close(); };
+    if (!gm) rgTypes(id).then(ty => {            // the background matches the Pokémon's habitat
+        const e = RG_ENV[ty[0]], e2 = ty[1] && RG_ENV[ty[1]]; if (done || !e) return;
+        box.style.setProperty('--rg1', `color-mix(in srgb,${e[2]} 38%,#0b1530)`); box.style.setProperty('--rg2', `color-mix(in srgb,${(e2 || e)[2]} 26%,#0b1530)`); sub.textContent = e[0] + ' ' + e[1] + (boss ? ' · ' + (tier === 2 ? 'dodge the shockwaves!' : 'tougher than usual') : '');
+    });
+    const end = won => { if (done) return; done = true; cancelAnimationFrame(raf); const hh = ov.querySelector('#rgHint'); if (hh) hh.remove(); const note = won ? rgRecord(id, shiny) : '';
+        const res = document.createElement('div'); res.className = 'rg-res';
+        res.innerHTML = won ? `<h3>🎉 Caught ${shiny ? '✨ ' : ''}${calcEsc(rgName(id))}!</h3><p>${note ? calcEsc(note) : 'Added to Bean’s Pokédex.'}</p>` : '<h3>It got away…</h3><p>Try again next time!</p>';
+        const b = document.createElement('button'); b.className = 'rg-btn2'; b.textContent = 'OK'; b.onclick = close; res.appendChild(b); cv.replaceWith(res); };
+    document.addEventListener('keydown', esc); ov.querySelector('.rg-x').onclick = close;
+    ov.addEventListener('touchmove', e => { if (e.target === cv || e.target === ov) e.preventDefault(); }, { passive: false });
+    const pt = e => { const b = cv.getBoundingClientRect(); return { x: (e.clientX - b.left) * 320 / b.width, y: (e.clientY - b.top) * 320 / b.height }; };
+    const seg = (a, b, c, d) => { const o = (p, q, s) => (q.x - p.x) * (s.y - p.y) - (q.y - p.y) * (s.x - p.x); return o(a, b, c) * o(a, b, d) < 0 && o(c, d, a) * o(c, d, b) < 0; };
+    const inPoly = (p, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) if ((poly[i].y > p.y) !== (poly[j].y > p.y) && p.x < (poly[j].x - poly[i].x) * (p.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x) c = !c; return c; };
+    cv.addEventListener('pointerdown', e => { if (done) return; if (!started) { started = true; const h = ov.querySelector('#rgHint'); if (h) h.remove(); } drawing = true; path = [pt(e)]; try { cv.setPointerCapture(e.pointerId); } catch (er) {} e.preventDefault(); });
+    cv.addEventListener('pointermove', e => { if (!drawing || done) return; const p = pt(e), l = path[path.length - 1]; if (!l || Math.hypot(p.x - l.x, p.y - l.y) < 4) return; path.push(p); const k = path.length;
+        for (let j = 0; j < k - 4; j++) if (seg(path[j], path[j + 1], path[k - 2], path[k - 1])) { if (inPoly(m, path.slice(j, k))) { hp--; flash = 8; path = []; if (hp <= 0) end(true); } else path = path.slice(-1); break; }
+        if (path.length > 160) path.splice(0, path.length - 160); });
+    const up = () => { drawing = false; path = []; }; cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    const loop = now => {
+        if (done) return; const dt = Math.min(0.05, (now - last) / 1000); last = now; if (started) elapsed += dt; const left = tMax - elapsed;
+        nt -= dt; if (nt <= 0) { const a = Math.random() * 6.283, sp = (50 + Math.random() * 40) * spd; tv.x = Math.cos(a) * sp; tv.y = Math.sin(a) * sp; nt = 0.6 + Math.random() * 0.9; }
+        const k = Math.min(1, dt * 3.2); m.vx += (tv.x - m.vx) * k; m.vy += (tv.y - m.vy) * k;           // steer smoothly instead of snapping to a new direction
+        m.x += m.vx * dt; m.y += m.vy * dt;
+        if (m.x < r || m.x > 320 - r) { m.vx *= -1; tv.x *= -1; m.x = Math.max(r, Math.min(320 - r, m.x)); } if (m.y < r || m.y > 320 - r) { m.vy *= -1; tv.y *= -1; m.y = Math.max(r, Math.min(320 - r, m.y)); }
+        if (drawing && path.length > 3) for (let i = Math.max(0, path.length - 50); i < path.length; i++) if (Math.hypot(path[i].x - m.x, path[i].y - m.y) < r * 0.5) { path = []; break; }
+        cx.clearRect(0, 0, 320, 320);
+        if (boss) {                                                  // shockwave: a dashed warning ring, then a ring that breaks any line it crosses
+            if (started) nextW -= dt; if (started && nextW <= 0) { waves.push({ x: m.x, y: m.y, age: 0 }); nextW = (tier === 2 ? 3.2 : 4.8) + Math.random() * 1.4; }
+            for (let q = waves.length - 1; q >= 0; q--) { const w = waves[q]; w.age += dt;
+                if (w.age < 0.7) {                               // charging: red glow around the Pokémon + a pulsing dashed ring
+                    const gl = cx.createRadialGradient(m.x, m.y, r * 0.5, m.x, m.y, r * 2.1); gl.addColorStop(0, `rgba(255,70,50,${0.18 + 0.32 * (w.age / 0.7)})`); gl.addColorStop(1, 'rgba(255,70,50,0)');
+                    cx.fillStyle = gl; cx.beginPath(); cx.arc(m.x, m.y, r * 2.1, 0, 6.283); cx.fill();
+                    cx.strokeStyle = `rgba(255,150,110,${0.45 + 0.4 * Math.sin(w.age * 22)})`; cx.lineWidth = 3; cx.setLineDash([7, 6]); cx.lineDashOffset = -w.age * 40; cx.beginPath(); cx.arc(m.x, m.y, r + 10 + w.age * 8, 0, 6.283); cx.stroke(); cx.setLineDash([]);
+                } else {
+                    const rad = (w.age - 0.7) * 150; if (rad > 340) { waves.splice(q, 1); continue; }
+                    const fade = Math.max(0.15, 1 - rad / 340);
+                    cx.strokeStyle = `rgba(255,90,70,${0.2 * fade})`; cx.lineWidth = 14; cx.beginPath(); cx.arc(w.x, w.y, rad, 0, 6.283); cx.stroke();          // soft outer glow
+                    cx.strokeStyle = `rgba(255,205,160,${0.9 * fade})`; cx.lineWidth = 4; cx.beginPath(); cx.arc(w.x, w.y, rad, 0, 6.283); cx.stroke();          // bright core
+                    if (drawing) for (let i = 0; i < path.length; i++) if (Math.abs(Math.hypot(path[i].x - w.x, path[i].y - w.y) - rad) < 8) { path = []; flash = 10; hitW = true; try { navigator.vibrate && navigator.vibrate(25); } catch (er) {} break; }
+                } }
+        }
+        const sz = r * 2.6; if (img.complete && img.naturalWidth) { cx.imageSmoothingEnabled = false; cx.drawImage(img, Math.round(m.x - sz / 2), Math.round(m.y - sz / 2), sz, sz); }   // whole pixels: no shimmer
+        if (path.length > 1) { cx.strokeStyle = flash > 0 ? (hitW ? '#ff6b6b' : '#ffd54f') : '#7ec8ff'; cx.lineWidth = 4; cx.lineCap = cx.lineJoin = 'round'; cx.beginPath(); cx.moveTo(path[0].x, path[0].y); path.forEach(p => cx.lineTo(p.x, p.y)); cx.stroke(); }
+        if (flash > 0) { flash--; if (!flash) hitW = false; } hpEl.style.width = (hp / hpMax * 100) + '%'; tmEl.style.width = Math.max(0, left / tMax * 100) + '%';
+        if (left <= 0) { end(false); return; } raf = requestAnimationFrame(loop);
+    }; raf = requestAnimationFrame(loop);
+}
+/* Rangers window: Pokédex, favorites, how to play */
+let _rgTab = 'dex', _rgGen = 1;
+function rgOpen() {
+    if (document.querySelector('.rg-ov.win')) return;
+    const ov = document.createElement('div'); ov.className = 'rg-ov win'; rgLock(); document.body.appendChild(ov);
+    let closed = false;
+    const close = () => { if (closed) return; closed = true; ov.remove(); document.removeEventListener('keydown', esc); rgUnlock(); }, esc = e => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', esc);
+    const draw = () => {
+        const prevBox = ov.querySelector('.rg-box'), keepY = prevBox ? prevBox.scrollTop : 0;
+        const c = rgCaught(), set = rgSet(), ids = Object.keys(c), sh = ids.reduce((a, k) => a + c[k][1], 0), tot = ids.reduce((a, k) => a + c[k][0], 0); let body = '';
+        if (_rgTab === 'dex') {
+            const [lo, hi] = DEX_GENS[_rgGen], cells = []; for (let i = lo; i <= hi; i++) { const e = c[i], f = set.fav.includes(i); cells.push(e ? `<button class="rg-cell${f ? ' fav' : ''}" data-i="${i}" title="${calcEsc(rgName(i))} ×${e[0]}"><img loading="lazy" src="${profileImg(i, e[1] > 0)}" alt="">${e[1] ? '<b>✨</b>' : ''}</button>` : '<button class="rg-cell" disabled>?</button>'); }
+            body = `<select id="rgGen" class="ab-modal-input" style="margin-bottom:8px">${Object.entries(DEX_GENS).map(([g, v]) => `<option value="${g}" ${+g === _rgGen ? 'selected' : ''}>Gen ${g} · ${v[2]} (${ids.filter(k => +k >= v[0] && +k <= v[1]).length}/${v[1] - v[0] + 1})</option>`).join('')}</select><div class="rg-grid">${cells.join('')}</div><p>Tap a caught Pokémon to ⭐ favorite it (max 6).</p>`;
+        } else if (_rgTab === 'fav') {
+            body = `<div class="rg-grid" style="grid-template-columns:repeat(6,1fr)">${[0, 1, 2, 3, 4, 5].map(i => { const f = set.fav[i]; return f ? `<button class="rg-cell fav" data-f="${i}"><img src="${profileImg(f, c[f] && c[f][1] > 0)}" alt=""></button>` : '<button class="rg-cell" disabled>+</button>'; }).join('')}</div><p>Pick favorites in the Pokédex tab. Tap one here to remove it.</p><button class="rg-btn2" id="rgUse" ${set.fav.length ? '' : 'disabled'}>Use as my Top 6</button>`;
+        } else body = `<p><b>How to play</b></p><ul><li>About every 5 minutes a Pokémon runs across the screen or peeks out for ~10 seconds. Tap it to start a catch. There's a ✕ to let it go, and the page behind never scrolls.</li><li>Draw a loop around it with your finger or mouse. Each closed loop takes 1 HP off the red bar. Empty the bar to catch it.</li><li>The timer (blue bar) starts when you first touch the screen: 30 seconds normally, 35 for mini-bosses, 40 for bosses (bigger fights get a little more time).</li><li>If the Pokémon touches your line, the line breaks and you restart that loop.</li><li><b>Mini-bosses</b> (pseudo-legendaries like Garchomp and Dragonite) show up after 12 species caught: 5 loops, and now and then a shockwave.</li><li><b>Bosses</b> (legendaries and mythicals) show up after 25 species: 6 loops, faster, with shockwaves. A dashed ring warns you, then a ring sweeps out and breaks any line it touches.</li><li>The background matches the Pokémon's habitat (or the game you have open in the Guide).</li><li>Shiny odds are 1 in 250. Your first shiny shows ✨ and unlocks the Shiny Spotter title.</li><li>Ranger titles unlock at 1, 20, 50, 100, 150 and 200 species caught. Pick them in your profile.</li><li>Tap a caught Pokémon in the Pokédex tab to ⭐ it (up to 6), then use them as your Top 6 from the Favorites tab.</li><li>Use the Rangers switch above to turn the roaming Pokémon on or off.</li></ul>`;
+        ov.innerHTML = `<div class="rg-box rg-win"><button class="rg-x" aria-label="Close">✕</button><div class="rg-hd">🌿 Bean’s Rangers<small>Roaming Pokémon side game</small></div><div class="rg-stats"><span>Caught: <b>${ids.length}/1025</b></span><span>✨ Shinies: <b>${sh}</b></span><span>Catches: <b>${tot}</b></span><label class="rg-sw"><input type="checkbox" id="rgOn" ${set.on ? 'checked' : ''}> Rangers on</label></div><div class="rg-tabs">${[['dex', 'Pokédex'], ['fav', 'Favorites'], ['how', 'How to play']].map(([k, l]) => `<button class="rg-tab${_rgTab === k ? ' on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>${body}</div>`;
+        const nb = ov.querySelector('.rg-box'); if (nb) nb.scrollTop = keepY;
+    };
+    ov.addEventListener('click', e => {
+        const t = e.target.closest('[data-t],[data-i],[data-f],.rg-x,#rgUse'); if (!t) return;
+        if (t.classList.contains('rg-x')) return close();
+        if (t.dataset.t) { _rgTab = t.dataset.t; return draw(); }
+        const set = rgSet();
+        if (t.dataset.i) { const i = +t.dataset.i, k = set.fav.indexOf(i); if (k >= 0) set.fav.splice(k, 1); else if (set.fav.length < 6) set.fav.push(i); else showToast('6 favorites max'); rgSetSave(set); return draw(); }
+        if (t.dataset.f) { set.fav.splice(+t.dataset.f, 1); rgSetSave(set); return draw(); }
+        if (t.id === 'rgUse') { const c = rgCaught(), p = profileGet(), names = set.fav.map(id => allPokemonNames.find(n => pokemonIdMap[n.toLowerCase()] === id) || ''); p.top = [0, 1, 2, 3, 4, 5].map(i => names[i] || ''); p.ts = [0, 1, 2, 3, 4, 5].map(i => !!(set.fav[i] && c[set.fav[i]] && c[set.fav[i]][1] > 0)); profileSave(p); profileRender(); showToast('Top 6 updated ⭐'); }
+    });
+    ov.addEventListener('change', e => { if (e.target.id === 'rgGen') { _rgGen = +e.target.value; draw(); } if (e.target.id === 'rgOn') { const s = rgSet(); s.on = e.target.checked; rgSetSave(s); } });
+    draw();
+}
+rgSchedule(true);
 </script>
 </body>
 </html>
