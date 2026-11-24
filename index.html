@@ -1014,7 +1014,7 @@ html{scrollbar-gutter:stable}
 .prof-ava{width:36px;height:36px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
 .prof-ava img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .zk-p{transform:scale(1.55);transform-origin:50% 42%}
-.zk-t{transform:scale(2.3);transform-origin:50% 14%}
+.zk-t{transform:scale(2);transform-origin:50% 9%}
 .zk-b{transform:scale(1.2)}
 .prof-pick{overflow:hidden}
 .hc-mon,.prof-slot{overflow:hidden}.hc-mon img,.prof-slot img{transform:scale(1.3)}
@@ -1064,7 +1064,11 @@ details.prof-sec[open]{padding-bottom:10px}
 .prof-sw.auto{background:var(--bg4);color:var(--muted2)}
 .prof-sw.on{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.35)}
 .hc-line1{font-size:.9rem;font-weight:800;color:var(--pa,var(--accent))}
-.hc-bimg{width:24px;height:24px;border-radius:50%;object-fit:cover;object-position:top;background:var(--bg4)}
+.hc-badge{gap:8px}.hc-bimg{width:34px;height:34px;object-fit:contain}
+.prof-bg{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px;margin:6px 0}
+.prof-bg button{aspect-ratio:1;padding:3px;background:var(--bg4);border:2px solid var(--border2);border-radius:10px;cursor:pointer;touch-action:manipulation}
+.prof-bg button.on{border-color:#facc15;box-shadow:0 0 8px rgba(250,204,21,.5)}
+.prof-bg img{width:100%;height:100%;object-fit:contain}
 .prof-stat{font-size:.8rem;color:var(--muted2);margin:4px 0 8px;line-height:1.5}.prof-stat b{color:var(--text)}
 .prof-clr{flex:none;width:38px}
 .prof-box,.sync-box{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:90vh;max-height:90dvh;overflow-y:auto}
@@ -2309,7 +2313,7 @@ function calcAvatarHTML(side) {
             if (!src) { name = pr.name || 'You'; sub = 'Trainer'; }
         }
     }
-    const av = img ? `<img${zk} src="${img}" data-a="${alt}" data-n="${calcEsc(ch)}" alt="" onerror="cxSprErr(this)">` : `<span class="cb-ch">${calcEsc(ch)}</span>`;
+    const av = img ? `<img${zk}${zk ? ' onload="profileFit(this)"' : ''} src="${img}" data-a="${alt}" data-n="${calcEsc(ch)}" alt="" onerror="cxSprErr(this)">` : `<span class="cb-ch">${calcEsc(ch)}</span>`;
     return `<div class="cb-side ${side}${has ? ' has' : ''}"><span class="cb-av">${av}</span><div class="cb-txt"><div class="cb-n">${calcEsc(name)}</div><div class="cb-s">${calcEsc(sub)}</div></div></div>`;
 }
 /* ===== POKÉMON SEARCH (short dropdown) ===== */
@@ -5066,13 +5070,21 @@ function syncLoadGIS() {
         document.head.appendChild(s);
     });
 }
-function syncToken(interactive) {
-    if (sync.token && Date.now() < sync.exp - 60000) return Promise.resolve(sync.token);
+/* The token only opens this app's hidden Drive folder and lasts about an hour. It is kept for this browser tab only (sessionStorage), so a page reload doesn't force a new sign-in. */
+function syncTokStore(t, e) { try { if (t) sessionStorage.setItem('beanSyncTok', JSON.stringify({ t, e })); else sessionStorage.removeItem('beanSyncTok'); } catch (x) {} }
+(function () { try { const o = JSON.parse(sessionStorage.getItem('beanSyncTok') || 'null'); if (o && o.t && o.e > Date.now() + 120000) { sync.token = o.t; sync.exp = o.e; } } catch (e) {} })();
+function syncRefreshSoon() {   // quietly renew the token a few minutes before it runs out, while the page is open
+    clearTimeout(sync.rt);
+    sync.rt = setTimeout(() => { if (syncWanted() && !document.hidden) syncToken(false, true).then(t => { if (!t) syncRefreshSoon(); }); }, Math.max(30000, sync.exp - Date.now() - 5 * 60000));
+}
+function syncToken(interactive, force) {
+    if (!force && sync.token && Date.now() < sync.exp - 60000) return Promise.resolve(sync.token);
+    if (interactive && sync.cb) sync.cb(null);      // a quiet attempt is still waiting: drop it so this tap goes straight to the sign-in window
     return syncLoadGIS().then(() => new Promise(res => {
-        let done = false; const fin = v => { if (!done) { done = true; sync.cb = null; res(v); } };
+        let done = false; const fin = v => { if (!done) { done = true; clearTimeout(tm); sync.cb = null; res(v); } };
         if (!sync.tc) sync.tc = google.accounts.oauth2.initTokenClient({ client_id: BEAN_GOOGLE_CLIENT_ID, scope: SYNC_SCOPE, callback: r => sync.cb && sync.cb(r), error_callback: () => sync.cb && sync.cb(null) });
-        sync.cb = r => { if (r && r.access_token) { sync.token = r.access_token; sync.exp = Date.now() + (+r.expires_in || 3600) * 1000; fin(sync.token); } else fin(null); };
-        setTimeout(() => fin(null), 20000);
+        sync.cb = r => { if (r && r.access_token) { sync.token = r.access_token; sync.exp = Date.now() + (+r.expires_in || 3600) * 1000; syncTokStore(sync.token, sync.exp); syncRefreshSoon(); fin(sync.token); } else fin(null); };
+        const tm = setTimeout(() => fin(null), interactive ? 180000 : 8000);   // quiet tries give up fast; a person picking an account gets 3 minutes
         try { sync.tc.requestAccessToken({ prompt: interactive ? '' : 'none' }); } catch (e) { fin(null); }   // 'none' = never pop anything up; just try quietly
     })).catch(() => null);
 }
@@ -5082,7 +5094,7 @@ async function syncApi(url, opts, retried) {
     const tok = await syncToken(false);
     if (!tok) throw new Error('auth');
     const r = await fetch(url, Object.assign({}, opts, { headers: Object.assign({ Authorization: 'Bearer ' + tok }, (opts && opts.headers) || {}) }));
-    if (r.status === 401 && !retried) { sync.token = null; return syncApi(url, opts, true); }
+    if (r.status === 401 && !retried) { sync.token = null; syncTokStore(null); return syncApi(url, opts, true); }
     if (!r.ok) throw new Error('drive ' + r.status);
     return r;
 }
@@ -5111,7 +5123,9 @@ async function syncUpload(state, again) {
 
 /* ---- the sync itself ---- */
 async function syncRun(reason) {
-    if (sync.running || !syncConfigured() || location.protocol === 'file:') return;
+    if (!syncConfigured() || location.protocol === 'file:') return;
+    if (sync.running && (reason === 'signin' || reason === 'manual') && sync.cb) { sync.cb(null); for (let i = 0; i < 20 && sync.running; i++) await new Promise(r => setTimeout(r, 50)); }   // a stuck quiet attempt must not swallow the tap
+    if (sync.running) return;
     if (reason !== 'signin' && !syncWanted()) return;
     sync.running = true; syncSet('syncing');
     try {
@@ -5174,14 +5188,14 @@ async function syncAct(a) {
     else if (a === 'out') {
         try { localStorage.removeItem('beanSyncOn'); } catch (e) {}
         if (sync.token && window.google && google.accounts) { try { google.accounts.oauth2.revoke(sync.token, () => {}); } catch (e) {} }
-        sync.token = null; sync.pending = null; syncToast(); syncSet('off');
+        sync.token = null; syncTokStore(null); clearTimeout(sync.rt); sync.pending = null; syncToast(); syncSet('off');
     }
 }
 /* ===================== PROFILE (top-right: sign in, or your avatar + name) ===================== */
-const PROFILE_POKE = [25,6,133,150,94,448,658,445,282,197,778,143,149,384,1,4,7,39,151,257];   // 20 fan favorites
-const PROFILE_BALLS = ['poke-ball','great-ball','ultra-ball','master-ball','premier-ball','love-ball','luxury-ball','timer-ball','dusk-ball','quick-ball'];
-const PROFILE_TRAINERS = ['red','leaf','ethan','lyra','brendan','may','lucas','dawn','cynthia','steven'];
-const PROFILE_MISC = ['rare-candy','lucky-egg'];
+const PROFILE_POKE = [25,6,133,150,94,448,658,445,282,197,778,143,149,384,1,7,39,151,257,54,199,196,249,244,1017,380,385,700];   // 20 fan favorites
+const PROFILE_BALLS = ['poke-ball','great-ball','ultra-ball','master-ball','premier-ball','love-ball','luxury-ball','timer-ball','dusk-ball','quick-ball','dive-ball','cherish-ball','heavy-ball','heal-ball'];
+const PROFILE_TRAINERS = ['red','ethan','brendan','may','lucas','dawn','gary','oak','juniper','giovanni','wallace','steven','cynthia','alder','n','iris','leon','nessa','az','pokemonranger'];
+const PROFILE_MISC = ['rare-candy','lucky-egg','shiny-charm','exp-share','town-map','oran-berry','bicycle'];
 const PROFILE_ITEM = n => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/' + n + '.png';
 function profileAv(p) {   // -> {key, src, k}: k = p (Pokémon) / b (ball or item) / t (trainer face)
     const key = p.av || (p.id ? 'p:' + p.id : 'b:poke-ball'), t = key.slice(0, 1), v = key.slice(2);
@@ -5199,10 +5213,30 @@ function profileGet() {
 }
 function profileSave(p) { try { localStorage.setItem('beanProfile', JSON.stringify({ title: p.title || '', type: p.type || '', color: p.color || '', badge: p.badge || '', ts: p.ts || [], name: p.name, id: p.id, av: p.av || '', shiny: p.shiny, fav: p.fav || '', region: p.region || '', top: p.top || [] })); } catch (e) {} try { const b = document.querySelector('.calc-banner'); if (b && typeof calcAvatarHTML === 'function') b.innerHTML = calcAvatarHTML('you') + '<span class="cb-vs">VS</span>' + calcAvatarHTML('opp'); } catch (e) {} }   // saved like everything else, so it syncs too
 function profileImg(id, shiny) { return id ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${shiny ? 'shiny/' : ''}${id}.png` : PROFILE_BALL; }
-const PROFILE_TITLES = ['Gym Challenger', 'Ace Trainer', 'Pokémon Breeder', 'Bug Catcher', 'Youngster', 'Team Rocket Dropout', 'Hex Maniac', 'Battle Nerd', 'Shiny Hunter', 'Cozy Trainer'];
+const PROFILE_TITLES = ['Ace Trainer', 'Admin', 'Baron', 'Baroness', 'Battle Nerd', 'Boss', 'Bug Catcher', 'Cameraman', 'Chef', 'Cozy Trainer', 'Duchess', 'Duke', 'Fisher', 'Gambler', 'Grunt', 'Gym Challenger', 'Hex Maniac', 'Painter', 'Pokémaniac', 'Pokémon Breeder', 'Pokémon Ranger', 'Professor', 'Rival', 'Shiny Hunter', 'Team Rocket Dropout', 'Youngster'];   // A to Z
 const PROFILE_TYPES = { Normal: '#a8a77a', Fire: '#ee8130', Water: '#6390f0', Electric: '#f7d02c', Grass: '#7ac74c', Ice: '#96d9d6', Fighting: '#c22e28', Poison: '#a33ea1', Ground: '#e2bf65', Flying: '#a98ff3', Psychic: '#f95587', Bug: '#a6b91a', Rock: '#b6a136', Ghost: '#735797', Dragon: '#6f35fc', Dark: '#705746', Steel: '#b7b7ce', Fairy: '#d685ad' };
 const PROFILE_COLORS = ['#ef4444', '#f97316', '#facc15', '#4ade80', '#2dd4bf', '#38bdf8', '#818cf8', '#c084fc', '#f472b6'];
 const profileAccent = p => p.color || PROFILE_TYPES[p.type] || '';
+const BADGE_NO = { Brock: 1, Misty: 2, 'Lt. Surge': 3, Erika: 4, Koga: 5, Janine: 5, Sabrina: 6, Blaine: 7, Giovanni: 8, Blue: 8,
+    Falkner: 9, Bugsy: 10, Whitney: 11, Morty: 12, Chuck: 13, Jasmine: 14, Pryce: 15, Clair: 16,
+    Roxanne: 17, Brawly: 18, Wattson: 19, Flannery: 20, Norman: 21, Winona: 22, 'Tate & Liza': 23, 'Liza & Tate': 23, Wallace: 24, Juan: 24,
+    Roark: 25, Gardenia: 26, Maylene: 27, 'Crasher Wake': 28, Fantina: 29, Byron: 30, Candice: 31, Volkner: 32,
+    Cilan: 33, Chili: 33, Cress: 33, Lenora: 34, Cheren: 34, Burgh: 35, Drayden: 36, Elesa: 37, Clay: 38, Skyla: 39, Brycen: 40, Roxie: 41, Marlon: 42,
+    Viola: 43, Grant: 44, Korrina: 45, Ramos: 46, Clemont: 47, Valerie: 48, Olympia: 49, Wulfric: 50,
+    Milo: 51, Nessa: 52, Kabu: 53, Bea: 54, Allister: 55, Opal: 56, Gordie: 57, Melony: 58, Piers: 59, Raihan: 60,
+    Katy: 70, Brassius: 71, Iono: 72, Kofu: 73, Larry: 74, Ryme: 75, Tulip: 76, Grusha: 77 };
+const BADGE_NAMES = { 1: 'Boulder', 2: 'Cascade', 3: 'Thunder', 4: 'Rainbow', 5: 'Soul', 6: 'Marsh', 7: 'Volcano', 8: 'Earth', 9: 'Zephyr', 10: 'Hive', 11: 'Plain', 12: 'Fog', 13: 'Storm', 14: 'Mineral', 15: 'Glacier', 16: 'Rising',
+    17: 'Stone', 18: 'Knuckle', 19: 'Dynamo', 20: 'Heat', 21: 'Balance', 22: 'Feather', 23: 'Mind', 24: 'Rain', 25: 'Coal', 26: 'Forest', 27: 'Cobble', 28: 'Fen', 29: 'Relic', 30: 'Mine', 31: 'Icicle', 32: 'Beacon',
+    33: 'Trio', 34: 'Basic', 35: 'Insect', 36: 'Legend', 37: 'Bolt', 38: 'Quake', 39: 'Jet', 40: 'Freeze', 41: 'Toxic', 42: 'Wave', 43: 'Bug', 44: 'Cliff', 45: 'Rumble', 46: 'Plant', 47: 'Voltage', 48: 'Fairy', 49: 'Psychic', 50: 'Iceberg',
+    51: 'Grass', 52: 'Water', 53: 'Fire', 54: 'Fighting', 55: 'Ghost', 56: 'Fairy', 57: 'Rock', 58: 'Ice', 59: 'Dark', 60: 'Dragon', 70: 'Bug', 71: 'Grass', 72: 'Electric', 73: 'Water', 74: 'Normal', 75: 'Ghost', 76: 'Psychic', 77: 'Ice' };
+const profileBadgeRegion = n => n <= 8 ? 'Kanto' : n <= 16 ? 'Johto' : n <= 24 ? 'Hoenn' : n <= 32 ? 'Sinnoh' : n <= 42 ? 'Unova' : n <= 50 ? 'Kalos' : n <= 60 ? 'Galar' : 'Paldea';
+const profileBadgeName = n => (BADGE_NAMES[n] || 'Gym') + ' Badge · ' + profileBadgeRegion(n);
+const profileBadgeImg = n => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/badges/' + n + '.png';
+function profileBadgeNo(name) {   // Cobbleverse names like "Petra (Roxanne)" use the badge of the mainline leader in brackets
+    let n = String(name), m = /\(([^)]+)\)/.exec(n);
+    if (m && BADGE_NO[m[1].split(' · ')[0].trim()]) return BADGE_NO[m[1].split(' · ')[0].trim()];
+    n = n.replace(/\s*\(.*\)\s*$/, '').trim(); return BADGE_NO[n] || 0;
+}
 function profileBadges() {   // read from the Guide's "Defeated" ticks; never throws (the game data loads later in the file)
     const out = { list: [], champs: 0, games: 0, full: 0 };
     try {
@@ -5212,7 +5246,7 @@ function profileBadges() {   // read from the Guide's "Defeated" ticks; never th
             g.trainers.forEach((t, i) => {
                 if (guideNoProg(t.c)) return; tot++;
                 if (!d[gid + ':' + i]) return; dn++;
-                if (/Gym Leaders$/.test(t.c)) out.list.push({ k: gid + ':' + i, n: t.n, game: g.name, gid, t });
+                if (/Gym Leaders$/.test(t.c)) out.list.push({ k: gid + ':' + i, n: t.n, game: g.name, gid, t, no: profileBadgeNo(t.n) });
                 if (t.c === 'Champion') out.champs++;
             });
             out.games++; if (tot && dn === tot) out.full++;
@@ -5226,21 +5260,57 @@ function profileRank(b) {
     const n = b.list.length;
     return n >= 25 ? 'Ace Trainer' : n >= 8 ? 'Badge Collector' : n >= 1 ? 'Gym Challenger' : 'Rookie';
 }
+const PROFILE_BB = {};
+function profileBBox(src, cb) {   // finds where the sprite's pixels actually are, so every avatar can be centred and fitted
+    if (src in PROFILE_BB) return cb(PROFILE_BB[src]);
+    const im = new Image(); im.crossOrigin = 'anonymous';
+    im.onload = () => {
+        let r = null;
+        try {
+            const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement('canvas'); c.width = w; c.height = h;
+            const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0);
+            const d = x.getImageData(0, 0, w, h).data; let x0 = w, y0 = h, x1 = -1, y1 = -1;
+            for (let y = 0; y < h; y++) for (let i = 0; i < w; i++) if (d[(y * w + i) * 4 + 3] > 40) { if (i < x0) x0 = i; if (i > x1) x1 = i; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+            if (x1 >= 0) {
+                const hy = y0 + Math.ceil((y1 - y0 + 1) * 0.3); let hx0 = w, hx1 = -1;
+                for (let y = y0; y <= hy && y < h; y++) for (let i = 0; i < w; i++) if (d[(y * w + i) * 4 + 3] > 40) { if (i < hx0) hx0 = i; if (i > hx1) hx1 = i; }
+                r = { x0: x0 / w, x1: (x1 + 1) / w, y0: y0 / h, y1: (y1 + 1) / h, hx0: hx0 / w, hx1: (hx1 + 1) / w };
+            }
+        } catch (e) { r = null; }
+        PROFILE_BB[src] = r; cb(r);
+    };
+    im.onerror = () => cb(null);
+    im.src = src;
+}
+function profileFit(img) {   // Pokémon/balls: fit whole sprite. Trainers: zoom on the head. Falls back to the CSS defaults if it can't measure.
+    try {
+        const m = /zk-([pbt])/.exec(img.className || ''); const src = img.currentSrc || img.src; if (!m || !src) return;
+        profileBBox(src, bb => {
+            if (!bb || (img.currentSrc || img.src) !== src) return;
+            let cx, cy, sc;
+            if (m[1] === 't') { const h = bb.y1 - bb.y0, win = Math.min(0.95, Math.max(0.3, h * 0.45)); cx = (bb.hx0 + bb.hx1) / 2; cy = bb.y0 + win * 0.5 - 0.02; sc = Math.min(3, 1 / win); }
+            else { const w = bb.x1 - bb.x0, h = bb.y1 - bb.y0; sc = Math.min(1.7, 0.8 / Math.max(w, h)); cx = (bb.x0 + bb.x1) / 2; cy = (bb.y0 + bb.y1) / 2; }
+            img.style.transformOrigin = '50% 50%';
+            img.style.transform = 'translate(' + ((0.5 - cx) * sc * 100).toFixed(1) + '%,' + ((0.5 - cy) * sc * 100).toFixed(1) + '%) scale(' + sc.toFixed(3) + ')';
+        });
+    } catch (e) {}
+}
 const PROFILE_REGIONS = ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Hisui', 'Unova', 'Kalos', 'Alola', 'Galar', 'Paldea'];
 function profileMonId(n) { return (n && typeof pokemonIdMap !== 'undefined' && pokemonIdMap[String(n).toLowerCase()]) || 0; }
 function profileCard() {
     const el = document.getElementById('homeCard'); if (!el) return;
-    const p = profileGet(), B = profileBadges(), fb = B.list.find(x => x.k === p.badge);
+    const p = profileGet(), B = profileBadges();
+    const bm = /^n:(\d+)$/.exec(p.badge || ''); let fno = bm ? +bm[1] : 0; if (!fno) { const lg = B.list.find(x => x.k === p.badge); fno = lg ? lg.no : 0; }
+    const fb = fno && B.list.some(x => x.no === fno) ? fno : 0;
     const has = p.fav || p.region || p.top.some(Boolean) || p.title || fb || B.list.length;
     if (!syncWanted() || !has) { el.innerHTML = ''; el.style.display = 'none'; return; }
     const acc = profileAccent(p); if (acc) el.style.setProperty('--pa', acc); else el.style.removeProperty('--pa');
     const rank = profileRank(B), title = p.title || rank;
     const line1 = `<div class="hc-line1">${rank === 'Master Trainer' && !p.title ? '👑 ' : ''}${calcEsc(title)}${B.list.length ? ` · 🏅 ${B.list.length}` : ''}</div>`;
-    const img = (n, i) => { const id = profileMonId(n); return id ? `<span class="hc-mon${p.ts[i] ? ' shiny' : ''}" title="${calcEsc(n)}${p.ts[i] ? ' (shiny)' : ''}"><img src="${profileImg(id, p.ts[i])}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; };
+    const img = (n, i) => { const id = profileMonId(n); return id ? `<span class="hc-mon${p.ts[i] ? ' shiny' : ''}" title="${calcEsc(n)}${p.ts[i] ? ' (shiny)' : ''}"><img class="zk-p" onload="profileFit(this)" src="${profileImg(id, p.ts[i])}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; };
     const six = p.top.some(Boolean) ? `<div class="hc-six">${p.top.map(img).join('')}</div>` : '';
     const fav = p.fav ? `<div class="hc-fav">⭐ Favorite: <b>${calcEsc(p.fav)}</b></div>` : '';
-    const bsrc = fb ? cxSpr(fb.gid, fb.t) : '';
-    const bad = fb ? `<div class="hc-fav">🎖️ Favorite badge: <b>${calcEsc(fb.n)}</b>${bsrc ? `<img class="hc-bimg" src="${bsrc}" data-a="${cxSprAlt(fb.t)}" data-n="${calcEsc(String(fb.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}</div>` : '';
+    const bad = fb ? `<div class="hc-fav hc-badge"><img class="hc-bimg" src="${profileBadgeImg(fb)}" alt="" onerror="this.style.display='none'"><span>🎖️ Favorite badge: <b>${calcEsc(profileBadgeName(fb))}</b></span></div>` : '';
     el.style.display = ''; el.innerHTML = line1 + `<div class="hc-title">My Favorites</div>` + (p.region ? `<div class="hc-region">🗺️ ${calcEsc(p.region)}</div>` : '') + fav + six + bad;
 }
 function profileRender() {
@@ -5251,7 +5321,7 @@ function profileRender() {
     { const ac = profileAccent(profileGet()); if (ac && syncWanted()) el.style.setProperty('--pa', ac); else el.style.removeProperty('--pa'); }
     if (!syncWanted()) { el.innerHTML = '<button type="button" class="prof-btn prof-in" onclick="syncOpen()">☁️ Sign in</button>'; return; }
     const p = profileGet(), dot = { syncing: 'sy', idle: 'ok', paused: 'pa', error: 'er' }[sync.status] || 'ok';
-    el.innerHTML = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava"><img class="zk-${profileAv(p).k}" src="${profileAv(p).src}" alt="" onerror="this.onerror=null;this.className='zk-b';this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
+    el.innerHTML = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava"><img class="zk-${profileAv(p).k}" onload="profileFit(this)" src="${profileAv(p).src}" alt="" onerror="this.onerror=null;this.className='zk-b';this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
 }
 function profileOpen() {
     const st = profileGet();
@@ -5292,8 +5362,8 @@ function profileOpen() {
     const tileSrc = k => profileAv(Object.assign({}, st, { av: k }));
     const keep = fn => { const bx = ov.querySelector('.prof-box'), y = bx ? bx.scrollTop : 0; fn(); if (bx) bx.scrollTop = y; };
     const paint = () => keep(() => {
-        const cur = profileAv(st), pv = $('#profPrev'); pv.className = 'zk-' + cur.k; pv.src = cur.src; pv.onerror = function () { this.onerror = null; this.className = 'zk-b'; this.src = PROFILE_BALL; };
-        grid.innerHTML = SECTIONS.map(([label, keys]) => `<div class="bk-h">${label}</div><div class="prof-grid">${keys.map(k => { const a = tileSrc(k); return `<button type="button" class="prof-pick${k === cur.key ? ' on' : ''}" data-k="${k}" title="${calcEsc(k.slice(2).replace(/-/g, ' '))}"><img class="zk-${a.k}" src="${a.src}" alt="" loading="lazy" onerror="this.closest('.prof-pick').remove()"></button>`; }).join('')}</div>`).join('');
+        const cur = profileAv(st), pv = $('#profPrev'); pv.className = 'zk-' + cur.k; pv.style.transform = ''; pv.onload = () => profileFit(pv); pv.src = cur.src; pv.onerror = function () { this.onerror = null; this.className = 'zk-b'; this.src = PROFILE_BALL; };
+        grid.innerHTML = SECTIONS.map(([label, keys]) => `<div class="bk-h">${label}</div><div class="prof-grid">${keys.map(k => { const a = tileSrc(k); return `<button type="button" class="prof-pick${k === cur.key ? ' on' : ''}" data-k="${k}" title="${calcEsc(k.slice(2).replace(/-/g, ' '))}"><img class="zk-${a.k}" onload="profileFit(this)" src="${a.src}" alt="" loading="lazy" onerror="this.closest('.prof-pick').remove()"></button>`; }).join('')}</div>`).join('');
     });
     const commit = () => { profileSave(st); profileRender(); };
     let timer = null; const later = () => { clearTimeout(timer); timer = setTimeout(commit, 250); };
@@ -5317,7 +5387,7 @@ function profileOpen() {
     favIn.addEventListener('change', () => { const n = canon(favIn.value); if (n) { st.fav = n; msg.textContent = ''; msg.className = 'bk-msg'; commit(); } else if (!favIn.value.trim()) { st.fav = ''; commit(); } else { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } });
     $('#profFavX').onclick = () => { st.fav = ''; favIn.value = ''; commit(); };
     regSel.addEventListener('change', () => { st.region = regSel.value; commit(); });
-    const paintSix = () => keep(() => { const sb = $('#sixS'); if (sb) { sb.classList.toggle('on', !!st.ts[sel]); sb.disabled = !st.top[sel]; } six.innerHTML = st.top.map((n, i) => { const id = profileMonId(n); return `<button type="button" class="prof-slot${i === sel ? ' on' : ''}${st.ts[i] ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(n || 'Empty slot ' + (i + 1))}">${id ? `<img src="${profileImg(id, st.ts[i])}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'">` : '+'}</button>`; }).join(''); });
+    const paintSix = () => keep(() => { const sb = $('#sixS'); if (sb) { sb.classList.toggle('on', !!st.ts[sel]); sb.disabled = !st.top[sel]; } six.innerHTML = st.top.map((n, i) => { const id = profileMonId(n); return `<button type="button" class="prof-slot${i === sel ? ' on' : ''}${st.ts[i] ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(n || 'Empty slot ' + (i + 1))}">${id ? `<img class="zk-p" onload="profileFit(this)" src="${profileImg(id, st.ts[i])}" alt="" onerror="this.onerror=null;this.src='${PROFILE_BALL}'">` : '+'}</button>`; }).join(''); });
     six.addEventListener('click', e => { const b = e.target.closest('.prof-slot'); if (b) { sel = +b.dataset.i; paintSix(); } });
     sixIn.addEventListener('change', () => { const n = canon(sixIn.value); if (!n) { if (sixIn.value.trim()) { msg.textContent = 'Pick a name from the list that appears while you type.'; msg.className = 'bk-msg bad'; } return; }
         msg.textContent = ''; msg.className = 'bk-msg'; st.top[sel] = n; sixIn.value = ''; if (!st.top.some((x, i) => i === sel && x === n)) st.ts[sel] = false; const nx = st.top.findIndex((x, i) => !x && i !== sel); if (nx >= 0) sel = nx; paintSix(); commit(); });
@@ -5334,19 +5404,25 @@ function profileOpen() {
     cols.addEventListener('click', e => { const b = e.target.closest('.prof-sw'); if (!b) return; st.color = b.dataset.c; paintCols(); commit(); });
     paintCols();
     const B = profileBadges(), bd = $('#profBadges');
-    if (!B.list.length) bd.innerHTML = `<div class="prof-stat">No badges yet. Open the <b>Guide</b>, pick a game, and tick <b>Defeated</b> on gym leaders. They show up here, and you can pick a favorite. Beat every trainer in every game to become a <b>Master Trainer</b>.</div>`;
+    const earned = []; B.list.forEach(x => { if (x.no && !earned.some(e => e.no === x.no)) earned.push(x); }); earned.sort((x, y) => x.no - y.no);
+    const curNo = () => { const m = /^n:(\d+)$/.exec(st.badge || ''); if (m) return +m[1]; const lg = B.list.find(x => x.k === st.badge); return lg ? lg.no : 0; };
+    if (!B.list.length) bd.innerHTML = `<div class="prof-stat">No badges yet. Open the <b>Guide</b>, pick a game, and tick <b>Defeated</b> on gym leaders. Their badges show up here, and you can pick a favorite. Beat every trainer in every game to become a <b>Master Trainer</b>.</div>`;
     else {
-        const groups = {}; B.list.forEach(x => (groups[x.game] = groups[x.game] || []).push(x));
+        const paintBg = () => { const c = curNo(); $('#profBg').innerHTML = earned.map(x => `<button type="button" class="${x.no === c ? 'on' : ''}" data-n="${x.no}" title="${calcEsc(profileBadgeName(x.no))}"><img src="${profileBadgeImg(x.no)}" alt="" loading="lazy" onerror="this.closest('button').remove()"></button>`).join(''); $('#profBgName').textContent = c ? profileBadgeName(c) : 'Tap a badge to pick your favorite'; };
         bd.innerHTML = `<div class="prof-stat">Rank: <b>${profileRank(B)}</b><br>🏅 <b>${B.list.length}</b> gym badge${B.list.length === 1 ? '' : 's'} · ${B.full}/${B.games} games complete</div>
-            <div class="bk-h">Favorite badge</div><select id="profBadge" class="ab-modal-input prof-sel"><option value="">None</option>${Object.entries(groups).map(([g, a]) => `<optgroup label="${calcEsc(g)}">${a.map(x => `<option value="${x.k}">${calcEsc(x.n)}</option>`).join('')}</optgroup>`).join('')}</select>`;
-        const bs = $('#profBadge'); bs.value = st.badge; bs.addEventListener('change', () => { st.badge = bs.value; commit(); });
+            <div class="bk-h">Favorite badge</div><div class="prof-stat" id="profBgName"></div><div class="prof-bg" id="profBg"></div>
+            <button type="button" class="pill-btn" id="profBgX">Clear favorite</button>`;
+        $('#profBg').addEventListener('click', e => { const b = e.target.closest('button[data-n]'); if (!b) return; st.badge = 'n:' + b.dataset.n; paintBg(); commit(); });
+        $('#profBgX').onclick = () => { st.badge = ''; paintBg(); commit(); };
+        paintBg();
     }
     $('.modal-cancel').onclick = close;
     syncModalFill($('#syncModalBody'));
 }
 
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && syncWanted() && !sync.running && Date.now() - sync.last > 60000) syncRun('visible'); });
-if (syncWanted() && syncConfigured() && location.protocol !== 'file:') { sync.status = 'syncing'; setTimeout(() => syncRun('start'), 400); }
+if (syncConfigured() && location.protocol !== 'file:') syncLoadGIS().catch(() => {});   // load Google's script early so the first sign-in tap isn't blocked as a popup
+if (syncWanted() && syncConfigured() && location.protocol !== 'file:') { sync.status = 'syncing'; if (sync.token) syncRefreshSoon(); setTimeout(() => syncRun('start'), 400); }
 syncUI();
 
 /* ===================== GAME TEAMS + LOAD PICKER ===================== */
