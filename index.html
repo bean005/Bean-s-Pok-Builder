@@ -5194,8 +5194,8 @@ async function syncAct(a) {
 /* ===================== PROFILE (top-right: sign in, or your avatar + name) ===================== */
 const PROFILE_POKE = [25,6,133,150,94,448,658,445,282,197,778,143,149,384,1,7,39,151,257,54,199,196,249,244,1017,380,385,700];   // 20 fan favorites
 const PROFILE_BALLS = ['poke-ball','great-ball','ultra-ball','master-ball','premier-ball','love-ball','luxury-ball','timer-ball','dusk-ball','quick-ball','dive-ball','cherish-ball','heavy-ball','heal-ball'];
-const PROFILE_TRAINERS = ['red','ethan','brendan','may','lucas','dawn','gary','oak','juniper','giovanni','wallace','steven','cynthia','alder','n','iris','leon','nessa','az','pokemonranger'];
-const PROFILE_MISC = ['rare-candy','lucky-egg','shiny-charm','exp-share','town-map','oran-berry','bicycle'];
+const PROFILE_TRAINERS = ['red','ethan','brendan','may','lucas','dawn','gary','oak','juniper','brock','clair','giovanni','wallace','steven','cynthia','alder','n','iris','leon','nessa','az','pokemonranger'];
+const PROFILE_MISC = ['rare-candy','lucky-egg','shiny-charm','exp-share','town-map','oran-berry','leftovers'];
 const PROFILE_ITEM = n => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/' + n + '.png';
 function profileAv(p) {   // -> {key, src, k}: k = p (Pokémon) / b (ball or item) / t (trainer face)
     const key = p.av || (p.id ? 'p:' + p.id : 'b:poke-ball'), t = key.slice(0, 1), v = key.slice(2);
@@ -5260,6 +5260,9 @@ function profileRank(b) {
     const n = b.list.length;
     return n >= 25 ? 'Ace Trainer' : n >= 8 ? 'Badge Collector' : n >= 1 ? 'Gym Challenger' : 'Rookie';
 }
+// small hand adjustments on top of the automatic centring: [right %, down %, zoom x]. Avatars only (not the top-6 tiles).
+const PROFILE_NUDGE = { 'p:384': [-8, 0, 1.15], 'p:199': [0, 8, 1.15], 'p:1017': [8, 8, 1.15], 'p:778': [8, 0, 1.15], 'p:149': [8, 8, 1.15], 'p:25': [8, 8, 1.15], 'p:282': [8, 8, 1.15],
+    't:iris': [0, -10, 1], 't:alder': [0, -10, 1], 't:giovanni': [0, 6, 1], 't:cynthia': [0, 6, 1], 't:n': [0, 6, 1], 't:wallace': [0, -10, 1] };
 const PROFILE_BB = {};
 function profileBBox(src, cb) {   // finds where the sprite's pixels actually are, so every avatar can be centred and fitted
     if (src in PROFILE_BB) return cb(PROFILE_BB[src]);
@@ -5290,8 +5293,13 @@ function profileFit(img) {   // Pokémon/balls: fit whole sprite. Trainers: zoom
             let cx, cy, sc;
             if (m[1] === 't') { const h = bb.y1 - bb.y0, win = Math.min(0.95, Math.max(0.3, h * 0.45)); cx = (bb.hx0 + bb.hx1) / 2; cy = bb.y0 + win * 0.5 - 0.02; sc = Math.min(3, 1 / win); }
             else { const w = bb.x1 - bb.x0, h = bb.y1 - bb.y0; sc = Math.min(1.7, 0.8 / Math.max(w, h)); cx = (bb.x0 + bb.x1) / 2; cy = (bb.y0 + bb.y1) / 2; }
+            let tx = (0.5 - cx) * sc * 100, ty = (0.5 - cy) * sc * 100;
+            if (!img.closest('.prof-slot,.hc-mon')) {
+                const km = /\/trainers\/([a-z0-9-]+)\.png/.exec(src) || /\/pokemon\/(?:shiny\/)?(\d+)\.png/.exec(src), nk = km ? (m[1] === 't' ? 't:' : 'p:') + km[1] : '', nd = PROFILE_NUDGE[nk];
+                if (nd) { tx += nd[0]; ty += nd[1]; sc *= nd[2]; }
+            }
             img.style.transformOrigin = '50% 50%';
-            img.style.transform = 'translate(' + ((0.5 - cx) * sc * 100).toFixed(1) + '%,' + ((0.5 - cy) * sc * 100).toFixed(1) + '%) scale(' + sc.toFixed(3) + ')';
+            img.style.transform = 'translate(' + tx.toFixed(1) + '%,' + ty.toFixed(1) + '%) scale(' + sc.toFixed(3) + ')';
         });
     } catch (e) {}
 }
