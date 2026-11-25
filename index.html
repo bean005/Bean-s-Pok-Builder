@@ -917,7 +917,9 @@ body.rg-lock{position:fixed;left:0;right:0;width:100%;overflow-x:hidden;overflow
 .dx-tile.tot{grid-column:1/-1;height:40px;flex-direction:row;gap:10px;border-top-color:var(--accent);--c:var(--accent)}
 /* Dex v2: sprites in list, info table, forms, evolutions, rich move rows */
 .dx-grid{grid-template-columns:repeat(auto-fill,minmax(168px,1fr))}
-.dx-chip{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:3px 6px 3px 10px;min-height:48px}
+.dx-chip{display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:3px 10px 3px 6px;min-height:48px}
+.dx-tx{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}.dx-tx .t{max-width:100%}
+.dx-sub{display:block;font-size:.66rem;font-weight:700;color:var(--accent);line-height:1.2;white-space:normal;overflow-wrap:anywhere}
 .dx-chip .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dx-chip img{width:44px;height:44px;object-fit:contain;flex-shrink:0;image-rendering:auto}
 .dx-h{align-items:flex-start}.dx-h>img{width:120px;height:120px;object-fit:contain;flex-shrink:0}
 .dx-info{flex:1;min-width:0}.dx-row{display:grid;grid-template-columns:96px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:.82rem;align-items:center}
@@ -6715,7 +6717,7 @@ const dexEvo = u => dexCache.evo[u] ? Promise.resolve(dexCache.evo[u]) : dexJson
 function dexInGen(id) { if (dexState.gen === 'all') return true; const r = DEX_GENS[dexState.gen]; return id >= r[0] && id <= r[1]; }
 const dexTypePill = n => { const t = dexCap(n), tc = (typeof typeColors !== 'undefined' && typeColors[t]) || null; return `<span class="cx-mtype" ${tc ? `style="background:${tc.bg};border-color:${tc.border};color:${tc.text}"` : ''}>${calcEsc(t)}</span>`; };
 const dexCatIcon = c => (typeof calcCatIcon === 'function' && c) ? calcCatIcon(dexCap(c)) : '';
-const dexChip = (p, v) => `<button class="dx-chip" onclick="dexOpen(${p.id})"><span class="t"><small>#${dexPad(p.id)}</small>${calcEsc(dexName(p.n))}</span>${v == null ? '' : `<span class="dx-val">${v}</span>`}<img loading="lazy" decoding="async" src="${dexSpr(p.id)}" alt="" onerror="this.style.visibility='hidden'"></button>`;
+const dexChip = (p, v, sub) => `<button class="dx-chip" onclick="dexOpen(${p.id})"><img loading="lazy" decoding="async" src="${dexSpr(p.id)}" alt="" onerror="this.style.visibility='hidden'"><span class="dx-tx"><span class="t"><small>#${dexPad(p.id)}</small>${calcEsc(dexName(p.n))}</span>${sub ? `<span class="dx-sub">${sub}</span>` : ''}</span>${v == null ? '' : `<span class="dx-val">${v}</span>`}</button>`;   // sprite first, so it never gets pushed off a narrow phone screen
 
 /* ---- move details (type / category / power / accuracy / PP / effect), cached in memory + localStorage ---- */
 let dexMvStore = null;
@@ -6868,7 +6870,7 @@ async function dexAbilView(body) {
         const tags = [];
         if (e.base && e.hiddenOnly) tags.push('Hidden');
         if (e.forms.length) tags.push(e.forms.length > 2 ? e.forms.slice(0, 2).join(', ') + ' +' + (e.forms.length - 2) : e.forms.join(', '));
-        return dexChip({ n: e.sp.n, id: e.sp.id }, tags.length ? calcEsc(tags.join(' · ')) : null);
+        return dexChip({ n: e.sp.n, id: e.sp.id }, null, tags.length ? calcEsc(tags.join(' · ')) : '');
     };
     body.innerHTML = `<div class="dx-nav">${back}<span class="sp"></span><button onclick="dexClearAbil()"><span class="pb-ico x">✕</span>Close ability</button></div>
         <div class="dx-h"><div><div class="n">${calcEsc(dexName(a))}</div>
