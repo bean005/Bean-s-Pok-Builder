@@ -1348,6 +1348,14 @@ details.prof-sec[open]{padding-bottom:10px}
 .mini-tile{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-family:inherit;cursor:pointer;text-align:left;transition:border-color .15s,background .15s;touch-action:manipulation}
 .mini-tile:hover{border-color:var(--accent);background:var(--bg3)}
 .mini-tile .mt-i{font-size:1.35rem;line-height:1}
+.mini-tile .mt-img{width:30px;height:30px;image-rendering:pixelated;display:block}
+.tk-h-img{width:24px;height:24px;image-rendering:pixelated;vertical-align:-6px;margin-right:4px}
+.rz-top{display:grid;grid-template-columns:3fr 1fr;gap:6px;margin:6px 0}
+.rz-top label{font-size:.7rem;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+#rzPick{display:flex;flex-direction:column;gap:5px;margin:8px 0}#rzPick .rz-pickbtn{text-align:left}
+.rz-abrow{padding:7px 0;border-bottom:1px solid var(--border2);font-size:.82rem;display:flex;gap:8px;align-items:flex-start}
+.rz-abrow .rz-main b{color:var(--accent)}
+.rz-abrow .rz-d{font-size:.76rem;color:var(--muted2);margin-top:2px;line-height:1.45}
 .mini-tile b{display:block;font-size:.86rem}
 .mini-tile small{display:block;font-size:.7rem;color:var(--muted)}
 .tk-box{width:620px;position:relative;max-height:88vh;overflow-y:auto;overscroll-behavior:contain}
@@ -1421,7 +1429,7 @@ details.prof-sec[open]{padding-bottom:10px}
 
 /* randomizer modes */
 .tk-box [hidden]{display:none!important}
-#rzList[data-mode="mon"] button[data-a="a"],#rzList[data-mode="abil"] button[data-a="m"]{display:none}
+#rzList[data-mode="mon"] button[data-a="a"]{display:none}
 
 /* hunts: pause / saved note */
 .tk-saved{font-size:.7rem;color:var(--muted);margin:2px 0 6px;line-height:1.4}
@@ -1489,8 +1497,8 @@ details.prof-sec[open]{padding-bottom:10px}
     </div>
     <div class="home-mini">
         <button type="button" class="gs-bar" onclick="gsOpen()" aria-label="Search everything"><span aria-hidden="true">🔍</span><span>Search Pokémon, trainers, moves, your teams…</span><kbd>/</kbd></button>
-        <button type="button" class="mini-tile" onclick="rzOpen()"><span class="mt-i" aria-hidden="true">🎲</span><span><b>Randomizer</b><small>Roll Pokémon &amp; abilities</small></span></button>
-        <button type="button" class="mini-tile" onclick="tkOpen()"><span class="mt-i" aria-hidden="true">✨</span><span><b>Hunts &amp; Dex</b><small id="tkTileSub">Shiny counter, living dex</small></span></button>
+        <button type="button" class="mini-tile" onclick="rzOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" onerror="this.replaceWith('⚪')"></span><span><b>Randomizer</b><small>Roll Pokémon &amp; abilities</small></span></button>
+        <button type="button" class="mini-tile" onclick="tkOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png" alt="" onerror="this.replaceWith('🔴')"></span><span><b>Hunts &amp; Dex</b><small id="tkTileSub">Shiny counter, living dex</small></span></button>
     </div>
     <div class="scroll-hint">Click a mode above, then scroll down to start building your team</div>
     <div class="home-tools"><button type="button" class="pill-btn" onclick="bkOpen()">💾 Backup &amp; Restore</button><button type="button" class="pill-btn" onclick="sdOpen()">⇄ Showdown</button><button type="button" class="pill-btn" onclick="thOpen()">🎨 Theme</button></div>
@@ -6345,6 +6353,7 @@ function guideCelebrate(kind, gid) {
 function guideGo(v) {
     if (typeof rgClearRoam === 'function') rgClearRoam();
     if (v === 'guide' && !guideState.picked) v = 'pick';           // first stop: choose a game
+    if (v === 'pick') gvFact.gid = null;   // fresh facts next time a game is opened
     guideState.view = v; if (typeof dexState !== 'undefined') dexState.ret = null;
     if (v === 'guide' && !guideState.game) guideState.game = GAME_TEAMS[cxLoad.game] ? cxLoad.game : Object.keys(GAME_TEAMS)[0];
     guideRender();
@@ -6452,7 +6461,7 @@ const FACTS_GAME = {
     cb_hoenn: ['Cobbleverse is a Minecraft modpack built on Cobblemon, which brings Pokémon into Minecraft.'], cb_johto: ['Cobbleverse is a Minecraft modpack built on Cobblemon, which brings Pokémon into Minecraft.'], cb_kanto: ['Cobbleverse is a Minecraft modpack built on Cobblemon, which brings Pokémon into Minecraft.'], cb_sinnoh: ['Cobbleverse is a Minecraft modpack built on Cobblemon, which brings Pokémon into Minecraft.']
 };
 const FACTS_GENERAL = ['Game Freak, the studio behind every mainline game, was founded by Satoshi Tajiri in 1989.', 'Ken Sugimori drew the original Pokémon, and Atsuko Nishida designed Pikachu.', 'Pokémon is short for the original Japanese name Pocket Monsters.', 'There are now more than 1,000 different Pokémon species.', 'Pokémon is managed by The Pokémon Company, which was founded by Nintendo, Game Freak and Creatures.', 'Clefairy was once considered as the franchise mascot before Pikachu took the spotlight.'];
-const gvFact = { list: [], i: 0, hold: false };
+const gvFact = { list: [], i: 0, hold: false, gid: null, t0: 0 };   // gid/t0: lets the fact (and its countdown) survive re-renders of the guide
 function guideFactList(gid) {
     const reg = guideRegionOf(gid), out = [];
     (FACTS_GAME[gid] || []).forEach(x => out.push(['This game', x])); (FACTS_REGION[reg] || []).forEach(x => out.push(['Region', x])); FACTS_GENERAL.forEach(x => out.push(['Pokémon', x]));
@@ -6460,21 +6469,26 @@ function guideFactList(gid) {
     return out;
 }
 function guideFactHtml(gid) {
-    gvFact.list = guideFactList(gid); gvFact.i = 0; gvFact.hold = false; if (!gvFact.list.length) return '';
-    const f = gvFact.list[0];
-    return `<div class="gv-factcard" id="gvFactCard" onmouseenter="gvFact.hold=true" onmouseleave="gvFact.hold=false" onfocusin="gvFact.hold=true" onfocusout="gvFact.hold=false"><span class="gv-fi" aria-hidden="true">💡</span><div class="gv-fbody"><small id="gvFk">${calcEsc(f[0])}</small><p id="gvFx" aria-live="polite">${calcEsc(f[1])}</p></div><div class="gv-fctl"><button type="button" aria-label="Previous fact" onclick="guideFactStep(-1)">‹</button><span id="gvFn">1 / ${gvFact.list.length}</span><button type="button" aria-label="Next fact" onclick="guideFactStep(1)">›</button></div><i class="gv-ftimer" id="gvFt"></i></div>`;
+    gvFact.hold = false;
+    if (gvFact.gid !== gid || !gvFact.list.length) { gvFact.list = guideFactList(gid); gvFact.i = 0; gvFact.gid = gid; gvFact.t0 = Date.now(); }   // same game: keep the fact on screen when something else on the page is clicked
+    if (!gvFact.list.length) return '';
+    const f = gvFact.list[gvFact.i] || gvFact.list[0], el = Math.max(0, Math.min(8900, Date.now() - gvFact.t0));
+    return `<div class="gv-factcard" id="gvFactCard" onmouseenter="gvFact.hold=true" onmouseleave="gvFact.hold=false" onfocusin="gvFact.hold=true" onfocusout="gvFact.hold=false"><span class="gv-fi" aria-hidden="true">💡</span><div class="gv-fbody"><small id="gvFk">${calcEsc(f[0])}</small><p id="gvFx" aria-live="polite">${calcEsc(f[1])}</p></div><div class="gv-fctl"><button type="button" aria-label="Previous fact" onclick="guideFactStep(-1)">‹</button><span id="gvFn">${gvFact.i + 1} / ${gvFact.list.length}</span><button type="button" aria-label="Next fact" onclick="guideFactStep(1)">›</button></div><i class="gv-ftimer" id="gvFt" style="animation-delay:-${el}ms"></i></div>`;
 }
 function guideFactStep(d, auto) {
     const card = document.getElementById('gvFactCard'); if (!card) { guideFactStop(); return; }
     if (auto && gvFact.hold) return;
-    const n = gvFact.list.length; gvFact.i = (gvFact.i + d + n) % n; const f = gvFact.list[gvFact.i], x = document.getElementById('gvFx'), k = document.getElementById('gvFk'), c = document.getElementById('gvFn'), t = document.getElementById('gvFt');
+    const n = gvFact.list.length; gvFact.i = (gvFact.i + d + n) % n; gvFact.t0 = Date.now(); const f = gvFact.list[gvFact.i], t = document.getElementById('gvFt');
     card.classList.add('sw');
-    setTimeout(() => { if (!document.getElementById('gvFactCard')) return; k.textContent = f[0]; x.textContent = f[1]; c.textContent = (gvFact.i + 1) + ' / ' + n; card.classList.remove('sw'); }, 170);
-    if (t) { t.style.animation = 'none'; void t.offsetWidth; t.style.animation = ''; }
+    setTimeout(() => { const cd = document.getElementById('gvFactCard'); if (!cd) return; const x = document.getElementById('gvFx'), k = document.getElementById('gvFk'), c = document.getElementById('gvFn'), g = gvFact.list[gvFact.i]; if (k) k.textContent = g[0]; if (x) x.textContent = g[1]; if (c) c.textContent = (gvFact.i + 1) + ' / ' + gvFact.list.length; cd.classList.remove('sw'); }, 170);
+    if (t) { t.style.animation = 'none'; t.style.animationDelay = '0ms'; void t.offsetWidth; t.style.animation = ''; }
     if (!auto) guideFactStart();   // restart the countdown after a manual click
 }
-function guideFactStart() { guideFactStop(); window._gvT = setInterval(() => guideFactStep(1, true), 9000); }
-function guideFactStop() { if (window._gvT) { clearInterval(window._gvT); window._gvT = null; } }
+function guideFactStart() {   // first tick fires when the current fact has had its full 9s, then every 9s
+    guideFactStop(); const wait = Math.max(250, 9000 - (Date.now() - gvFact.t0));
+    window._gvT = setTimeout(() => { guideFactStep(1, true); window._gvT = setInterval(() => guideFactStep(1, true), 9000); }, wait);
+}
+function guideFactStop() { if (window._gvT) { clearTimeout(window._gvT); clearInterval(window._gvT); window._gvT = null; } }
 function guideRender() {
     guideFactStop();
     const root = document.getElementById('guideRoot'); if (!root) return;
@@ -7257,13 +7271,12 @@ function tkOverlay(html) {
 const tkSpName = id => { const p = (dexCache.species || []).find(x => x.id === id); return p ? dexName(p.n) : '#' + id; };
 
 /* ---------------- Randomizer ---------------- */
-const RZ = { mode: 'both', n: 6, gens: [1, 2, 3, 4, 5, 6, 7, 8, 9], type: '', bmax: '', bmin: '', legs: false, abil: 'own', hid: true, rows: [], busy: false };
+const RZ = { mode: 'both', n: 6, gens: [1, 2, 3, 4, 5, 6, 7, 8, 9], type: '', bmax: '', bmin: '', legs: false, abil: 'own', hid: true, rows: [], abRows: [], busy: false };
 function rzOpen() {
-    const ui = tkOverlay(`<h3>🎲 Randomizer</h3><p>Randomize Pokémon, abilities, or both. Each slot can be re-rolled on its own, and 🔒 keeps one.</p>
-        <div class="rz-opts"><label style="grid-column:1/-1">Randomize<select class="tk-in" id="rzMode"><option value="mon" ${RZ.mode === 'mon' ? 'selected' : ''}>Pokémon only</option><option value="abil" ${RZ.mode === 'abil' ? 'selected' : ''}>Abilities only (for my team)</option><option value="both" ${RZ.mode === 'both' ? 'selected' : ''}>Pokémon + abilities</option></select></label></div>
+    const ui = tkOverlay(`<h3><img class="tk-h-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" onerror="this.remove()">Randomizer</h3><p>Roll random Pokémon, Pokémon with abilities, or just a list of abilities. Each slot can be re-rolled on its own, and 🔒 keeps one.</p>
+        <div class="rz-top"><label>Randomize<select class="tk-in" id="rzMode"><option value="mon" ${RZ.mode === 'mon' ? 'selected' : ''}>Pokémon</option><option value="both" ${RZ.mode === 'both' ? 'selected' : ''}>Pokémon + abilities</option><option value="abil" ${RZ.mode === 'abil' ? 'selected' : ''}>Abilities</option></select></label><label>How many<input class="tk-in" type="number" id="rzN" min="1" max="30" value="${RZ.n}"></label></div>
         <div id="rzFilters">
-            <div class="rz-opts">
-                <label>How many<input class="tk-in" type="number" id="rzN" min="1" max="30" value="${RZ.n}"></label>
+            <div class="rz-opts" style="grid-template-columns:repeat(3,1fr)">
                 <label>Type<select class="tk-in" id="rzT"><option value="">Any</option>${TK_TYPES.map(t => `<option value="${t}" ${RZ.type === t ? 'selected' : ''}>${dexName(t)}</option>`).join('')}</select></label>
                 <label>BST min<input class="tk-in" type="number" id="rzBmin" min="0" max="800" placeholder="none" value="${RZ.bmin}"></label>
                 <label>BST max<input class="tk-in" type="number" id="rzBmax" min="0" max="800" placeholder="none" value="${RZ.bmax}"></label>
@@ -7276,9 +7289,10 @@ function rzOpen() {
             <label>Abilities<select class="tk-in" id="rzAm"><option value="own" ${RZ.abil === 'own' ? 'selected' : ''}>From its own abilities</option><option value="any" ${RZ.abil === 'any' ? 'selected' : ''}>Any real ability (chaos)</option></select></label>
             <label class="ck"><input type="checkbox" id="rzHid" ${RZ.hid ? 'checked' : ''}> Allow hidden abilities</label>
         </div>
-        <div class="bk-row"><button type="button" class="pill-btn" id="rzRollBtn" data-a="roll">🎲 Roll Pokémon</button><button type="button" class="pill-btn" id="rzUse" data-a="useteam" hidden>👥 Use my team</button><button type="button" class="pill-btn" id="rzAbBtn" data-a="rollab">🔀 Re-roll all abilities</button></div>
+        <div class="bk-row"><button type="button" class="pill-btn" id="rzRollBtn" data-a="roll">🎲 Roll Pokémon</button><button type="button" class="pill-btn" id="rzAbRoll" data-a="rollabs" hidden>🎲 Roll abilities</button><button type="button" class="pill-btn" id="rzAbBtn" data-a="rollab">🔀 Re-roll all abilities</button></div>
         <div id="rzList"></div>
-        <div class="bk-row" id="rzAct" hidden><button type="button" class="pill-btn" data-a="pool">➕ Save as a new team</button><button type="button" class="pill-btn" data-a="copy">⧉ Copy list</button></div>
+        <div class="bk-row" id="rzAct" hidden><button type="button" class="pill-btn" id="rzPoolBtn" data-a="pick">➕ Add to a draft</button><button type="button" class="pill-btn" id="rzNewBtn" data-a="newdraft">🆕 New draft</button><button type="button" class="pill-btn" data-a="copy">⧉ Copy list</button></div>
+        <div id="rzPick" hidden></div>
         <div class="bk-msg" id="rzMsg" role="status"></div>`);
     const $ = id => ui.box.querySelector('#' + id), say = (t, c) => { const m = $('rzMsg'); if (m) { m.textContent = t; m.className = 'bk-msg ' + (c || ''); } };
     const read = () => {
@@ -7289,12 +7303,15 @@ function rzOpen() {
     };
     const applyMode = () => {   // show only the controls that matter for the chosen mode
         const m = RZ.mode, sh = (id, on) => { const e = $(id); if (e) e.hidden = !on; };
-        sh('rzFilters', m !== 'abil'); sh('rzAbOpts', m !== 'mon'); sh('rzRollBtn', m !== 'abil'); sh('rzAbBtn', m !== 'mon'); sh('rzUse', m === 'abil');
-        const b = $('rzAbBtn'); if (b) b.textContent = m === 'abil' ? '🔀 Randomize abilities' : '🔀 Re-roll all abilities';
+        sh('rzFilters', m !== 'abil'); sh('rzAbOpts', m === 'both'); sh('rzRollBtn', m !== 'abil'); sh('rzAbBtn', m === 'both'); sh('rzAbRoll', m === 'abil'); sh('rzPoolBtn', m !== 'abil'); sh('rzNewBtn', m !== 'abil'); if (m === 'abil') { const pk = $('rzPick'); if (pk) pk.hidden = true; }
         const L = $('rzList'); if (L) L.dataset.mode = m;
     };
     const draw = () => {
         const L = $('rzList'); if (!L) return; const h = L.offsetHeight; if (h) L.style.minHeight = h + 'px';
+        if (RZ.mode === 'abil') {
+            L.innerHTML = RZ.abRows.map((r, i) => `<div class="rz-abrow"><div class="rz-main"><b>${calcEsc(dexName(r.slug))}</b><div class="rz-d">${calcEsc(r.desc || 'No description available.')}</div></div><div class="rz-btns"><button type="button" data-a="ra" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="rl" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
+            L.dataset.mode = RZ.mode; $('rzAct').hidden = !RZ.abRows.length; L.style.minHeight = ''; return;
+        }
         L.innerHTML = RZ.rows.map((r, i) => `<div class="rz-row"><img src="${TK_IMG}${r.id}.png" alt="" loading="lazy"><div class="rz-main"><b>${calcEsc(dexName(r.n))}</b> ${r.types.map(dexTypePill).join(' ')} <small>BST ${r.bst}</small><div class="rz-ab">${r.ab ? calcEsc(dexName(r.ab)) + (r.abH ? ' <small>(hidden)</small>' : '') : '—'}</div></div><div class="rz-btns"><button type="button" data-a="m" data-i="${i}" title="Re-roll this Pokémon" aria-label="Re-roll Pokémon ${i + 1}">🎲</button><button type="button" data-a="a" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="l" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
         L.dataset.mode = RZ.mode; $('rzAct').hidden = !RZ.rows.length; L.style.minHeight = '';
     };
@@ -7305,12 +7322,22 @@ function rzOpen() {
         read(); const a = b.dataset.a, i = +b.dataset.i;
         try {
             if (a === 'l') { RZ.rows[i].lock = !RZ.rows[i].lock; draw(); return; }
-            if (a === 'copy') { const t = RZ.rows.map(r => `${sdSpecies(dexName(r.n).replace(/ /g, '-'))}${r.ab ? '\nAbility: ' + dexName(r.ab) : ''}`).join('\n\n'); try { await navigator.clipboard.writeText(t); say('Copied.', 'ok'); } catch (x) { say('Copy was blocked by the browser.', 'bad'); } return; }
+            if (a === 'rl') { RZ.abRows[i].lock = !RZ.abRows[i].lock; draw(); return; }
+            if (a === 'copy') { const t = RZ.mode === 'abil' ? RZ.abRows.map(r => `${dexName(r.slug)}: ${r.desc || ''}`).join('\n\n') : RZ.rows.map(r => `${sdSpecies(dexName(r.n).replace(/ /g, '-'))}${r.ab ? '\nAbility: ' + dexName(r.ab) : ''}`).join('\n\n'); try { await navigator.clipboard.writeText(t); say('Copied.', 'ok'); } catch (x) { say('Copy was blocked by the browser.', 'bad'); } return; }
             RZ.busy = true;
-            if (a === 'pool') { await rzSave(say); RZ.busy = false; return; }
+            if (a === 'pick') {   // show the list of existing drafts to add to
+                const pk = $('rzPick'); RZ.busy = false;
+                if (!pk.hidden) { pk.hidden = true; return; }
+                const ds = savedTeams.filter(t => t.mode === 'draft').sort((x, y) => (y.savedAt || 0) - (x.savedAt || 0));
+                pk.innerHTML = ds.length ? ds.map(t => `<button type="button" class="pill-btn rz-pickbtn" data-a="todraft" data-id="${t.id}">${calcEsc(t.name)} <small>(${(t.pokemonList || []).length}/${MAX_POOL.draft})</small></button>`).join('') : '<div class="bk-msg">You don’t have any drafts yet. Tap “New draft” to make one.</div>';
+                pk.hidden = false; return;
+            }
+            if (a === 'todraft') { await rzSave(say, +b.dataset.id); $('rzPick').hidden = true; RZ.busy = false; return; }
+            if (a === 'newdraft') { await rzSave(say, null); RZ.busy = false; return; }
             say('Rolling…'); let warn = '';
-            if (a === 'roll') { await rzRollAll(); if (RZ.rows.length < RZ.n) warn = `Only ${RZ.rows.length} Pokémon matched those filters.`; } else if (a === 'rollab') { if (!RZ.rows.length) warn = RZ.mode === 'abil' ? 'Tap “Use my team” first so there are Pokémon to randomize.' : 'Roll some Pokémon first.'; for (const r of RZ.rows) if (!r.lock) await rzAbil(r); }
-            else if (a === 'useteam') warn = await rzUseTeam();
+            if (a === 'roll') { await rzRollAll(); if (RZ.rows.length < RZ.n) warn = `Only ${RZ.rows.length} Pokémon matched those filters.`; } else if (a === 'rollab') { if (!RZ.rows.length) warn = 'Roll some Pokémon first.'; for (const r of RZ.rows) if (!r.lock) await rzAbil(r); }
+            else if (a === 'rollabs') await rzRollAbilities();
+            else if (a === 'ra') { const r = await rzOneAbility(new Set(RZ.abRows.map(x => x.slug))); if (r) RZ.abRows[i] = r; else warn = 'Nothing else to roll.'; }
             else if (a === 'm') { const r = await rzTake(await rzPool(), new Set(RZ.rows.map(x => x.id)), 1); if (r) { await rzAbil(r); RZ.rows[i] = r; } else warn = 'Nothing else fits those filters.'; }
             else if (a === 'a') await rzAbil(RZ.rows[i]);
             draw(); say(warn, warn ? 'bad' : '');
@@ -7320,18 +7347,20 @@ function rzOpen() {
     ui.o.addEventListener('change', e => { if (e.target.id === 'rzMode') { RZ.mode = e.target.value; applyMode(); draw(); } });
     applyMode(); draw();
 }
-async function rzUseTeam() {   // abilities-only mode: take the Pokémon from the builder (active team, or the whole pool if none are active)
-    const src = pokemonList.filter(p => p.active).length ? pokemonList.filter(p => p.active) : pokemonList;
-    if (!src.length) return 'Your builder has no Pokémon yet. Build a team first, or switch to “Pokémon + abilities”.';
-    await dexLists(); if (!dexCache.species) throw new Error('no list');
-    const rows = [];
-    for (const p of src.slice(0, 30)) {
-        const sp = dexSpeciesOfForm(String(p.name).toLowerCase()) || (p._data && dexCache.species.find(x => x.id === p._data.id)); if (!sp) continue;
-        const m = await dexMon(sp.id); if (!m) continue;
-        const r = { id: sp.id, n: sp.n, types: m.types.map(t => t.type.name), bst: m.stats.reduce((a, x) => a + x.base_stat, 0), ab: '', abH: false, lock: false };
-        await rzAbil(r); rows.push(r);
+async function rzOneAbility(taken) {   // one random real ability (not already in the list) plus its description
+    await dexLists(); const l = dexCache.abils || []; if (!l.length) throw new Error('no list');
+    for (let t = 0; t < 60; t++) {
+        const c = l[Math.floor(Math.random() * l.length)]; if (taken.has(c)) continue;
+        if (!(await rzMainAbil(c))) continue;
+        let d = ''; try { d = getAbilityDesc(dexName(c)) || await fetchAbilityDetail(c) || ''; } catch (e) {}
+        return { slug: c, desc: d, lock: false };
     }
-    RZ.rows = rows; return rows.length ? '' : 'Couldn\'t match your Pokémon to the Pokédex.';
+    return null;
+}
+async function rzRollAbilities() {
+    const keep = RZ.abRows.filter(r => r.lock).slice(0, RZ.n), out = keep.slice(), taken = new Set(keep.map(r => r.slug));
+    while (out.length < RZ.n) { const r = await rzOneAbility(taken); if (!r) break; out.push(r); taken.add(r.slug); }
+    RZ.abRows = out;
 }
 async function rzPool() {
     await dexLists(); if (!dexCache.species) throw new Error('no list');
@@ -7379,8 +7408,8 @@ async function rzRollAll() {
     while (out.length < RZ.n) { const r = await rzTake(pool, taken); if (!r) break; await rzAbil(r); out.push(r); taken.add(r.id); }
     RZ.rows = out;
 }
-async function rzSave(say) {
-    say('Building your team…'); const list = [];
+async function rzSave(say, targetId) {   // targetId: id of an existing draft to add to, or null for a brand-new draft
+    say('Adding…'); let list = [];
     for (const r of RZ.rows) {
         const p = await fetchPokemonFromAPI(String(r.id)); if (!p) continue; p.uid = newUid();
         if (r.ab) {
@@ -7391,11 +7420,21 @@ async function rzSave(say) {
         list.push(p);
     }
     if (!list.length) { say('Couldn\'t load those Pokémon (check your connection).', 'bad'); return; }
-    const mode = list.length > 6 ? 'draft' : 'regular'; if (mode === 'regular') list.forEach(p => { p.active = true; });
-    savedTeams.push({ id: Date.now(), name: 'Random roll ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric' }), mode, savedAt: Date.now(), pokemonList: list });
-    try { localStorage.setItem('pokeTeams', JSON.stringify(savedTeams)); } catch (e) {}
-    try { renderSavedTeams(); } catch (e) {}
-    say(`Saved ${list.length} Pokémon as a new ${mode === 'regular' ? 'team' : 'draft pool'}. Find it under Saved Teams.`, 'ok');
+    const save = () => { try { localStorage.setItem('pokeTeams', JSON.stringify(savedTeams)); } catch (e) {} try { renderSavedTeams(); } catch (e) {} };
+    if (targetId == null) {
+        list = list.slice(0, MAX_POOL.draft);
+        let base = 'Random draft ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric' }), name = base, n = 2;
+        while (savedTeams.some(t => t.name === name)) name = `${base} (${n++})`;
+        savedTeams.push({ id: Date.now(), name, mode: 'draft', savedAt: Date.now(), pokemonList: list }); save();
+        say(`Created “${name}” with ${list.length} Pokémon.`, 'ok'); return;
+    }
+    const t = savedTeams.find(x => x.id === targetId); if (!t) { say('That draft no longer exists.', 'bad'); return; }
+    const live = (t.id === currentTeamId && Array.isArray(pokemonList)), dest = live ? pokemonList : (t.pokemonList = t.pokemonList || []);
+    const room = MAX_POOL.draft - dest.length; if (room <= 0) { say(`“${t.name}” is full (${MAX_POOL.draft} max).`, 'bad'); return; }
+    const add = list.slice(0, room); add.forEach(p => dest.push(p));
+    if (live) { const ix = savedTeams.findIndex(x => x.id === t.id); if (ix !== -1) savedTeams[ix] = buildSaveObj(); try { render(); } catch (e) {} } else t.savedAt = Date.now();
+    save();
+    say(`Added ${add.length} Pokémon to “${t.name}”.` + (add.length < list.length ? ` (${list.length - add.length} didn’t fit — the draft holds ${MAX_POOL.draft}.)` : ''), 'ok');
 }
 
 /* ---------------- Shiny hunts + living dex ---------------- */
@@ -7443,7 +7482,7 @@ function tkScopeInfo() {   // what the "game or region" dropdown currently means
 const tkAgo = ts => { if (!ts) return ''; const m = Math.round((Date.now() - ts) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' }); };
 function tkFlashSaved(box) { const el = box.querySelector('.tk-saved'); if (!el) return; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 900); }
 function tkOpen() {
-    const ui = tkOverlay(`<h3>✨ Hunts &amp; Dex</h3><div class="tk-tabs" role="tablist"><button type="button" class="tk-tab" data-t="hunt">Hunt counter</button><button type="button" class="tk-tab" data-t="shiny">Shiny dex</button><button type="button" class="tk-tab" data-t="live">Living dex</button></div><div id="tkBody"></div>`);
+    const ui = tkOverlay(`<h3><img class="tk-h-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png" alt="" onerror="this.remove()">Hunts &amp; Dex</h3><div class="tk-tabs" role="tablist"><button type="button" class="tk-tab" data-t="hunt">Hunt counter</button><button type="button" class="tk-tab" data-t="shiny">Shiny dex</button><button type="button" class="tk-tab" data-t="live">Living dex</button></div><div id="tkBody"></div>`);
     const body = () => ui.box.querySelector('#tkBody');
     const render = () => {
         const y = ui.box.scrollTop;
@@ -7580,8 +7619,8 @@ const GS_TOOLS = [
     ['📋', 'Draft Pool & Team Builder', 'Build and save teams', 'draft pool team builder teams', () => openSection('draft')],
     ['🧭', 'Trainer Guide', 'Gym leaders, run tracker, counter team', 'guide gym leader elite four champion trainers run tracker', () => openSection('guide')],
     ['📖', 'Pokédex', 'Browse, sort and compare', 'pokedex dex pokemon', () => openSection('dex')],
-    ['🎲', 'Randomizer', 'Roll random Pokémon & abilities', 'randomizer random roll nuzlocke', () => rzOpen()],
-    ['✨', 'Hunts & Dex', 'Shiny counter, living dex', 'shiny hunt counter living dex catch log', () => tkOpen()],
+    ['⚪', 'Randomizer', 'Roll random Pokémon & abilities', 'randomizer random roll nuzlocke', () => rzOpen()],
+    ['🔴', 'Hunts & Dex', 'Shiny counter, living dex', 'shiny hunt counter living dex catch log', () => tkOpen()],
     ['🎨', 'Theme', 'Change the accent colour', 'theme colour color accent', () => thOpen()],
     ['💾', 'Backup & Restore', 'Save or load your data', 'backup restore export import data', () => bkOpen()],
     ['⇄', 'Showdown import / export', 'Teams as Showdown text', 'showdown import export paste', () => sdOpen()],
