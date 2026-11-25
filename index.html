@@ -1119,6 +1119,7 @@ html{scrollbar-gutter:stable}
 .prof-ava img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .zk-p{transform:scale(1.55);transform-origin:50% 42%}
 .zk-t{transform:scale(2);transform-origin:50% 9%}
+img.zk-p[src^="data:image/png"],img.zk-t[src^="data:image/png"]{transform:none;object-fit:cover}   /* already-cropped avatars: show as-is */
 .zk-t[src*="/trainers/alder"]{transform:translateY(-30%) scale(2)}   /* Alder: lift him so his head isn't at the bottom of the circle */
 .zk-b{transform:scale(1.2)}
 .prof-pick{overflow:hidden}
@@ -5522,13 +5523,13 @@ async function syncRun(reason) {
             sync.pending = M; syncToast(); syncSet('idle'); return;                  // don't change teams under someone who is mid-build
         }
         syncRaw('beanSyncMeta', JSON.stringify(Object.assign(syncMeta(), { __last: Date.now() })));
-        sync.firstRun = false; sync.last = Date.now(); syncSet('idle');
+        sync.firstRun = false; sync.last = Date.now(); sync.dirty = false; syncSet('idle');
     } catch (e) { syncSet(e && e.message === 'auth' ? 'paused' : 'error'); }
     finally { sync.running = false; }
 }
 function syncSchedule() {
     if (!syncWanted() || !syncConfigured() || location.protocol === 'file:') return;
-    clearTimeout(sync.timer); sync.timer = setTimeout(() => syncRun('change'), sync.debounce);
+    sync.dirty = true; clearTimeout(sync.timer); sync.timer = setTimeout(() => syncRun('change'), sync.debounce);
 }
 
 /* ---- interface ---- */
@@ -5590,7 +5591,12 @@ function profileProbe(v) {   // checks the newer sprites once, in the background
         const im = new Image(); im.onload = () => { PROFILE_RES[v] = ch[i]; try { profileRender(); } catch (e) {} }; im.onerror = () => next(i + 1); im.src = profileTSrc(ch[i]);
     })(0);
 }
-function profileAv(p) {   // -> {key, src, k}: k = p (Pokémon) / b (ball or item) / t (trainer face)
+function profileAv(p) {   // same as below, but once a sprite has been cropped we hand back the cropped picture straight away (no flash of the uncropped one)
+    const r = profileAv0(p);
+    try { const f = PROFILE_FITTED[r.src]; if (f) r.src = f; } catch (e) {}
+    return r;
+}
+function profileAv0(p) {   // -> {key, src, k}: k = p (Pokémon) / b (ball or item) / t (trainer face)
     const key = p.av || (p.id ? 'p:' + p.id : 'b:poke-ball'), t = key.slice(0, 1), v = key.slice(2);
     if (t === 'p' && +v) return { key, src: profileImg(+v, p.shiny), k: 'p' };
     if (t === 't' && /^[a-z0-9-]+$/.test(v)) { const nm = PROFILE_TCHAIN[v] ? (PROFILE_RES[v] || PROFILE_TCHAIN[v][0]) : v; return { key, src: profileTSrc(nm), k: 't' }; }
@@ -5877,6 +5883,7 @@ function profileOpen() {
     syncModalFill($('#syncModalBody'));
 }
 
+document.addEventListener('visibilitychange', () => { if (document.hidden && sync.dirty && syncWanted() && !sync.running) { clearTimeout(sync.timer); syncRun('change'); } });   // leaving the app/tab: push the latest save now instead of waiting out the 5s delay
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && syncWanted() && !sync.running && Date.now() - sync.last > 60000) syncRun('visible'); });
 if (syncConfigured() && location.protocol !== 'file:') syncLoadGIS().catch(() => {});   // load Google's script early so the first sign-in tap isn't blocked as a popup
 if (syncWanted() && syncConfigured() && location.protocol !== 'file:') { sync.status = 'syncing'; if (sync.token) syncRefreshSoon(); setTimeout(() => syncRun('start'), 400); }
