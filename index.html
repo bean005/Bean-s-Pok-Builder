@@ -1418,6 +1418,16 @@ details.prof-sec[open]{padding-bottom:10px}
 @media(max-width:480px){.cx-hpf{grid-column:1/-1}.tk-hunt{flex-wrap:wrap}.tk-hb{flex-direction:row;width:100%;flex-wrap:wrap}.tk-hb .tk-plus{flex:1}.th-sw{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:380px){.home-mini{grid-template-columns:1fr}}
 @media(hover:none){.gs-bar kbd{display:none}}
+
+/* randomizer modes */
+.tk-box [hidden]{display:none!important}
+#rzList[data-mode="mon"] button[data-a="a"],#rzList[data-mode="abil"] button[data-a="m"]{display:none}
+
+/* hunts: pause / saved note */
+.tk-saved{font-size:.7rem;color:var(--muted);margin:2px 0 6px;line-height:1.4}
+.tk-saved.on{color:#86efac}.tk-saved.on::after{content:" ✓ Saved"}
+.tk-hunt.paused{opacity:.78;border-style:dashed}
+.tk-badge{display:inline-block;font-size:.6rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fbbf24;border:1px solid #fbbf24;border-radius:999px;padding:0 7px;vertical-align:middle}
 </style>
 <script>try{var _t=JSON.parse(localStorage.getItem("beanTheme")||"null");if(_t&&_t.accent)document.documentElement.style.setProperty("--accent",_t.accent)}catch(e){}</script>
 </head>
@@ -6652,7 +6662,7 @@ async function dexLists() {
     if (!dexCache.abils) {
         const d = await dexJson('https://pokeapi.co/api/v2/ability?limit=1000');
         if (d) {
-            const set = new Set(d.results.map(x => x.name));
+            const set = new Set(d.results.filter(x => dexIdOf(x.url) < 10000).map(x => x.name));   // ids 10000+ are spin-off game abilities (Conquest, Rumble), not main-series
             try { Object.keys(zaMegaDB).forEach(k => (zaMegaDB[k].abilities || []).forEach(a => { if (!/unknown/i.test(a)) set.add(String(a).toLowerCase().replace(/\s+/g, '-')); })); } catch (e) {}
             try { Object.keys(abilityDescriptions).forEach(k => set.add(String(k).toLowerCase().trim().replace(/\s+/g, '-'))); } catch (e) {}
             dexCache.abils = [...set].sort();
@@ -6841,7 +6851,7 @@ async function openAbilityInDex(name) {
     } catch (e) { showToast('Couldn\'t open the Dex.'); }
 }
 
-/* ---- stat hexagon (200 = outer edge) + equal tiles ---- */
+/* ---- stat hexagon (255 = outer edge: Blissey's HP is the highest base stat in the game) + equal tiles ---- */
 const DEX_GMAX_NOTE = `<div class="dx-gmax"><b>Gigantamax stats</b>
 <p>Gigantamaxing only raises <b>HP</b>. Attack, Defense, Sp. Atk, Sp. Def and Speed stay the same.</p>
 <ul><li><b>HP multiplier:</b> 1.5× at Dynamax Level 0, rising 0.05× per level to 2× at Dynamax Level 10 (Shedinja is the exception).</li>
@@ -6850,17 +6860,17 @@ const DEX_GMAX_NOTE = `<div class="dx-gmax"><b>Gigantamax stats</b>
 <span class="dx-src">Sources: <a href="https://bulbapedia.bulbagarden.net/wiki/Gigantamax" target="_blank" rel="noopener">Bulbapedia</a> · <a href="https://pokemondb.net/pokebase/365406/how-know-characteristics-dynamaxed-gigantamaxed-pokemon" target="_blank" rel="noopener">PokéBase</a></span></div>`;
 function dexStatsHtml(stats) {
     const val = {}; stats.forEach(x => { val[x.stat.name] = x.base_stat; });
-    const cx = 150, cy = 128, R = 86, MAX = 200, pt = (i, r) => { const a = (-90 + i * 60) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+    const cx = 150, cy = 128, R = 86, MAX = 255, pt = (i, r) => { const a = (-90 + i * 60) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
     const poly = r => DEX_STAT.map((_, i) => pt(i, r).map(n => n.toFixed(1)).join(',')).join(' ');
-    const rings = [50, 100, 150, 200].map(v => `<polygon points="${poly(R * v / MAX)}" fill="${v === 200 ? 'rgba(160,196,255,.05)' : 'none'}" stroke="#2e2e5e" stroke-width="1"/>`).join('');
+    const rings = [50, 100, 150, 200, 255].map(v => `<polygon points="${poly(R * v / MAX)}" fill="${v === 255 ? 'rgba(160,196,255,.05)' : 'none'}" stroke="#2e2e5e" stroke-width="1"/>`).join('');
     const axes = DEX_STAT.map((_, i) => { const p = pt(i, R); return `<line x1="${cx}" y1="${cy}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}" stroke="#2e2e5e"/>`; }).join('');
-    const ringLbl = [50, 100, 150, 200].map(v => `<text x="${cx + 3}" y="${(cy - R * v / MAX + 3).toFixed(1)}" font-size="7" fill="#666">${v}</text>`).join('');
+    const ringLbl = [50, 100, 150, 200, 255].map(v => `<text x="${cx + 3}" y="${(cy - R * v / MAX + 3).toFixed(1)}" font-size="7" fill="#666">${v}</text>`).join('');
     const shape = DEX_STAT.map(([k], i) => pt(i, R * Math.min(val[k] || 0, MAX) / MAX).map(n => n.toFixed(1)).join(',')).join(' ');
     const dots = DEX_STAT.map(([k, , c], i) => { const p = pt(i, R * Math.min(val[k] || 0, MAX) / MAX); return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${c}" stroke="#0a0a1e" stroke-width="1"/>`; }).join('');
     const labels = DEX_STAT.map(([k, l, c], i) => { const p = pt(i, R + 17), a = (-90 + i * 60) * Math.PI / 180, anc = Math.cos(a) > 0.3 ? 'start' : Math.cos(a) < -0.3 ? 'end' : 'middle', dx = anc === 'start' ? 6 : anc === 'end' ? -6 : 0; return `<text x="${(p[0] + dx).toFixed(1)}" y="${(p[1] - 1).toFixed(1)}" text-anchor="${anc}" font-size="10" font-weight="800" fill="${c}">${l}</text><text x="${(p[0] + dx).toFixed(1)}" y="${(p[1] + 12).toFixed(1)}" text-anchor="${anc}" font-size="12" font-weight="700" fill="#e0e0e0">${val[k] ?? '—'}</text>`; }).join('');
     const total = DEX_STAT.reduce((a, [k]) => a + (val[k] || 0), 0);
     const tiles = DEX_STAT.map(([k, l, c]) => `<div class="dx-tile" style="--c:${c}"><span>${l}</span><b>${val[k] ?? '—'}</b></div>`).join('') + `<div class="dx-tile tot"><span>Total</span><b>${total}</b></div>`;
-    return `<div class="dx-stats"><svg class="dx-radar" viewBox="0 0 300 256" role="img" aria-label="Base stat hexagon, 200 maximum">${rings}${axes}${ringLbl}<polygon points="${shape}" fill="rgba(160,196,255,.22)" stroke="#a0c4ff" stroke-width="2" stroke-linejoin="round"/>${dots}${labels}</svg><div class="dx-tiles">${tiles}</div></div><div class="dx-note">Hexagon scale: 200 = outer edge (higher stats are clipped at the edge; the numbers are exact).</div>`;
+    return `<div class="dx-stats"><svg class="dx-radar" viewBox="0 0 300 256" role="img" aria-label="Base stat hexagon, 255 maximum">${rings}${axes}${ringLbl}<polygon points="${shape}" fill="rgba(160,196,255,.22)" stroke="#a0c4ff" stroke-width="2" stroke-linejoin="round"/>${dots}${labels}</svg><div class="dx-tiles">${tiles}</div></div><div class="dx-note">Hexagon scale: 200 = outer edge (higher stats are clipped at the edge; the numbers are exact).</div>`;
 }
 
 /* ---- forms (Mega, Primal, regional, Gigantamax, other formes) ---- */
@@ -7247,23 +7257,26 @@ function tkOverlay(html) {
 const tkSpName = id => { const p = (dexCache.species || []).find(x => x.id === id); return p ? dexName(p.n) : '#' + id; };
 
 /* ---------------- Randomizer ---------------- */
-const RZ = { n: 6, gens: [1, 2, 3, 4, 5, 6, 7, 8, 9], type: '', bmax: '', bmin: '', legs: false, abil: 'own', hid: true, rows: [], busy: false };
+const RZ = { mode: 'both', n: 6, gens: [1, 2, 3, 4, 5, 6, 7, 8, 9], type: '', bmax: '', bmin: '', legs: false, abil: 'own', hid: true, rows: [], busy: false };
 function rzOpen() {
-    const ui = tkOverlay(`<h3>🎲 Randomizer</h3><p>Roll a random set of Pokémon and abilities. Each slot can be re-rolled on its own, and 🔒 keeps one.</p>
-        <div class="rz-opts">
-            <label>How many<input class="tk-in" type="number" id="rzN" min="1" max="30" value="${RZ.n}"></label>
-            <label>Type<select class="tk-in" id="rzT"><option value="">Any</option>${TK_TYPES.map(t => `<option value="${t}" ${RZ.type === t ? 'selected' : ''}>${dexName(t)}</option>`).join('')}</select></label>
-            <label>BST min<input class="tk-in" type="number" id="rzBmin" min="0" max="800" placeholder="none" value="${RZ.bmin}"></label>
-            <label>BST max<input class="tk-in" type="number" id="rzBmax" min="0" max="800" placeholder="none" value="${RZ.bmax}"></label>
+    const ui = tkOverlay(`<h3>🎲 Randomizer</h3><p>Randomize Pokémon, abilities, or both. Each slot can be re-rolled on its own, and 🔒 keeps one.</p>
+        <div class="rz-opts"><label style="grid-column:1/-1">Randomize<select class="tk-in" id="rzMode"><option value="mon" ${RZ.mode === 'mon' ? 'selected' : ''}>Pokémon only</option><option value="abil" ${RZ.mode === 'abil' ? 'selected' : ''}>Abilities only (for my team)</option><option value="both" ${RZ.mode === 'both' ? 'selected' : ''}>Pokémon + abilities</option></select></label></div>
+        <div id="rzFilters">
+            <div class="rz-opts">
+                <label>How many<input class="tk-in" type="number" id="rzN" min="1" max="30" value="${RZ.n}"></label>
+                <label>Type<select class="tk-in" id="rzT"><option value="">Any</option>${TK_TYPES.map(t => `<option value="${t}" ${RZ.type === t ? 'selected' : ''}>${dexName(t)}</option>`).join('')}</select></label>
+                <label>BST min<input class="tk-in" type="number" id="rzBmin" min="0" max="800" placeholder="none" value="${RZ.bmin}"></label>
+                <label>BST max<input class="tk-in" type="number" id="rzBmax" min="0" max="800" placeholder="none" value="${RZ.bmax}"></label>
+            </div>
+            <div class="bk-h" style="margin:8px 0 2px">Generations</div>
+            <div class="rz-gens">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(g => `<button type="button" class="rz-gen ${RZ.gens.includes(g) ? 'on' : ''}" data-g="${g}" aria-pressed="${RZ.gens.includes(g)}">${g}</button>`).join('')}</div>
+            <div class="rz-opts2"><label class="ck"><input type="checkbox" id="rzLeg" ${RZ.legs ? 'checked' : ''}> Include legendaries &amp; mythicals</label></div>
         </div>
-        <div class="bk-h" style="margin:8px 0 2px">Generations</div>
-        <div class="rz-gens">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(g => `<button type="button" class="rz-gen ${RZ.gens.includes(g) ? 'on' : ''}" data-g="${g}" aria-pressed="${RZ.gens.includes(g)}">${g}</button>`).join('')}</div>
-        <div class="rz-opts2">
-            <label class="ck"><input type="checkbox" id="rzLeg" ${RZ.legs ? 'checked' : ''}> Include legendaries &amp; mythicals</label>
-            <label>Abilities<select class="tk-in" id="rzAm"><option value="own" ${RZ.abil === 'own' ? 'selected' : ''}>From its own abilities</option><option value="any" ${RZ.abil === 'any' ? 'selected' : ''}>Any ability (chaos)</option></select></label>
+        <div class="rz-opts2" id="rzAbOpts">
+            <label>Abilities<select class="tk-in" id="rzAm"><option value="own" ${RZ.abil === 'own' ? 'selected' : ''}>From its own abilities</option><option value="any" ${RZ.abil === 'any' ? 'selected' : ''}>Any real ability (chaos)</option></select></label>
             <label class="ck"><input type="checkbox" id="rzHid" ${RZ.hid ? 'checked' : ''}> Allow hidden abilities</label>
         </div>
-        <div class="bk-row"><button type="button" class="pill-btn" data-a="roll">🎲 Roll Pokémon</button><button type="button" class="pill-btn" data-a="rollab">🔀 Re-roll all abilities</button></div>
+        <div class="bk-row"><button type="button" class="pill-btn" id="rzRollBtn" data-a="roll">🎲 Roll Pokémon</button><button type="button" class="pill-btn" id="rzUse" data-a="useteam" hidden>👥 Use my team</button><button type="button" class="pill-btn" id="rzAbBtn" data-a="rollab">🔀 Re-roll all abilities</button></div>
         <div id="rzList"></div>
         <div class="bk-row" id="rzAct" hidden><button type="button" class="pill-btn" data-a="pool">➕ Save as a new team</button><button type="button" class="pill-btn" data-a="copy">⧉ Copy list</button></div>
         <div class="bk-msg" id="rzMsg" role="status"></div>`);
@@ -7272,12 +7285,18 @@ function rzOpen() {
         RZ.n = Math.max(1, Math.min(30, parseInt($('rzN').value, 10) || 6)); RZ.type = $('rzT').value;
         const bn = parseInt($('rzBmin').value, 10), bx = parseInt($('rzBmax').value, 10);
         RZ.bmin = isNaN(bn) ? '' : bn; RZ.bmax = isNaN(bx) ? '' : bx;
-        RZ.legs = $('rzLeg').checked; RZ.abil = $('rzAm').value; RZ.hid = $('rzHid').checked;
+        RZ.legs = $('rzLeg').checked; RZ.abil = $('rzAm').value; RZ.hid = $('rzHid').checked; RZ.mode = $('rzMode').value;
+    };
+    const applyMode = () => {   // show only the controls that matter for the chosen mode
+        const m = RZ.mode, sh = (id, on) => { const e = $(id); if (e) e.hidden = !on; };
+        sh('rzFilters', m !== 'abil'); sh('rzAbOpts', m !== 'mon'); sh('rzRollBtn', m !== 'abil'); sh('rzAbBtn', m !== 'mon'); sh('rzUse', m === 'abil');
+        const b = $('rzAbBtn'); if (b) b.textContent = m === 'abil' ? '🔀 Randomize abilities' : '🔀 Re-roll all abilities';
+        const L = $('rzList'); if (L) L.dataset.mode = m;
     };
     const draw = () => {
         const L = $('rzList'); if (!L) return; const h = L.offsetHeight; if (h) L.style.minHeight = h + 'px';
         L.innerHTML = RZ.rows.map((r, i) => `<div class="rz-row"><img src="${TK_IMG}${r.id}.png" alt="" loading="lazy"><div class="rz-main"><b>${calcEsc(dexName(r.n))}</b> ${r.types.map(dexTypePill).join(' ')} <small>BST ${r.bst}</small><div class="rz-ab">${r.ab ? calcEsc(dexName(r.ab)) + (r.abH ? ' <small>(hidden)</small>' : '') : '—'}</div></div><div class="rz-btns"><button type="button" data-a="m" data-i="${i}" title="Re-roll this Pokémon" aria-label="Re-roll Pokémon ${i + 1}">🎲</button><button type="button" data-a="a" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="l" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
-        $('rzAct').hidden = !RZ.rows.length; L.style.minHeight = '';
+        L.dataset.mode = RZ.mode; $('rzAct').hidden = !RZ.rows.length; L.style.minHeight = '';
     };
     ui.o.addEventListener('click', async e => {
         const g = e.target.closest('.rz-gen');
@@ -7290,14 +7309,29 @@ function rzOpen() {
             RZ.busy = true;
             if (a === 'pool') { await rzSave(say); RZ.busy = false; return; }
             say('Rolling…'); let warn = '';
-            if (a === 'roll') { await rzRollAll(); if (RZ.rows.length < RZ.n) warn = `Only ${RZ.rows.length} Pokémon matched those filters.`; } else if (a === 'rollab') { for (const r of RZ.rows) if (!r.lock) await rzAbil(r); }
+            if (a === 'roll') { await rzRollAll(); if (RZ.rows.length < RZ.n) warn = `Only ${RZ.rows.length} Pokémon matched those filters.`; } else if (a === 'rollab') { if (!RZ.rows.length) warn = RZ.mode === 'abil' ? 'Tap “Use my team” first so there are Pokémon to randomize.' : 'Roll some Pokémon first.'; for (const r of RZ.rows) if (!r.lock) await rzAbil(r); }
+            else if (a === 'useteam') warn = await rzUseTeam();
             else if (a === 'm') { const r = await rzTake(await rzPool(), new Set(RZ.rows.map(x => x.id)), 1); if (r) { await rzAbil(r); RZ.rows[i] = r; } else warn = 'Nothing else fits those filters.'; }
             else if (a === 'a') await rzAbil(RZ.rows[i]);
             draw(); say(warn, warn ? 'bad' : '');
         } catch (x) { say('Something went wrong. Check your connection and try again.', 'bad'); }
         RZ.busy = false;
     });
-    draw();
+    ui.o.addEventListener('change', e => { if (e.target.id === 'rzMode') { RZ.mode = e.target.value; applyMode(); draw(); } });
+    applyMode(); draw();
+}
+async function rzUseTeam() {   // abilities-only mode: take the Pokémon from the builder (active team, or the whole pool if none are active)
+    const src = pokemonList.filter(p => p.active).length ? pokemonList.filter(p => p.active) : pokemonList;
+    if (!src.length) return 'Your builder has no Pokémon yet. Build a team first, or switch to “Pokémon + abilities”.';
+    await dexLists(); if (!dexCache.species) throw new Error('no list');
+    const rows = [];
+    for (const p of src.slice(0, 30)) {
+        const sp = dexSpeciesOfForm(String(p.name).toLowerCase()) || (p._data && dexCache.species.find(x => x.id === p._data.id)); if (!sp) continue;
+        const m = await dexMon(sp.id); if (!m) continue;
+        const r = { id: sp.id, n: sp.n, types: m.types.map(t => t.type.name), bst: m.stats.reduce((a, x) => a + x.base_stat, 0), ab: '', abH: false, lock: false };
+        await rzAbil(r); rows.push(r);
+    }
+    RZ.rows = rows; return rows.length ? '' : 'Couldn\'t match your Pokémon to the Pokédex.';
 }
 async function rzPool() {
     await dexLists(); if (!dexCache.species) throw new Error('no list');
@@ -7318,8 +7352,24 @@ async function rzTake(pool, taken) {
     }
     return null;
 }
+const _rzMain = {};
+async function rzMainAbil(slug) {   // true for real main-series abilities (and the new Z-A ones this app knows about)
+    if (_rzMain[slug] !== undefined) return _rzMain[slug];
+    let ok = false;
+    try { ok = Object.keys(abilityDescriptions).some(k => k.toLowerCase().trim().replace(/\s+/g, '-') === slug) || Object.keys(zaMegaDB).some(k => (zaMegaDB[k].abilities || []).some(x => String(x).toLowerCase().replace(/\s+/g, '-') === slug)); } catch (e) {}
+    if (!ok) { const d = await dexJson('https://pokeapi.co/api/v2/ability/' + slug); ok = !!(d && d.is_main_series !== false); }
+    return (_rzMain[slug] = ok);
+}
 async function rzAbil(r) {
-    if (RZ.abil === 'any') { const l = dexCache.abils || []; r.ab = l.length ? l[Math.floor(Math.random() * l.length)] : ''; r.abH = false; return; }
+    if (RZ.mode === 'mon') {   // Pokémon-only mode: keep its normal ability
+        const m = await dexMon(r.id); if (!m) return; const a = m.abilities.find(x => !x.is_hidden) || m.abilities[0];
+        if (a) { r.ab = a.ability.name; r.abH = !!a.is_hidden; } return;
+    }
+    if (RZ.abil === 'any') {
+        const l = dexCache.abils || []; r.ab = ''; r.abH = false;
+        for (let t = 0; l.length && t < 40; t++) { const c = l[Math.floor(Math.random() * l.length)]; if (await rzMainAbil(c)) { r.ab = c; break; } }
+        return;
+    }
     const m = await dexMon(r.id); if (!m) return;
     let l = m.abilities.filter(a => RZ.hid || !a.is_hidden); if (!l.length) l = m.abilities;
     const a = l[Math.floor(Math.random() * l.length)]; r.ab = a.ability.name; r.abH = !!a.is_hidden;
@@ -7352,8 +7402,22 @@ async function rzSave(say) {
 const TK_GAMES = [['rby', 'Red / Blue / Yellow', 1], ['gsc', 'Gold / Silver / Crystal', 2], ['rse', 'Ruby / Sapphire / Emerald', 3], ['frlg', 'FireRed / LeafGreen', 3], ['dppt', 'Diamond / Pearl / Platinum', 4], ['hgss', 'HeartGold / SoulSilver', 4], ['bw', 'Black / White', 5], ['b2w2', 'Black 2 / White 2', 5], ['xy', 'X / Y', 6], ['oras', 'Omega Ruby / Alpha Sapphire', 6], ['sm', 'Sun / Moon', 7], ['usum', 'Ultra Sun / Ultra Moon', 7], ['lgpe', 'Let\'s Go Pikachu / Eevee', 1], ['swsh', 'Sword / Shield', 8], ['bdsp', 'Brilliant Diamond / Shining Pearl', 4], ['pla', 'Legends: Arceus', 4], ['sv', 'Scarlet / Violet', 9], ['za', 'Legends: Z-A', 6], ['cobble', 'Cobblemon / Cobbleverse', 1], ['go', 'Pokémon GO', 1], ['home', 'Pokémon HOME', 1]];
 const TK_METHODS = ['Random encounters', 'Soft reset', 'Masuda method', 'Chaining / chain fishing', 'Outbreak / horde / SOS', 'Raid / Dynamax / Tera raid', 'Static encounter', 'Egg', 'Other'];
 const TK_ODDS = [['1 / 4096 (full odds, Gen 6+)', 4096], ['1 / 8192 (full odds, Gen 2–5)', 8192], ['≈ 1 / 1365 (Shiny Charm, Gen 6+)', 1365], ['≈ 1 / 683 (Masuda, Gen 6+)', 683], ['1 / 512 (Masuda + Charm, Gen 6+)', 512], ['≈ 1 / 1638 (Masuda, Gen 4)', 1638], ['≈ 1 / 1365 (Masuda, Gen 5)', 1365], ['Custom…', 0]];
-const TK = { tab: 'hunt', gen: 1, game: 'sv' };
+const TK = { tab: 'hunt', gen: 1, game: 'sv', scope: 'all' };
+const TK_DEXMAP = { rby:['kanto'], gsc:['original-johto'], rse:['hoenn'], frlg:['kanto'], dppt:['extended-sinnoh'], hgss:['updated-johto'], bw:['original-unova'], b2w2:['updated-unova'], xy:['kalos-central','kalos-coastal','kalos-mountain'], oras:['updated-hoenn'], sm:['original-alola'], usum:['updated-alola'], lgpe:['letsgo-kanto'], swsh:['galar','isle-of-armor','crown-tundra'], bdsp:['extended-sinnoh'], pla:['hisui'], sv:['paldea','kitakami','blueberry'], za:['lumiose'] };   // PokeAPI regional Pokédexes; cobble / GO / HOME allow everything
+const _tkSets = {}, _tkSetV = {};
+function tkGameSet(game) {   // Promise of the Set of Pokémon ids in that game (null = unknown, allow all)
+    if (_tkSets[game]) return _tkSets[game];
+    const slugs = TK_DEXMAP[game]; if (!slugs) return (_tkSets[game] = Promise.resolve((_tkSetV[game] = null)));
+    return (_tkSets[game] = Promise.all(slugs.map(sl => dexJson('https://pokeapi.co/api/v2/pokedex/' + sl))).then(arr => {
+        const set = new Set(); let ok = false;
+        arr.forEach(d => { if (d && d.pokemon_entries) { ok = true; d.pokemon_entries.forEach(e => set.add(dexIdOf(e.pokemon_species.url))); } });
+        if (!ok) { delete _tkSets[game]; return (_tkSetV[game] = null); }
+        return (_tkSetV[game] = set);
+    }));
+}
 const tkJ = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+{ const sv = tkJ('beanTk', {}); if (sv && typeof sv === 'object') { if (['hunt', 'shiny', 'live'].includes(sv.tab)) TK.tab = sv.tab; if (typeof sv.scope === 'string') TK.scope = sv.scope; if (typeof sv.game === 'string' && TK_GAMES.some(g => g[0] === sv.game)) TK.game = sv.game; } }
+const tkSaveState = () => { try { localStorage.setItem('beanTk', JSON.stringify({ tab: TK.tab, scope: TK.scope, game: TK.game })); } catch (e) {} };
 const tkHunts = () => { const a = tkJ('beanHunts', []); return Array.isArray(a) ? a : []; };
 const tkHuntsSave = a => { try { localStorage.setItem('beanHunts', JSON.stringify(a)); } catch (e) {} };
 const tkDex = () => { const o = tkJ('beanDex', {}); return o && typeof o === 'object' && !Array.isArray(o) ? o : {}; };
@@ -7361,9 +7425,23 @@ const tkDexSet = (k, v) => { const o = tkDex(); o[k] = v ? 1 : 0; try { localSto
 const tkN = n => Number(n || 0).toLocaleString();
 function tkTileRefresh() {
     const el = document.getElementById('tkTileSub'); if (!el) return;
-    const d = tkDex(), sh = Object.keys(d).filter(k => k[0] === 's' && d[k]).length, act = tkHunts().filter(h => !h.done).length;
-    el.textContent = (sh || act) ? `${sh} shiny${sh === 1 ? '' : 's'}${act ? ` · ${act} hunting` : ''}` : 'Shiny counter, living dex';
+    const d = tkDex(), sh = Object.keys(d).filter(k => k[0] === 's' && d[k]).length, hs = tkHunts().filter(h => !h.done), act = hs.filter(h => !h.paused).length, pa = hs.length - act;
+    const bits = []; if (sh) bits.push(`${sh} shiny${sh === 1 ? '' : 's'}`); if (act) bits.push(`${act} hunting`); if (pa) bits.push(`${pa} paused`);
+    el.textContent = bits.length ? bits.join(' · ') : 'Shiny counter, living dex';
 }
+function tkScopeInfo() {   // what the "game or region" dropdown currently means: which Pokémon to show and which save-key to use
+    const sc = TK.scope || 'all', all = () => Array.from({ length: 1025 }, (_, i) => i + 1); let m;
+    if ((m = /^r([1-9])$/.exec(sc)) && DEX_GENS[m[1]]) { const [lo, hi, rg] = DEX_GENS[m[1]]; return { key: 'cnat', label: rg + ' (Gen ' + m[1] + ')', ids: Array.from({ length: hi - lo + 1 }, (_, i) => lo + i) }; }
+    if ((m = /^g:(\w+)$/.exec(sc)) && TK_DEXMAP[m[1]] && TK_GAMES.some(g => g[0] === m[1])) {
+        const g = m[1], gl = TK_GAMES.find(x => x[0] === g)[1], v = _tkSetV[g];
+        if (v === undefined) return { key: 'c' + g, label: gl, ids: null, pending: tkGameSet(g) };
+        if (v === null) return { key: 'c' + g, label: gl, ids: all(), note: 'Couldn\'t load this game\'s Pokédex, so every Pokémon is shown.' };
+        return { key: 'c' + g, label: gl, ids: [...v].filter(id => id <= 1025).sort((x, y) => x - y) };
+    }
+    return { key: 'cnat', label: 'All games', ids: all() };
+}
+const tkAgo = ts => { if (!ts) return ''; const m = Math.round((Date.now() - ts) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' }); };
+function tkFlashSaved(box) { const el = box.querySelector('.tk-saved'); if (!el) return; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 900); }
 function tkOpen() {
     const ui = tkOverlay(`<h3>✨ Hunts &amp; Dex</h3><div class="tk-tabs" role="tablist"><button type="button" class="tk-tab" data-t="hunt">Hunt counter</button><button type="button" class="tk-tab" data-t="shiny">Shiny dex</button><button type="button" class="tk-tab" data-t="live">Living dex</button></div><div id="tkBody"></div>`);
     const body = () => ui.box.querySelector('#tkBody');
@@ -7373,12 +7451,13 @@ function tkOpen() {
         body().innerHTML = TK.tab === 'hunt' ? tkHuntHtml() : tkGridHtml();
         ui.box.scrollTop = y;
         if (TK.tab === 'hunt') tkFillNames(ui.box);
+        else { const sc = tkScopeInfo(); if (sc.pending) sc.pending.then(() => { if (ui.o.isConnected && TK.tab !== 'hunt') render(); }); }
     };
     ui.box.addEventListener('click', e => {
-        const t = e.target.closest('.tk-tab'); if (t) { TK.tab = t.dataset.t; render(); return; }
+        const t = e.target.closest('.tk-tab'); if (t) { TK.tab = t.dataset.t; tkSaveState(); render(); return; }
         const cell = e.target.closest('.tk-cell');
         if (cell) {
-            const id = +cell.dataset.id, key = TK.tab === 'shiny' ? 's' + id : 'c' + TK.game + '_' + id, on = !cell.classList.contains('on');
+            const id = +cell.dataset.id, key = TK.tab === 'shiny' ? 's' + id : tkScopeInfo().key + '_' + id, on = !cell.classList.contains('on');
             tkDexSet(key, on); cell.classList.toggle('on', on); cell.setAttribute('aria-pressed', String(on));
             if (TK.tab === 'shiny') cell.querySelector('img').src = TK_IMG + (on ? 'shiny/' : '') + id + '.png';
             tkProgUpdate(ui.box); return;
@@ -7388,74 +7467,87 @@ function tkOpen() {
         if (a === 'start') { tkStart(ui.box, render); return; }
         if (!h) return;
         if (a === '+' || a === '-') {
-            h.n = Math.max(0, (h.n || 0) + (a === '+' ? 1 : -1)); tkHuntsSave(hs);
-            const n = ui.box.querySelector('#tkN-' + h.id), p = ui.box.querySelector('#tkP-' + h.id); if (n) n.textContent = tkN(h.n); if (p) p.innerHTML = tkProbHtml(h); return;
+            h.n = Math.max(0, (h.n || 0) + (a === '+' ? 1 : -1)); h.tl = Date.now(); tkHuntsSave(hs);
+            const n = ui.box.querySelector('#tkN-' + h.id), p = ui.box.querySelector('#tkP-' + h.id); if (n) n.textContent = tkN(h.n); if (p) p.innerHTML = tkProbHtml(h); tkFlashSaved(ui.box); return;
         }
-        if (a === 'found') { h.done = true; h.tf = Date.now(); tkHuntsSave(hs); tkDexSet('s' + h.sp, true); showToast('✨ Shiny logged!'); render(); return; }
-        if (a === 'del') { showConfirm('Delete this hunt?', 'Its count will be lost.', () => { tkHuntsSave(tkHunts().filter(x => String(x.id) !== b.dataset.id)); render(); }); return; }
+        if (a === 'pause' || a === 'resume') { h.paused = a === 'pause'; h.tl = Date.now(); tkHuntsSave(hs); showToast(a === 'pause' ? '⏸ Hunt paused. It stays saved under “Paused hunts”.' : '▶ Hunt resumed.'); render(); return; }
+        if (a === 'found') { h.done = true; h.paused = false; h.tf = Date.now(); tkHuntsSave(hs); tkDexSet('s' + h.sp, true); showToast('✨ Shiny logged!'); render(); return; }
+        if (a === 'del') { showConfirm('Delete this hunt?', 'Its count will be lost. (Use Pause instead if you want to come back to it.)', () => { tkHuntsSave(tkHunts().filter(x => String(x.id) !== b.dataset.id)); render(); }); return; }
         if (a === 'rmlog') { showConfirm('Remove this from your log?', 'The shiny stays ticked in your Shiny Dex.', () => { tkHuntsSave(tkHunts().filter(x => String(x.id) !== b.dataset.id)); render(); }); return; }
     });
     ui.box.addEventListener('change', e => {
-        if (e.target.id === 'tkGen') { TK.gen = +e.target.value; render(); }
-        else if (e.target.id === 'tkGame') { TK.game = e.target.value; const g = TK_GAMES.find(x => x[0] === TK.game); if (g) TK.gen = g[2]; render(); }
+        if (e.target.id === 'tkScope') { TK.scope = e.target.value; const m = /^g:(\w+)$/.exec(TK.scope); if (m) TK.game = m[1]; tkSaveState(); render(); }
+        else if (e.target.id === 'tkG') { TK.game = e.target.value; tkSaveState(); tkFillNames(ui.box); const msg = ui.box.querySelector('#tkMsg'); if (msg) msg.textContent = ''; }
         else if (e.target.id === 'tkO') { const c = ui.box.querySelector('#tkOc'); if (c) c.hidden = e.target.value !== '0'; }
     });
-    render(); dexLists().then(() => { if (ui.o.isConnected) { tkFillNames(ui.box); if (TK.tab !== 'hunt') { const y = ui.box.scrollTop; /* titles only */ ui.box.querySelectorAll('.tk-cell').forEach(c => { c.title = tkSpName(+c.dataset.id); }); ui.box.scrollTop = y; } } });
+    render(); dexLists().then(() => { if (ui.o.isConnected) { tkFillNames(ui.box); if (TK.tab !== 'hunt') { const y = ui.box.scrollTop; ui.box.querySelectorAll('.tk-cell').forEach(c => { c.title = tkSpName(+c.dataset.id); }); ui.box.scrollTop = y; } } });
 }
-function tkFillNames(box) { const dl = box.querySelector('#tkSpl'); if (dl && dexCache.species && !dl.children.length) dl.innerHTML = dexCache.species.filter(p => p.id <= 1025).map(p => `<option value="${calcEsc(dexName(p.n))}"></option>`).join(''); }
+function tkFillNames(box) {   // the Pokémon suggestions only list what exists in the chosen game
+    const dl = box.querySelector('#tkSpl'), sel = box.querySelector('#tkG'); if (!dl || !dexCache.species) return;
+    const g = sel ? sel.value : TK.game, gl = (TK_GAMES.find(x => x[0] === g) || [0, g])[1];
+    tkGameSet(g).then(set => {
+        if (!dl.isConnected) return; const list = dexCache.species.filter(p => p.id <= 1025 && (!set || set.has(p.id)));
+        dl.innerHTML = list.map(p => `<option value="${calcEsc(dexName(p.n))}"></option>`).join('');
+        const note = box.querySelector('#tkGameNote'); if (note) note.textContent = set ? `${list.length} Pokémon are available in ${gl}.` : '';
+    });
+}
 function tkProbHtml(h) {
     const N = h.odds || 4096, n = h.n || 0, pct = (1 - Math.pow(1 - 1 / N, n)) * 100, x = n / N;
     return `${x.toFixed(2)}× odds · ${pct < 99.95 ? pct.toFixed(1) : '99.9+'}% chance by now`;
 }
 function tkHuntHtml() {
-    const hs = tkHunts(), act = hs.filter(h => !h.done), done = hs.filter(h => h.done).sort((a, b) => (b.tf || 0) - (a.tf || 0));
+    const hs = tkHunts(), act = hs.filter(h => !h.done && !h.paused), paused = hs.filter(h => !h.done && h.paused), done = hs.filter(h => h.done).sort((a, b) => (b.tf || 0) - (a.tf || 0));
     const gl = id => (TK_GAMES.find(g => g[0] === id) || [0, id])[1];
     const form = `<div class="tk-sec-h" style="margin-top:2px">Start a hunt</div><div class="tk-form">
         <input class="tk-in wide" id="tkSp" list="tkSpl" placeholder="Pokémon (start typing)" autocomplete="off"><datalist id="tkSpl"></datalist>
-        <select class="tk-in" id="tkG">${TK_GAMES.map(g => `<option value="${g[0]}" ${g[0] === TK.game ? 'selected' : ''}>${g[1]}</option>`).join('')}</select>
+        <select class="tk-in" id="tkG" aria-label="Game">${TK_GAMES.map(g => `<option value="${g[0]}" ${g[0] === TK.game ? 'selected' : ''}>${g[1]}</option>`).join('')}</select><div class="dx-note wide" id="tkGameNote" style="font-size:.7rem;color:var(--muted);margin:-2px 0 0"></div>
         <select class="tk-in" id="tkM">${TK_METHODS.map(m => `<option>${m}</option>`).join('')}</select>
         <select class="tk-in" id="tkO">${TK_ODDS.map(o => `<option value="${o[1]}">${o[0]}</option>`).join('')}</select>
         <input class="tk-in" id="tkOc" type="number" min="2" placeholder="Odds: 1 / ?" hidden>
         <button type="button" class="pill-btn wide" data-a="start">▶ Start hunt</button></div>
         <div class="bk-msg" id="tkMsg" role="status"></div>
         <div class="dx-note" style="font-size:.7rem;color:var(--muted)">Odds are the commonly quoted values. Pick Custom if your method differs.</div>`;
-    const active = act.length ? `<div class="tk-sec-h">Active hunts</div>` + act.map(h => `<div class="tk-hunt"><img src="${TK_IMG}${h.sp}.png" alt=""><div class="tk-hm"><b>${calcEsc(h.name)}</b><small>${calcEsc(gl(h.game))} · ${calcEsc(h.method)} · 1/${tkN(h.odds)}</small><div class="tk-c"><span id="tkN-${h.id}">${tkN(h.n)}</span> <small id="tkP-${h.id}">${tkProbHtml(h)}</small></div></div><div class="tk-hb"><button type="button" class="tk-plus" data-a="+" data-id="${h.id}" aria-label="Add one encounter to ${calcEsc(h.name)}">+1</button><button type="button" data-a="-" data-id="${h.id}" aria-label="Remove one encounter">−1</button><button type="button" data-a="found" data-id="${h.id}">✨ Found it!</button><button type="button" data-a="del" data-id="${h.id}" aria-label="Delete hunt">✕</button></div></div>`).join('') : '';
+    const card = (h, isP) => `<div class="tk-hunt${isP ? ' paused' : ''}"><img src="${TK_IMG}${h.sp}.png" alt=""><div class="tk-hm"><b>${calcEsc(h.name)}</b>${isP ? ' <span class="tk-badge">Paused</span>' : ''}<small>${calcEsc(gl(h.game))} · ${calcEsc(h.method)} · 1/${tkN(h.odds)}</small><div class="tk-c"><span id="tkN-${h.id}">${tkN(h.n)}</span> <small id="tkP-${h.id}">${tkProbHtml(h)}</small></div><small>Last updated ${tkAgo(h.tl || h.t0)}</small></div><div class="tk-hb">${isP ? `<button type="button" class="tk-plus" data-a="resume" data-id="${h.id}">▶ Resume</button>` : `<button type="button" class="tk-plus" data-a="+" data-id="${h.id}" aria-label="Add one encounter to ${calcEsc(h.name)}">+1</button><button type="button" data-a="-" data-id="${h.id}" aria-label="Remove one encounter">−1</button>`}<button type="button" data-a="found" data-id="${h.id}">✨ Found it!</button>${isP ? '' : `<button type="button" data-a="pause" data-id="${h.id}">⏸ Pause</button>`}<button type="button" data-a="del" data-id="${h.id}" aria-label="Delete hunt">✕</button></div></div>`;
+    const saved = (act.length + paused.length) ? `<div class="tk-saved">💾 Hunts save automatically on this device, so you can close this and come back any time. Use <b>Pause</b> to put one aside.</div>` : '';
+    const active = act.length ? `<div class="tk-sec-h">Active hunts</div>` + act.map(h => card(h, false)).join('') : '';
+    const pausedHtml = paused.length ? `<div class="tk-sec-h">Paused hunts</div>` + paused.map(h => card(h, true)).join('') : '';
     const enc = done.filter(h => h.n > 0), avg = enc.length ? Math.round(enc.reduce((a, h) => a + h.n, 0) / enc.length) : 0, best = enc.length ? Math.min(...enc.map(h => h.n)) : 0;
     const log = done.length ? `<div class="tk-sec-h">Shiny log</div><div class="tk-stats"><span>✨ ${done.length} found</span>${enc.length ? `<span>Avg ${tkN(avg)} encounters</span><span>Fastest ${tkN(best)}</span>` : ''}</div>` + done.map(h => `<div class="tk-log"><img src="${TK_IMG}shiny/${h.sp}.png" alt=""><div class="tk-lm"><b>${calcEsc(h.name)}</b><small>${calcEsc(gl(h.game))} · ${calcEsc(h.method)} · ${tkN(h.n)} encounters · ${new Date(h.tf || h.t0).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' })}</small></div><button type="button" class="pill-btn" data-a="rmlog" data-id="${h.id}" aria-label="Remove from log">✕</button></div>`).join('') : '';
-    return form + active + log;
+    return form + saved + active + pausedHtml + log;
 }
-function tkStart(box, render) {
+async function tkStart(box, render) {
     const msg = box.querySelector('#tkMsg'), say = t => { msg.textContent = t; msg.className = 'bk-msg bad'; };
     const q = dexNorm(box.querySelector('#tkSp').value);
     if (!dexCache.species) { say('Still loading the Pokémon list, try again in a moment.'); return; }
     const sp = dexCache.species.find(p => p.id <= 1025 && (dexNorm(dexName(p.n)) === q || dexNorm(p.n) === q));
     if (!sp) { say('Pick a Pokémon from the list.'); return; }
+    const g = box.querySelector('#tkG').value, gl = (TK_GAMES.find(x => x[0] === g) || [0, g])[1], set = await tkGameSet(g);
+    if (set && !set.has(sp.id)) { say(`${dexName(sp.n)} isn't in ${gl}. Pick a Pokémon that is, or change the game.`); return; }
     let odds = +box.querySelector('#tkO').value; if (!odds) odds = parseInt(box.querySelector('#tkOc').value, 10);
     if (!odds || odds < 2) { say('Enter your odds as a number, for example 4096.'); return; }
-    TK.game = box.querySelector('#tkG').value;
-    const hs = tkHunts(); hs.push({ id: Date.now(), sp: sp.id, name: dexName(sp.n), game: TK.game, method: box.querySelector('#tkM').value, odds, n: 0, t0: Date.now(), done: false });
+    TK.game = g; tkSaveState();
+    const hs = tkHunts(); hs.push({ id: Date.now(), sp: sp.id, name: dexName(sp.n), game: g, method: box.querySelector('#tkM').value, odds, n: 0, t0: Date.now(), tl: Date.now(), done: false });
     tkHuntsSave(hs); render();
 }
-function tkGridHtml() {
-    const [lo, hi, region] = DEX_GENS[TK.gen], shiny = TK.tab === 'shiny', d = tkDex();
-    const key = id => shiny ? 's' + id : 'c' + TK.game + '_' + id, total = hi - lo + 1;
-    let have = 0, all = 0; for (const k in d) { if (!d[k]) continue; if (shiny ? k[0] === 's' : k.startsWith('c' + TK.game + '_')) { all++; const id = +k.split(/[sc_]/).pop(); if (id >= lo && id <= hi) have++; } }
-    const cells = []; for (let id = lo; id <= hi; id++) { const on = !!d[key(id)]; cells.push(`<button type="button" class="tk-cell ${on ? 'on' : ''} ${shiny ? '' : 'liv'}" data-id="${id}" title="${calcEsc(tkSpName(id))}" aria-label="${calcEsc(tkSpName(id))}" aria-pressed="${on}"><img loading="lazy" alt="" src="${TK_IMG}${shiny && on ? 'shiny/' : ''}${id}.png"></button>`); }
-    const genSel = `<select class="tk-in" id="tkGen" aria-label="Generation">${Object.keys(DEX_GENS).map(g => `<option value="${g}" ${+g === TK.gen ? 'selected' : ''}>Gen ${g} · ${DEX_GENS[g][2]}</option>`).join('')}</select>`;
-    const gameSel = shiny ? '' : `<select class="tk-in" id="tkGame" aria-label="Game">${TK_GAMES.map(g => `<option value="${g[0]}" ${g[0] === TK.game ? 'selected' : ''}>${g[1]}</option>`).join('')}</select>`;
-    const gname = (TK_GAMES.find(g => g[0] === TK.game) || [0, ''])[1];
-    return `<div class="bk-row" style="margin:0 0 8px">${gameSel}${genSel}</div>
-        <div class="tk-stats"><span id="tkProgTxt" data-lo="${lo}" data-hi="${hi}"><b>${have} / ${total}</b> Gen ${TK.gen} ${shiny ? 'shinies' : 'caught in ' + calcEsc(gname)}</span><span id="tkProgAll">${all} total ${shiny ? 'shinies' : 'in this game'}</span></div>
+let TK_VIEW = null;
+function tkGridHtml() {   // Shiny dex / Living dex: one "game or region" dropdown decides which Pokémon are shown
+    const shiny = TK.tab === 'shiny', d = tkDex(), sc = tkScopeInfo(), cur = TK.scope || 'all';
+    const sel = `<select class="tk-in" id="tkScope" aria-label="Game or region" style="width:100%"><option value="all" ${cur === 'all' ? 'selected' : ''}>All games (National Dex)</option><optgroup label="Regions">${Object.keys(DEX_GENS).map(g => `<option value="r${g}" ${cur === 'r' + g ? 'selected' : ''}>${DEX_GENS[g][2]} (Gen ${g})</option>`).join('')}</optgroup><optgroup label="Games">${TK_GAMES.filter(g => TK_DEXMAP[g[0]]).map(g => `<option value="g:${g[0]}" ${cur === 'g:' + g[0] ? 'selected' : ''}>${g[1]}</option>`).join('')}</optgroup></select>`;
+    if (!sc.ids) { TK_VIEW = null; return `<div class="bk-row" style="margin:0 0 8px">${sel}</div><div class="dx-note">Loading ${calcEsc(sc.label)}'s Pokédex…</div>`; }
+    const key = id => shiny ? 's' + id : sc.key + '_' + id; TK_VIEW = { ids: sc.ids, key };
+    let have = 0; const cells = sc.ids.map(id => { const on = !!d[key(id)]; if (on) have++; return `<button type="button" class="tk-cell ${on ? 'on' : ''} ${shiny ? '' : 'liv'}" data-id="${id}" title="${calcEsc(tkSpName(id))}" aria-label="${calcEsc(tkSpName(id))}" aria-pressed="${on}"><img loading="lazy" alt="" src="${TK_IMG}${shiny && on ? 'shiny/' : ''}${id}.png"></button>`; });
+    const total = sc.ids.length, allSh = Object.keys(d).filter(k => k[0] === 's' && d[k]).length;
+    return `<div class="bk-row" style="margin:0 0 8px">${sel}</div>
+        <div class="tk-stats"><span id="tkProgTxt"><b>${have} / ${total}</b> ${shiny ? 'shinies' : 'caught'} · ${calcEsc(sc.label)}</span>${shiny ? `<span id="tkProgAll">${allSh} shinies in total</span>` : ''}</div>
         <div class="tk-prog"><i id="tkProgBar" style="width:${(have / total * 100).toFixed(1)}%"></i></div>
         <div class="tk-grid">${cells.join('')}</div>
-        <div class="dx-note" style="font-size:.7rem;color:var(--muted);margin-top:8px">${shiny ? 'Tap a Pokémon to mark it as a shiny you own. Finishing a hunt ticks it for you.' : 'Tap a Pokémon to mark it caught in this game. This tracks the national Dex number, so tick only what the game actually has.'}</div>`;
+        <div class="dx-note" style="font-size:.7rem;color:var(--muted);margin-top:8px">${sc.note ? calcEsc(sc.note) + ' ' : ''}${shiny ? 'Tap a Pokémon to mark it as a shiny you own. Finishing a hunt ticks it for you. Your progress saves automatically.' : (TK.scope || '').startsWith('g:') ? 'Tap a Pokémon to mark it caught in this game. It saves automatically.' : 'Tap a Pokémon to mark it caught. This view tracks your overall living dex and saves automatically.'}</div>`;
 }
 function tkProgUpdate(box) {
-    const t = box.querySelector('#tkProgTxt'); if (!t) return; const lo = +t.dataset.lo, hi = +t.dataset.hi, shiny = TK.tab === 'shiny', d = tkDex();
-    let have = 0, all = 0; for (const k in d) { if (!d[k]) continue; if (shiny ? k[0] === 's' : k.startsWith('c' + TK.game + '_')) { all++; const id = +k.split(/[sc_]/).pop(); if (id >= lo && id <= hi) have++; } }
-    const b = t.querySelector('b'); if (b) b.textContent = `${have} / ${hi - lo + 1}`;
-    const a = box.querySelector('#tkProgAll'); if (a) a.textContent = `${all} total ${shiny ? 'shinies' : 'in this game'}`;
-    const bar = box.querySelector('#tkProgBar'); if (bar) bar.style.width = (have / (hi - lo + 1) * 100).toFixed(1) + '%';
+    if (!TK_VIEW) return; const d = tkDex(), shiny = TK.tab === 'shiny'; let have = 0; TK_VIEW.ids.forEach(id => { if (d[TK_VIEW.key(id)]) have++; });
+    const b = box.querySelector('#tkProgTxt b'); if (b) b.textContent = `${have} / ${TK_VIEW.ids.length}`;
+    const a = box.querySelector('#tkProgAll'); if (a && shiny) a.textContent = `${Object.keys(d).filter(k => k[0] === 's' && d[k]).length} shinies in total`;
+    const bar = box.querySelector('#tkProgBar'); if (bar) bar.style.width = (have / TK_VIEW.ids.length * 100).toFixed(1) + '%';
 }
 tkTileRefresh();
 
