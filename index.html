@@ -5579,10 +5579,20 @@ const PROFILE_BALLS = ['poke-ball','great-ball','ultra-ball','master-ball','prem
 const PROFILE_TRAINERS = ['red','ethan','brendan','may','lucas','dawn','oak','juniper','brock','clair','giovanni','wallace','steven','cynthia','alder','n','iris','leon','nessa','az','pokemonranger'];
 const PROFILE_MISC = ['rare-candy','lucky-egg','shiny-charm','exp-share','town-map','oran-berry','leftovers'];
 const PROFILE_ITEM = n => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/' + n + '.png';
+const PROFILE_TCHAIN = { giovanni: ['giovanni-lgpe', 'giovanni-gen3', 'giovanni'], brock: ['brock-lgpe', 'brock-gen3', 'brock', 'looker', 'silver'], wallace: ['wallace-gen6', 'wallace-gen3', 'wallace'], alder: ['alder-gen5bw2', 'alder'], iris: ['iris-gen5bw2', 'iris'] };
+const PROFILE_RES = {};   // trainer key -> the sprite file that actually loads
+const profileTSrc = n => 'https://play.pokemonshowdown.com/sprites/trainers/' + n + '.png';
+function profileProbe(v) {   // checks the newer sprites once, in the background, so picking one later is instant
+    const ch = PROFILE_TCHAIN[v]; if (!ch || v in PROFILE_RES) return; PROFILE_RES[v] = null;
+    (function next(i) {
+        if (i >= ch.length) { PROFILE_RES[v] = v; return; }
+        const im = new Image(); im.onload = () => { PROFILE_RES[v] = ch[i]; try { profileRender(); } catch (e) {} }; im.onerror = () => next(i + 1); im.src = profileTSrc(ch[i]);
+    })(0);
+}
 function profileAv(p) {   // -> {key, src, k}: k = p (Pokémon) / b (ball or item) / t (trainer face)
     const key = p.av || (p.id ? 'p:' + p.id : 'b:poke-ball'), t = key.slice(0, 1), v = key.slice(2);
     if (t === 'p' && +v) return { key, src: profileImg(+v, p.shiny), k: 'p' };
-    if (t === 't' && /^[a-z0-9-]+$/.test(v)) return { key, src: 'https://play.pokemonshowdown.com/sprites/trainers/' + v + '.png', k: 't' };
+    if (t === 't' && /^[a-z0-9-]+$/.test(v)) { const nm = PROFILE_TCHAIN[v] ? (PROFILE_RES[v] || PROFILE_TCHAIN[v][0]) : v; return { key, src: profileTSrc(nm), k: 't' }; }
     if ((t === 'b' || t === 'm') && /^[a-z0-9-]+$/.test(v)) return { key, src: PROFILE_ITEM(v), k: 'b' };
     return { key: 'b:poke-ball', src: PROFILE_BALL, k: 'b' };
 }
@@ -5659,7 +5669,9 @@ function profileRank(b) {
 // small hand adjustments on top of the automatic centring: [right %, down %, zoom x]. Avatars only (not the top-6 tiles).
 const PROFILE_NUDGE = { 'p:384': [-8, 0, 1.15], 'p:199': [0, 8, 1.15], 'p:1017': [8, 8, 1.15], 'p:778': [8, 0, 1.15], 'p:149': [8, 8, 1.15], 'p:25': [8, 8, 1.15], 'p:282': [8, 8, 1.15],
     't:iris': [0, -22, 1], 't:alder': [0, -22, 1], 't:giovanni': [0, 11, 1], 't:leon': [-10, 0, 1], 't:brock': [8, -12, 1], 't:cynthia': [0, 6, 1], 't:n': [0, 6, 1], 't:wallace': [0, -28, 1] };
-const PROFILE_BB = {};
+setTimeout(() => Object.keys(PROFILE_TCHAIN).forEach(profileProbe), 800);
+const PROFILE_BB = {}, PROFILE_FITTED = {}, PROFILE_IMGS = {};
+const PROFILE_DOWN = { giovanni: 0.14 };   // crop window moves up this much of its height, so the figure sits a little lower
 function profileBBox(src, cb) {   // finds where the sprite's pixels actually are (ignoring stray specks) plus where the head is, so every avatar can be centred and fitted
     if (src in PROFILE_BB) return cb(PROFILE_BB[src]);
     const im = new Image(); im.crossOrigin = 'anonymous';
@@ -5689,7 +5701,7 @@ function profileBBox(src, cb) {   // finds where the sprite's pixels actually ar
                 r = { x0: x0 / w, x1: (x1 + 1) / w, y0: y0 / h, y1: (y1 + 1) / h, hx0: hx0 / w, hx1: (hx1 + 1) / w, hc: (hc + 0.5) / w };
             }
         } catch (e) { r = null; }
-        PROFILE_BB[src] = r; cb(r);
+        PROFILE_BB[src] = r; PROFILE_IMGS[src] = im; cb(r);
     };
     im.onerror = () => cb(null);
     im.src = src;
@@ -5710,21 +5722,23 @@ function profileCrop(kind, bb, W, H) {
 function profileFit(img) {
     try {
         const m = /zk-([pbt])/.exec(img.className || ''); const src = img.currentSrc || img.src; if (!m || !src || src.indexOf('data:') === 0) return;
+        const done = url => { if ((img.currentSrc || img.src) !== src) return; img.style.transform = 'none'; img.style.objectFit = 'cover'; img.src = url; };
+        if (PROFILE_FITTED[src]) { done(PROFILE_FITTED[src]); return; }   // already cropped once: instant, no re-processing
         profileBBox(src, bb => {
             if (!bb || (img.currentSrc || img.src) !== src) return;
-            const im = new Image(); im.crossOrigin = 'anonymous';
-            im.onload = () => {
+            const paint = im => {
                 try {
                     if ((img.currentSrc || img.src) !== src) return;
                     const c = profileCrop(m[1], bb, im.naturalWidth, im.naturalHeight), out = document.createElement('canvas'); out.width = out.height = 128;
+                    const dn = /\/trainers\/([a-z0-9]+)[^/]*\.png$/.exec(src); if (m[1] === 't' && dn && PROFILE_DOWN[dn[1]]) c.sy -= c.side * PROFILE_DOWN[dn[1]];
                     const g = out.getContext('2d'); g.imageSmoothingEnabled = false;
                     // draw only the part of the window that lies inside the image, so a window poking past an edge is padded instead of stretched
                     const ix0 = Math.max(c.sx, 0), iy0 = Math.max(c.sy, 0), ix1 = Math.min(c.sx + c.side, im.naturalWidth), iy1 = Math.min(c.sy + c.side, im.naturalHeight), k = 128 / c.side;
                     if (ix1 > ix0 && iy1 > iy0) g.drawImage(im, ix0, iy0, ix1 - ix0, iy1 - iy0, (ix0 - c.sx) * k, (iy0 - c.sy) * k, (ix1 - ix0) * k, (iy1 - iy0) * k);
-                    img.style.transform = 'none'; img.style.objectFit = 'cover'; img.src = out.toDataURL('image/png');
+                    PROFILE_FITTED[src] = out.toDataURL('image/png'); done(PROFILE_FITTED[src]);
                 } catch (e) {}
             };
-            im.src = src;
+            if (PROFILE_IMGS[src]) paint(PROFILE_IMGS[src]); else { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => paint(im); im.src = src; }
         });
     } catch (e) {}
 }
@@ -7162,7 +7176,7 @@ async function dexList(body) {
 function dexShiny() { dexState.shiny = !dexState.shiny; const b = document.getElementById('dxShBtn'); if (b) b.classList.toggle('on', dexState.shiny); dexUpdate(); }
 
 /* ===== Open any Pokémon in the Dex from the builder, calc or trainer guide ===== */
-const DEX_RET_LABEL = { draft: 'Draft Pool', calc: 'Calc', guide: 'Trainer Guide' };
+const DEX_RET_LABEL = { draft: 'Draft Pool', calc: 'Calc', guide: 'Trainer Guide', rz: 'Randomizer' };
 async function openInDex(name) {
     const _y = window.scrollY; let _uid = null;                       // remember where you were, and which card you clicked
     try { const c = window.event && window.event.target && window.event.target.closest ? window.event.target.closest('[data-uid]') : null; if (c) _uid = c.dataset.uid; } catch (e) {}
@@ -7185,6 +7199,7 @@ async function openInDex(name) {
 function dexReturn() {
     const r = dexState.ret; dexState.ret = null; dexState.sel = null; dexState.abil = null; dexState.form = null;
     if (!r) { dexUpdate(); return; }
+    if (r.sec === 'rz') { closeSections(); window.scrollTo(0, 0); rzOpen(); return; }   // back to the randomizer, with the rolled list still there
     if (r.sec === 'dex') { dexUpdate(); return; }
     if (r.sec === 'guide') guideState.view = (r.view && r.view !== 'dex') ? r.view : 'home';
     if ((r.sec === 'draft' || r.sec === 'calc' || r.sec === 'guide') && r.y != null) {
@@ -7309,7 +7324,7 @@ function rzOpen() {
     const draw = () => {
         const L = $('rzList'); if (!L) return; const h = L.offsetHeight; if (h) L.style.minHeight = h + 'px';
         if (RZ.mode === 'abil') {
-            L.innerHTML = RZ.abRows.map((r, i) => `<div class="rz-abrow"><div class="rz-main"><b>${calcEsc(dexName(r.slug))}</b><div class="rz-d">${calcEsc(r.desc || 'No description available.')}</div></div><div class="rz-btns"><button type="button" data-a="ra" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="rl" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
+            L.innerHTML = RZ.abRows.map((r, i) => `<div class="rz-abrow"><div class="rz-main"><b>${calcEsc(dexName(r.slug))}</b><div class="rz-d">${calcEsc(r.desc || 'No description available.')}</div></div><div class="rz-btns"><button type="button" data-a="dx" data-i="${i}" title="See in the Pokédex (who learns it, details)" aria-label="Open ${calcEsc(dexName(r.slug))} in the Pokédex">📖</button><button type="button" data-a="ra" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="rl" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
             L.dataset.mode = RZ.mode; $('rzAct').hidden = !RZ.abRows.length; L.style.minHeight = ''; return;
         }
         L.innerHTML = RZ.rows.map((r, i) => `<div class="rz-row"><img src="${TK_IMG}${r.id}.png" alt="" loading="lazy"><div class="rz-main"><b>${calcEsc(dexName(r.n))}</b> ${r.types.map(dexTypePill).join(' ')} <small>BST ${r.bst}</small><div class="rz-ab">${r.ab ? calcEsc(dexName(r.ab)) + (r.abH ? ' <small>(hidden)</small>' : '') : '—'}</div></div><div class="rz-btns"><button type="button" data-a="m" data-i="${i}" title="Re-roll this Pokémon" aria-label="Re-roll Pokémon ${i + 1}">🎲</button><button type="button" data-a="a" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="l" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
@@ -7323,6 +7338,7 @@ function rzOpen() {
         try {
             if (a === 'l') { RZ.rows[i].lock = !RZ.rows[i].lock; draw(); return; }
             if (a === 'rl') { RZ.abRows[i].lock = !RZ.abRows[i].lock; draw(); return; }
+            if (a === 'dx') { const sl = RZ.abRows[i] && RZ.abRows[i].slug; if (!sl) return; ui.close(); openSection('dex'); dexState.ret = { sec: 'rz', lab: 'Randomizer' }; dexPickAbil(sl); return; }
             if (a === 'copy') { const t = RZ.mode === 'abil' ? RZ.abRows.map(r => `${dexName(r.slug)}: ${r.desc || ''}`).join('\n\n') : RZ.rows.map(r => `${sdSpecies(dexName(r.n).replace(/ /g, '-'))}${r.ab ? '\nAbility: ' + dexName(r.ab) : ''}`).join('\n\n'); try { await navigator.clipboard.writeText(t); say('Copied.', 'ok'); } catch (x) { say('Copy was blocked by the browser.', 'bad'); } return; }
             RZ.busy = true;
             if (a === 'pick') {   // show the list of existing drafts to add to
