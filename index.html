@@ -5671,7 +5671,8 @@ const PROFILE_NUDGE = { 'p:384': [-8, 0, 1.15], 'p:199': [0, 8, 1.15], 'p:1017':
     't:iris': [0, -22, 1], 't:alder': [0, -22, 1], 't:giovanni': [0, 11, 1], 't:leon': [-10, 0, 1], 't:brock': [8, -12, 1], 't:cynthia': [0, 6, 1], 't:n': [0, 6, 1], 't:wallace': [0, -28, 1] };
 setTimeout(() => Object.keys(PROFILE_TCHAIN).forEach(profileProbe), 800);
 const PROFILE_BB = {}, PROFILE_FITTED = {}, PROFILE_IMGS = {};
-const PROFILE_DOWN = { giovanni: 0.14 };   // crop window moves up this much of its height, so the figure sits a little lower
+const PROFILE_PADJ = { 384: { zoom: 1, right: 0.1 } };   // Rayquaza: more room around him, and moved to the right
+const PROFILE_DOWN = { giovanni: 0.14, alder: -0.34 };   // crop window moves up this much of its height, so the figure sits a little lower
 function profileBBox(src, cb) {   // finds where the sprite's pixels actually are (ignoring stray specks) plus where the head is, so every avatar can be centred and fitted
     if (src in PROFILE_BB) return cb(PROFILE_BB[src]);
     const im = new Image(); im.crossOrigin = 'anonymous';
@@ -5731,6 +5732,8 @@ function profileFit(img) {
                     if ((img.currentSrc || img.src) !== src) return;
                     const c = profileCrop(m[1], bb, im.naturalWidth, im.naturalHeight), out = document.createElement('canvas'); out.width = out.height = 128;
                     const dn = /\/trainers\/([a-z0-9]+)[^/]*\.png$/.exec(src); if (m[1] === 't' && dn && PROFILE_DOWN[dn[1]]) c.sy -= c.side * PROFILE_DOWN[dn[1]];
+                    const pn = /\/pokemon\/(?:shiny\/)?(\d+)\.png$/.exec(src), pa = m[1] === 'p' && pn && PROFILE_PADJ[pn[1]];
+                    if (pa) { const ns = c.side * pa.zoom; c.sx -= (ns - c.side) / 2; c.sy -= (ns - c.side) / 2; c.side = ns; c.sx -= ns * pa.right; }   // wider window (so nothing is clipped) and slid so the sprite sits further right
                     const g = out.getContext('2d'); g.imageSmoothingEnabled = false;
                     // draw only the part of the window that lies inside the image, so a window poking past an edge is padded instead of stretched
                     const ix0 = Math.max(c.sx, 0), iy0 = Math.max(c.sy, 0), ix1 = Math.min(c.sx + c.side, im.naturalWidth), iy1 = Math.min(c.sy + c.side, im.naturalHeight), k = 128 / c.side;
