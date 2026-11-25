@@ -7335,7 +7335,7 @@ function rzOpen() {
     const draw = () => {
         const L = $('rzList'); if (!L) return; const h = L.offsetHeight; if (h) L.style.minHeight = h + 'px';
         if (RZ.mode === 'abil') {
-            L.innerHTML = RZ.abRows.map((r, i) => `<div class="rz-abrow"><div class="rz-main"><b>${calcEsc(dexName(r.slug))}</b><div class="rz-d">${calcEsc(r.desc || 'No description available.')}</div></div><div class="rz-btns"><button type="button" data-a="dx" data-i="${i}" title="See in the Pokédex (who learns it, details)" aria-label="Open ${calcEsc(dexName(r.slug))} in the Pokédex">📖</button><button type="button" data-a="ra" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="rl" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
+            L.innerHTML = RZ.abRows.map((r, i) => `<div class="rz-abrow"><div class="rz-main"><b>${calcEsc(dexName(r.slug))}</b><div class="rz-d">${calcEsc(r.desc || 'No description available.')}</div></div><div class="rz-btns"><button type="button" data-a="dx" data-i="${i}" title="See in the Pokédex (who learns it, details)" aria-label="Open ${calcEsc(dexName(r.slug))} in the Pokédex"><svg style="width:1.2em;height:1.2em;vertical-align:-3px" aria-hidden="true"><use href="#ico-dex"/></svg></button><button type="button" data-a="ra" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="rl" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
             L.dataset.mode = RZ.mode; $('rzAct').hidden = !RZ.abRows.length; L.style.minHeight = ''; return;
         }
         L.innerHTML = RZ.rows.map((r, i) => `<div class="rz-row"><img src="${TK_IMG}${r.id}.png" alt="" loading="lazy"><div class="rz-main"><b>${calcEsc(dexName(r.n))}</b> ${r.types.map(dexTypePill).join(' ')} <small>BST ${r.bst}</small><div class="rz-ab">${r.ab ? calcEsc(dexName(r.ab)) + (r.abH ? ' <small>(hidden)</small>' : '') : '—'}</div></div><div class="rz-btns"><button type="button" data-a="m" data-i="${i}" title="Re-roll this Pokémon" aria-label="Re-roll Pokémon ${i + 1}">🎲</button><button type="button" data-a="a" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="l" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
@@ -7349,7 +7349,11 @@ function rzOpen() {
         try {
             if (a === 'l') { RZ.rows[i].lock = !RZ.rows[i].lock; draw(); return; }
             if (a === 'rl') { RZ.abRows[i].lock = !RZ.abRows[i].lock; draw(); return; }
-            if (a === 'dx') { const sl = RZ.abRows[i] && RZ.abRows[i].slug; if (!sl) return; ui.close(); openSection('dex'); dexState.ret = { sec: 'rz', lab: 'Randomizer' }; dexPickAbil(sl); return; }
+            if (a === 'dx') { const sl = RZ.abRows[i] && RZ.abRows[i].slug; if (!sl) return; ui.close();   // closing the popup snaps the page back to where it was, so wait for that to finish, then open the Dex and scroll to it
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    openSection('dex', { noScroll: true }); dexState.ret = { sec: 'rz', lab: 'Randomizer' }; dexPickAbil(sl);
+                    const h = document.getElementById('sectionHost'); if (h) window.scrollTo({ top: Math.max(0, h.getBoundingClientRect().top + window.scrollY - 8), left: 0, behavior: 'instant' });
+                })); return; }
             if (a === 'copy') { const t = RZ.mode === 'abil' ? RZ.abRows.map(r => `${dexName(r.slug)}: ${r.desc || ''}`).join('\n\n') : RZ.rows.map(r => `${sdSpecies(dexName(r.n).replace(/ /g, '-'))}${r.ab ? '\nAbility: ' + dexName(r.ab) : ''}`).join('\n\n'); try { await navigator.clipboard.writeText(t); say('Copied.', 'ok'); } catch (x) { say('Copy was blocked by the browser.', 'bad'); } return; }
             RZ.busy = true;
             if (a === 'pick') {   // show the list of existing drafts to add to
