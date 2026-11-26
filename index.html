@@ -835,7 +835,7 @@ body.rg-lock{position:fixed;left:0;right:0;width:100%;overflow-x:hidden;overflow
 .gp-grid{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;padding:2px 2px 6px;scroll-snap-type:x proximity;scrollbar-width:thin}
 .gp-grid .gp-game{flex:0 0 auto;width:196px;scroll-snap-align:start}
 .gp-game{position:relative;overflow:hidden;min-height:78px;display:flex;align-items:center;background:linear-gradient(90deg,rgba(0,0,0,.38),rgba(0,0,0,0) 72%),linear-gradient(115deg,color-mix(in srgb,var(--g1) 42%,var(--bg3)),color-mix(in srgb,var(--g2) 30%,var(--bg3)))!important;border-color:color-mix(in srgb,var(--g1) 55%,var(--border2))!important}
-.gp-txt{position:relative;z-index:1;max-width:60%}.gp-game .gp-txt b{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.85)}
+.gp-cut{display:inline-block;width:0;height:0;font-style:normal}.gp-txt{position:relative;z-index:1;max-width:60%}.gp-game .gp-txt b{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.85)}
 .gp-game .gp-txt small{display:block;color:#f1f5fb;text-shadow:0 1px 2px rgba(0,0,0,.9);font-size:.72rem}
 .gp-game .gp-txt small.gp-yr{color:#ffe9a8;font-weight:700;font-size:.7rem}
 .gp-pic{position:absolute;top:0;right:0;bottom:0;width:68%;background-size:cover;background-position:70% 40%;background-repeat:no-repeat;opacity:.95;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 55%);mask-image:linear-gradient(90deg,transparent 0,#000 55%);pointer-events:none}
@@ -6478,6 +6478,21 @@ const GAME_TAG = { rb: 'The one that started it all: collect Pokémon and take o
     pt: 'Adds the Distortion World and a new look for Giratina.', bdsp: 'Faithful remakes of Diamond and Pearl.', bw: 'A brand-new roster: no older Pokémon until the post-game.',
     b2w2: 'Direct sequels, set two years after Black and White.', xy: 'The first 3D mainline games, with Mega Evolution and the Fairy type.', sm: 'No gyms: island trials, Totem Pokémon and Z-Moves.',
     usum: 'Expanded Sun and Moon with Ultra Necrozma and more.', swsh: 'Dynamax, the Wild Area and stadium-style gym challenges.', sv: 'An open world with three story paths and Terastallization.' };
+// Picture positions (x% y%): lower x = picture slides further right so more of the left side shows
+// Cobbleverse cards: the picture starts exactly between the "e" of "Cobble" and the "v" of "verse" on every card
+function gpNameHtml(name) { return calcEsc(name).replace(/^Cobbleverse/, 'Cobble<i class="gp-cut"></i>verse'); }
+function gpAlignPics() {
+    document.querySelectorAll('.gp-game').forEach(card => {
+        const cut = card.querySelector('.gp-cut'), pic = card.querySelector('.gp-pic');
+        if (!cut || !pic) return;
+        const cr = card.getBoundingClientRect(), x = cut.getBoundingClientRect().left - cr.left;
+        if (cr.width > 0 && x > 0) { pic.style.left = x + 'px'; pic.style.width = 'auto'; }
+    });
+}
+window.addEventListener('resize', gpAlignPics);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(gpAlignPics);
+const GAME_PIC_POS_CARD = {cb_hoenn:'background-position:0% 40%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 32%);mask-image:linear-gradient(90deg,transparent 0,#000 32%)', cb_johto:'background-position:55% 40%'};   // game-list cards
+const GAME_PIC_POS_HERO = {cb_hoenn:'0% center'};   // expanded banner after clicking a game
 function guideRegionOf(gid) { const g = GAME_TEAMS[gid] || {}; return GUIDE_REGION[g.grp] || (/^Cobbleverse: (.+)$/.exec(g.name || '') || [])[1] || ''; }
 function guideGymType(t) {
     const nm = String(t.n || ''), br = /\(([^)]+)\)/.exec(nm), plain = nm.replace(/\s*\(.*\)\s*$/, '').trim(), key = br ? br[1].split(' · ')[0].trim() : plain;
@@ -6492,7 +6507,7 @@ function guideHeroHtml(gid, g, prog, nDone, next) {
         const t = next[0], img = cxSpr(gid, t), loc = guideLoc(gid, t);
         nx = `<button type="button" class="gv-next" onclick="guidePick(${next[1]})">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<div><small>Up next</small><b>${calcEsc(t.n)}</b><span>Level cap ${guideCapOf(t)}${loc ? ' · 📍 ' + calcEsc(loc[0]) : ''}</span></div></button>`;
     } else if (prog.length) nx = `<div class="gv-next" style="cursor:default"><div><small>All done</small><b>🏆 Complete!</b></div></div>`;
-    return `<div class="gv-hero${GAME_PIC[gid] ? ' has-pic' : ''}">${GAME_PIC[gid] ? `<div class="gv-pic" style="background-image:url(${GAME_PIC[gid]})"></div>` : ''}<div class="gv-heroL"><div class="gv-reg">${calcEsc(reg)}${GAME_YEAR[gid] ? ' · ' + GAME_YEAR[gid] : ''}</div><div class="gv-title">${calcEsc(g.name)}</div>${tag ? `<div class="gv-tag">${calcEsc(tag)}</div>` : ''}<div class="gv-prog"><div style="width:${pct}%"></div></div><div class="gv-count">${nDone} / ${prog.length} defeated</div></div>${mons ? `<div class="gv-mons">${mons}</div>` : ''}${nx}</div>`;
+    return `<div class="gv-hero${GAME_PIC[gid] ? ' has-pic' : ''}">${GAME_PIC[gid] ? `<div class="gv-pic" style="background-image:url(${GAME_PIC[gid]})${GAME_PIC_POS_HERO[gid] ? ';background-position:' + GAME_PIC_POS_HERO[gid] : ''}"></div>` : ''}<div class="gv-heroL"><div class="gv-reg">${calcEsc(reg)}${GAME_YEAR[gid] ? ' · ' + GAME_YEAR[gid] : ''}</div><div class="gv-title">${calcEsc(g.name)}</div>${tag ? `<div class="gv-tag">${calcEsc(tag)}</div>` : ''}<div class="gv-prog"><div style="width:${pct}%"></div></div><div class="gv-count">${nDone} / ${prog.length} defeated</div></div>${mons ? `<div class="gv-mons">${mons}</div>` : ''}${nx}</div>`;
 }
 const GYM_ALTS = [['Cilan', 'Chili', 'Cress'], ['Bea', 'Allister'], ['Gordie', 'Melony']];   // the game makes you face only one of these, so they share one badge slot
 function guideGymSlots(prog) {
@@ -6613,12 +6628,13 @@ function guideRender() {
         const card = ([id, x]) => { const prog = x.trainers.map((t, i) => [t, i]).filter(([t]) => !guideNoProg(t.c)), n = prog.filter(([t, i]) => done[id + ':' + i]).length;
             const mt = GAME_META[id] || ['#3b82c4', '#1e3a5f', []], pct = prog.length ? Math.round(100 * n / prog.length) : 0;
             const mons = mt[2].map(m => `<img src="${profileImg(m)}" alt="" loading="lazy" onerror="this.remove()">`).join('');
-            return `<button class="gp-game" style="--g1:${mt[0]};--g2:${mt[1]}" onclick="guideStart('${id}')"><span class="gp-txt"><b>${calcEsc(x.name)}</b><small>${n ? n + ' / ' + prog.length + ' beaten' : prog.length + ' trainers'}</small>${GAME_YEAR[id] ? `<small class="gp-yr">Released ${GAME_YEAR[id]}</small>` : ''}</span>${GAME_PIC[id] ? `<span class="gp-pic" style="background-image:url(${GAME_PIC[id]})"></span>` : ''}<span class="gp-mons">${mons}</span><i class="gp-bar" style="width:${pct}%"></i></button>`; };
+            return `<button class="gp-game" style="--g1:${mt[0]};--g2:${mt[1]}" onclick="guideStart('${id}')"><span class="gp-txt"><b>${gpNameHtml(x.name)}</b><small>${n ? n + ' / ' + prog.length + ' beaten' : prog.length + ' trainers'}</small>${GAME_YEAR[id] ? `<small class="gp-yr">Released ${GAME_YEAR[id]}</small>` : ''}</span>${GAME_PIC[id] ? `<span class="gp-pic" style="background-image:url(${GAME_PIC[id]})${GAME_PIC_POS_CARD[id] ? ';' + GAME_PIC_POS_CARD[id] : ''}"></span>` : ''}<span class="gp-mons">${mons}</span><i class="gp-bar" style="width:${pct}%"></i></button>`; };
         root.innerHTML = title + `<div class="guide-bar"><button class="guide-back" onclick="guideHome()"><span class="pb-ico">‹</span>Back</button></div>
             <div class="gp-top">${guideRing(allT ? Math.round(100 * allN / allT) : 0, 'Overall progress')}<div class="gp-toptxt"><b>Overall</b><small>${allN} / ${allT} trainers beaten</small></div>${guideSearchBox()}</div>${cont}
             ${Object.entries(groups).map(([grp, arr]) => `<div class="gp-row"><div class="gp-lab"><div class="guide-cat">${calcEsc(grp)}</div>${guideRing(grpPct(arr), grpPct(arr) + '% of ' + (GUIDE_REGION[grp] || grp) + ' done')}${GUIDE_REGION[grp] ? `<small>${GUIDE_REGION[grp]}</small>` : ''}</div><div class="gp-grid">${arr.map(card).join('')}</div></div>`).join('')}`;
         { const r0 = document.getElementById('guideRoot'), top = r0 ? Math.max(0, r0.getBoundingClientRect().top + window.scrollY - 70) : 0; window.scrollTo(0, guideState.pickY != null ? guideState.pickY : top); guideState.pickY = null; }
         guideSearch(guideState.gq);
+        gpAlignPics();
         return;
     }
     const gid = guideState.game, g = GAME_TEAMS[gid], done = guideDone();
