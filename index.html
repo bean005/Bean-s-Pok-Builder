@@ -785,7 +785,7 @@ body.rg-lock{position:fixed;left:0;right:0;width:100%;overflow-x:hidden;overflow
 .rg-tabs{display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap}.rg-tab{background:rgba(0,0,0,.3);border:1px solid var(--border2);color:#cfe0ff;border-radius:999px;padding:6px 12px;font-size:.72rem;font-weight:700;cursor:pointer}.rg-tab.on{background:#1a4a7a;color:#fff;border-color:var(--accent)}
 .rg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:5px}
 .rg-cell{position:relative;aspect-ratio:1;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1rem;color:#7f93b8;padding:0;cursor:pointer}
-.rg-cell img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}.rg-cell.fav{border-color:#ffd54f;box-shadow:0 0 0 1px #ffd54f}.rg-cell b{position:absolute;right:1px;top:0;font-size:.6rem}
+.rg-cell img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}.rg-cell.fav{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}.rg-cell.fav::after{content:'';position:absolute;left:1px;top:1px;width:15px;height:15px;background:url(https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/heart-scale.png) center/contain no-repeat;image-rendering:pixelated}.rg-cell.shiny{border-color:#fde047;box-shadow:0 0 8px rgba(250,204,21,.5)}.rg-cell.shiny.fav{box-shadow:0 0 0 1px var(--accent),0 0 8px rgba(250,204,21,.5)}.rg-cell.shiny::before{content:'';position:absolute;right:1px;top:1px;width:15px;height:15px;background:url(https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png) center/contain no-repeat;image-rendering:pixelated}.rg-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0;box-shadow:0 0 0 1px rgba(255,255,255,.35)}.rg-warn{font-size:.62rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid;vertical-align:2px}.rg-warn.boss{color:#f87171;border-color:#f87171;background:rgba(248,113,113,.12)}.rg-warn.mini{color:#fb923c;border-color:#fb923c;background:rgba(251,146,60,.12)}.hs-ico{width:18px;height:18px;vertical-align:-4px;margin-right:6px;image-rendering:pixelated}.rg-cell b{position:absolute;right:1px;top:0;font-size:.6rem}
 .rg-stats{display:flex;gap:10px;flex-wrap:wrap;font-size:.74rem;color:#dbe7ff;margin-bottom:8px}
 .rg-win p,.rg-win li{font-size:.78rem;line-height:1.45;color:#e6eefc}.rg-win ul{padding-left:18px;margin:6px 0}
 .rg-sw{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;cursor:pointer}
@@ -1232,6 +1232,13 @@ details.prof-sec[open]{padding-bottom:10px}
 .prof-find{display:flex;gap:10px;align-items:center;margin-top:4px}
 .prof-find .ab-modal-input{margin-bottom:0;flex:1;min-width:0}
 .prof-shiny{font-size:.78rem;color:var(--muted2);white-space:nowrap;display:flex;gap:6px;align-items:center}
+.home-bar{display:contents}
+@media (max-width:768px){
+.home-bar{position:absolute;top:10px;left:10px;right:10px;z-index:5;display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:nowrap}
+.home-bar .home-qrow,.home-bar .profile-chip{position:static;top:auto;right:auto}
+.home-bar .rg-btn{padding:0 9px;white-space:nowrap}
+.home-bar .prof-btn{height:40px;max-width:150px}
+}
 @media (max-width:768px){#homeScreen{padding-top:62px}.prof-nm{max-width:80px}}
 
 /* scenes redrawn: forest, swamp, cliffs, desert, sky (layered, original artwork) */
@@ -1507,8 +1514,7 @@ details.prof-sec[open]{padding-bottom:10px}
 <h1 class="seo-h1">Bean's PokéBuilder: Pokémon Team Builder, Damage Calculator, Trainer Guide and Pokédex</h1>
 <!-- HOME SCREEN -->
 <div id="homeScreen" class="screen active">
-    <div class="profile-chip" id="profileChip"></div>
-    <div class="home-qrow"><button type="button" class="rg-btn" id="homeSyncBtn" onclick="homeSyncTap()" aria-label="Resync" style="display:none">↻ Sync</button><button type="button" class="rg-btn" id="rgBtn" onclick="rgOpen()" aria-label="Rangers"><svg class="rg-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="48 15" transform="rotate(-50 12 12)"/><path d="M17.2 2.6 21.6 3.4 19.6 7.4z" fill="#38bdf8"/><circle cx="12" cy="12" r="5.6" fill="#fff" stroke="#0f172a" stroke-width="1.4"/><path d="M6.4 12a5.6 5.6 0 0 1 11.2 0z" fill="#ef4444"/><path d="M6.4 12h11.2" stroke="#0f172a" stroke-width="1.4"/><circle cx="12" cy="12" r="1.9" fill="#fff" stroke="#0f172a" stroke-width="1.2"/></svg><span>Rangers</span></button></div>
+    <div class="home-bar"><div class="home-qrow"><button type="button" class="rg-btn" id="homeSyncBtn" onclick="homeSyncTap()" aria-label="Resync" style="display:none">Sync</button><button type="button" class="rg-btn" id="rgBtn" onclick="rgOpen()" aria-label="Rangers"><svg class="rg-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="48 15" transform="rotate(-50 12 12)"/><path d="M17.2 2.6 21.6 3.4 19.6 7.4z" fill="#38bdf8"/><circle cx="12" cy="12" r="5.6" fill="#fff" stroke="#0f172a" stroke-width="1.4"/><path d="M6.4 12a5.6 5.6 0 0 1 11.2 0z" fill="#ef4444"/><path d="M6.4 12h11.2" stroke="#0f172a" stroke-width="1.4"/><circle cx="12" cy="12" r="1.9" fill="#fff" stroke="#0f172a" stroke-width="1.2"/></svg><span>Rangers</span></button></div><div class="profile-chip" id="profileChip"></div></div>
     <div class="home-logo">Bean's<br><span>PokéBuilder</span></div>
     <div class="home-subtitle" id="homeSub">Build your team, craft your strategy</div>
     <div class="home-card" id="homeCard" style="display:none" onclick="profileOpen()" title="Edit your profile"></div>
@@ -1539,12 +1545,12 @@ details.prof-sec[open]{padding-bottom:10px}
         </div>
     </div>
     <div class="home-mini">
-        <button type="button" class="gs-bar" onclick="gsOpen()" aria-label="Search everything"><span aria-hidden="true">🔍</span><span>Search Pokémon, trainers, moves, your teams…</span><kbd>/</kbd></button>
+        <button type="button" class="gs-bar" onclick="gsOpen()" aria-label="Search everything"><span>Search Pokémon, trainers, moves, your teams…</span><kbd>/</kbd></button>
         <button type="button" class="mini-tile" onclick="rzOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" onerror="this.replaceWith('⚪')"></span><span><b>Randomizer</b><small>Roll Pokémon &amp; abilities</small></span></button>
-        <button type="button" class="mini-tile" onclick="tkOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png" alt="" onerror="this.replaceWith('🔴')"></span><span><b>Hunts &amp; Dex</b><small id="tkTileSub">Shiny counter, living dex</small></span></button>
+        <button type="button" class="mini-tile" onclick="tkOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-radar.png" alt="" onerror="this.replaceWith('🔴')"></span><span><b>Hunts &amp; Dex</b><small id="tkTileSub">Shiny counter, living dex</small></span></button>
     </div>
     <div class="scroll-hint">Click a mode above, then scroll down to get started</div>
-    <div class="home-tools"><button type="button" class="pill-btn" onclick="bkOpen()">💾 Backup &amp; Restore</button><button type="button" class="pill-btn" onclick="sdOpen()">⇄ Showdown</button><button type="button" class="pill-btn" onclick="thOpen()">🎨 Theme</button></div>
+    <div class="home-tools"><button type="button" class="pill-btn" onclick="bkOpen()">Backup &amp; Restore</button><button type="button" class="pill-btn" onclick="sdOpen()">Showdown</button><button type="button" class="pill-btn" onclick="thOpen()">Theme</button></div>
     <div id="sectionHost" class="section-host"></div>
 </div>
 
@@ -2424,7 +2430,8 @@ const CALC_CAT_IMG = {
     Special:  'https://archives.bulbagarden.net/media/upload/8/86/SpecialIC_SV.png',
     Status:   'https://archives.bulbagarden.net/media/upload/8/8a/StatusIC_SV.png'
 };
-const CALC_CAT_SYM = { Physical: '⚔', Special: '✦', Status: '●' };
+const CAT_SYM = { physical: '⚔\uFE0E', special: '✦', status: '●' };
+const CALC_CAT_SYM = { Physical: CAT_SYM.physical, Special: CAT_SYM.special, Status: CAT_SYM.status };
 const CALC_CAT_COL = { Physical: '#e67e22', Special: '#3498db', Status: '#a855f7' };
 const CALC_POPULAR_ITEMS = ['Leftovers','Choice Band','Choice Specs','Choice Scarf','Life Orb','Assault Vest','Focus Sash','Sitrus Berry','Lum Berry','Rocky Helmet','Eviolite','Expert Belt','Weakness Policy','Safety Goggles','Covert Cloak','Booster Energy'];
 const calcMoveFilters = {};
@@ -4646,7 +4653,7 @@ function buildMoveTypeFilterBar(p, pokeName, slot) {
 
     const catPills = catDefs.map(({cat, cls, url, label}) => {
         const isActive = activeCats.has(cat);
-        const fallbackSymbol = cat === 'physical' ? '⚔' : cat === 'special' ? '✦' : '●';
+        const fallbackSymbol = CAT_SYM[cat];
         return `<button class="move-cat-pill ${cls}${isActive?' cat-active':''}"
             onmousedown="event.preventDefault();toggleMoveCatFilter('${pokeName}',${slot},'${cat}')">
             <img src="${url}" alt="${fallbackSymbol}"
@@ -5290,7 +5297,7 @@ async function guideCounterRender() {
         return `<div class="gc-pick"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p._data.id}.png" alt="" onerror="this.style.visibility='hidden'"><div><b>${calcEsc(p.nickname || p.name)}</b> <small>Lv ${p.level}</small> ${p._data.type.map(tp).join('')}<div class="gc-sum">${mine.length ? 'Answers: ' + calcEsc(mine.join(', ')) : 'Backup / bulk'}</div></div></div>`; }).join('');
     const gaps = r.answers.filter(a => !a.by.length && a.tm.types && a.tm.types.length).map(a => guideCap(a.tm.sp));
     const cap = guideCapOf(t), top = Math.max(...r.chosen.map(m => +m.p.level || 0)), keepY = window.scrollY;
-    box.innerHTML = `<div class="gc-box"><div class="gc-top">${sel}<span class="gc-v ready">🎯 Best ${r.chosen.length} for ${calcEsc(t.n)}</span></div>${picks}
+    box.innerHTML = `<div class="gc-box"><div class="gc-top">${sel}<span class="gc-v ready">Best ${r.chosen.length} for ${calcEsc(t.n)}</span></div>${picks}
         ${gaps.length ? `<div class="gc-sum gc-meh">No clean answer in this pool for: ${calcEsc(gaps.join(', '))}.</div>` : '<div class="gc-sum">Every Pokémon on their team has an answer.</div>'}
         ${top < cap ? `<div class="gc-sum gc-bad">Your highest level here is ${top}; their top Pokémon is Lv ${cap}.</div>` : ''}
         <div class="bk-row"><button type="button" class="pill-btn" onclick="guideCounterApply()">✔ Set these as my active team</button></div>
@@ -5304,7 +5311,7 @@ function guideCounterApply() {
     list.forEach((p, i) => { p.active = c.idx.includes(i); });
     if (c.key === 'cur') { if (currentTeamId) { const ix = savedTeams.findIndex(t => t.id === currentTeamId); if (ix !== -1) savedTeams[ix] = buildSaveObj(); } }
     try { localStorage.setItem('pokeTeams', JSON.stringify(savedTeams)); } catch (e) {}
-    showToast('🎯 Active team updated');
+    showToast('Active team updated');
 }
 
 /* ===================== V2.52: SHOWDOWN EXPORT / IMPORT ===================== */
@@ -5590,7 +5597,7 @@ function syncSchedule() {
 function syncSet(st) { sync.status = st; syncUI(); }
 function syncUI() {
     const b = document.getElementById('syncBtn');
-    if (b) b.textContent = { off: '☁️ Sign in to sync', syncing: '☁️ Syncing…', idle: '☁️ Synced ✓', paused: '☁️ Reconnect', error: '☁️ Sync problem' }[sync.status] || '☁️ Sign in to sync';
+    if (b) b.textContent = { off: 'Sign in to sync', syncing: 'Syncing…', idle: 'Synced ✓', paused: 'Reconnect', error: 'Sync problem' }[sync.status] || 'Sign in to sync';
     const m = document.getElementById('syncModalBody'); if (m) syncModalFill(m);
     profileRender();
     try { homeSyncUpdate(); } catch (e) {}
@@ -5599,7 +5606,7 @@ function homeSyncUpdate() {
     const b = document.getElementById('homeSyncBtn'); if (!b) return;
     if (!syncConfigured() || !syncWanted()) { b.style.display = 'none'; return; }
     b.style.display = '';
-    b.textContent = { syncing: '☁️ Syncing…', paused: '☁️ Reconnect', error: '☁️ Retry sync' }[sync.status] || '↻ Sync';
+    b.textContent = { syncing: 'Syncing…', paused: 'Reconnect', error: 'Retry sync' }[sync.status] || 'Sync';
 }
 function homeSyncTap() {
     if (!syncWanted()) { syncOpen(); return; }
@@ -5617,7 +5624,7 @@ function syncLoadPending() { if (sync.pending) { syncApply(sync.pending); syncRe
 function syncDismiss() { sync.pending = null; syncToast(); }
 function syncOpen() {
     const overlay = document.createElement('div'); overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal-box sync-box"><h3>☁️ Sync with Google</h3><div id="syncModalBody"></div><button class="modal-cancel" type="button">Close</button></div>';
+    overlay.innerHTML = '<div class="modal-box sync-box"><h3>Sync with Google</h3><div id="syncModalBody"></div><button class="modal-cancel" type="button">Close</button></div>';
     document.body.appendChild(overlay);
     overlay.querySelector('.modal-cancel').onclick = () => overlay.remove();
     overlay.addEventListener('click', e => { if (e.target === overlay) return overlay.remove(); const b = e.target.closest('button[data-a]'); if (b) syncAct(b.dataset.a); });
@@ -5629,7 +5636,7 @@ function syncModalFill(el) {
     const stat = { syncing: 'Syncing…', idle: 'Everything is saved to your Google Drive.' + (sync.last ? ' Last synced ' + new Date(sync.last).toLocaleTimeString() + '.' : ''), paused: 'Sync is paused: Google needs you to reconnect.', error: 'Something went wrong talking to Google Drive. Your teams are still safe on this device.' }[sync.status] || '';
     el.innerHTML = `<p>Sign in with Google to keep your teams, calc teams and trainer progress in sync between your phone and computer. They're stored in a private, hidden app folder in <b>your own Google Drive</b>. This site never sees your password or your email.</p>
         ${why ? `<div class="bk-msg bad">${why}</div>` : ''}${on && stat ? `<div class="bk-msg ok">${stat}</div>` : ''}
-        <div class="bk-row">${on ? `<button type="button" class="pill-btn" data-a="now">↻ Sync now</button>${sync.status === 'paused' ? '<button type="button" class="pill-btn" data-a="in">Reconnect</button>' : ''}<button type="button" class="pill-btn danger" data-a="out">Sign out</button>` : `<button type="button" class="pill-btn" data-a="in" ${why ? 'disabled' : ''}>Sign in with Google</button>`}</div>
+        <div class="bk-row">${on ? `<button type="button" class="pill-btn" data-a="now">Sync now</button>${sync.status === 'paused' ? '<button type="button" class="pill-btn" data-a="in">Reconnect</button>' : ''}<button type="button" class="pill-btn danger" data-a="out">Sign out</button>` : `<button type="button" class="pill-btn" data-a="in" ${why ? 'disabled' : ''}>Sign in with Google</button>`}</div>
         <div class="bk-sum">When you sign out, you can choose whether to keep your teams on this device.</div>
         <div class="sync-note"><b>🔒 Please read</b><p>This site is a hobby team builder. It is <b>not designed to store personal or sensitive information</b>. It never asks for or keeps your email or password, and you shouldn't type passwords, personal details or anything private into team names, notes or your profile.</p><p>Your data is only saved in your browser and, if you sign in, in a hidden app folder in <b>your own</b> Google Drive. You can sign out, or remove access at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>, at any time. <a href="privacy.html" target="_blank" rel="noopener">Read the privacy policy</a>.</p></div>`;
 }
@@ -5872,7 +5879,7 @@ function profileCard() {
     if (!syncWanted() || !has) { el.innerHTML = ''; el.style.display = 'none'; return; }
     const acc = profileAccent(p); if (acc) el.style.setProperty('--pa', acc); else el.style.removeProperty('--pa');
     const rank = profileRank(B), title = p.title || rank;
-    const line1 = `<div class="hc-line1">${rank === 'Master Trainer' && !p.title ? '👑 ' : ''}${profileTitleHTML(title)}${B.list.length ? ` · 🏅 ${B.list.length}` : ''}</div>`;
+    const line1 = `<div class="hc-line1">${rank === 'Master Trainer' && !p.title ? '👑 ' : ''}${profileTitleHTML(title)}${B.list.length ? ` · ${B.list.length} badge${B.list.length === 1 ? '' : 's'}` : ''}</div>`;
     const img = (n, i) => { const id = profileMonId(n); return id ? `<span class="hc-mon${p.ts[i] ? ' shiny' : ''}" title="${calcEsc(n)}${p.ts[i] ? ' (shiny)' : ''}"><img class="zk-p" onload="profileFit(this)" src="${profileImg(id, p.ts[i])}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; };
     const six = p.top.some(Boolean) ? `<div class="hc-six">${p.top.map(img).join('')}</div>` : '';
     const fav = p.fav ? `<div class="hc-fav">Pokémon: <b>${calcEsc(p.fav)}</b></div>` : '';
@@ -5887,7 +5894,7 @@ function profileRender() {
     if (sub) sub.textContent = syncWanted() ? 'Welcome back, ' + (profileGet().name || 'Trainer') + '!' : 'Build your team, craft your strategy';
     const el = document.getElementById('profileChip'); if (!el) return;
     { const ac = profileAccent(profileGet()); if (ac && syncWanted()) el.style.setProperty('--pa', ac); else el.style.removeProperty('--pa'); }
-    if (!syncWanted()) { el._sig = ''; el.innerHTML = '<button type="button" class="prof-btn prof-in" onclick="syncOpen()">☁️ Sign in</button>'; return; }
+    if (!syncWanted()) { el._sig = ''; el.innerHTML = '<button type="button" class="prof-btn prof-in" onclick="syncOpen()">Sign in</button>'; return; }
     const p = profileGet(), dot = { syncing: 'sy', idle: 'ok', paused: 'pa', error: 'er' }[sync.status] || 'ok';
     const chipHtml = `<button type="button" class="prof-btn" onclick="profileOpen()" title="Your profile and sync"><span class="prof-ava ${p.bd === 'w' ? 'wh' : 'bk'}"><img class="zk-${profileAv(p).k}" onload="profileFit(this)" src="${profileAv(p).src}" alt="" onerror="this.onerror=null;this.className='zk-b';this.src='${PROFILE_BALL}'"></span><span class="prof-nm"><span class="prof-wel">Welcome, </span>${calcEsc(p.name || 'Trainer')}</span><i class="prof-dot ${dot}"></i></button>`;
     if (el._sig !== chipHtml) { el._sig = chipHtml; el.innerHTML = chipHtml; }
@@ -5899,11 +5906,11 @@ function profileOpen() {
         <div class="prof-top"><span class="prof-avwrap"><span class="prof-ava big bk"><img id="profPrev" alt=""></span><button type="button" class="prof-bd" id="profBd" title="Avatar backdrop: black / white" aria-label="Toggle avatar backdrop">◐</button></span>
             <div class="prof-nmwrap"><label class="bk-h" for="profName">Display name</label><input id="profName" class="ab-modal-input" maxlength="20" placeholder="Trainer" autocomplete="off" spellcheck="false"></div></div>
         <div class="bk-msg" id="profMsg"></div>
-        <details class="prof-sec"><summary>🎨 Change avatar</summary>
+        <details class="prof-sec"><summary>Change avatar</summary>
         <div id="profGrid"></div>
         <div class="prof-find"><input id="profFind" class="ab-modal-input" list="profList" placeholder="Search any Pokémon…" autocomplete="off"><label class="prof-shiny"><input type="checkbox" id="profShiny"> Shiny</label></div>
         <datalist id="profList"></datalist></details>
-        <details class="prof-sec"><summary>⭐ Favorites</summary>
+        <details class="prof-sec"><summary><img class="hs-ico" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/heart-scale.png" alt="" onerror="this.remove()">Favorites</summary>
         <div class="bk-h">Favorite Pokémon</div>
         <div class="prof-find"><input id="profFav" class="ab-modal-input" list="profList" placeholder="Search a Pokémon…" autocomplete="off"><button type="button" class="pill-btn prof-clr" id="profFavX" title="Clear">✕</button></div>
         <div class="bk-h">Favorite region</div>
@@ -5911,9 +5918,9 @@ function profileOpen() {
         <div class="bk-h">My top 6 <span style="font-weight:400;color:var(--muted)">(tap a slot, then search)</span></div>
         <div class="prof-six" id="profSix"></div>
         <input id="profSixIn" class="ab-modal-input" list="profList" placeholder="Search to fill the selected slot…" autocomplete="off">
-        <div class="prof-sixbtns"><button type="button" class="pill-btn" id="sixL">◀ Move</button><button type="button" class="pill-btn" id="sixR">Move ▶</button><button type="button" class="pill-btn" id="sixS">✨ Shiny</button><button type="button" class="pill-btn" id="sixX">Clear slot</button></div>
+        <div class="prof-sixbtns"><button type="button" class="pill-btn" id="sixL">◀ Move</button><button type="button" class="pill-btn" id="sixR">Move ▶</button><button type="button" class="pill-btn" id="sixS">Shiny</button><button type="button" class="pill-btn" id="sixX">Clear slot</button></div>
         </details>
-        <details class="prof-sec"><summary>🎭 Title &amp; colors</summary>
+        <details class="prof-sec"><summary>Title &amp; colors</summary>
         <div class="bk-h">Trainer title</div>
         <select id="profTitle" class="ab-modal-input prof-sel"><option value="">Auto (my rank)</option>${(() => { const cur = st.title, u = guideTitleDefs().filter(x => x.ok || x.t === cur); return (u.length ? `<optgroup label="Unlocked titles">${u.map(x => { const k = guideTitleLook(x.t); return `<option${k && k.color ? ` style="color:${k.color}"` : ''}>${x.t}</option>`; }).join('')}</optgroup>` : '') + `<optgroup label="Titles">${PROFILE_TITLES.map(t => `<option>${t}</option>`).join('')}</optgroup>`; })()}</select>
         <div class="bk-h">Favorite type</div>
@@ -5921,7 +5928,7 @@ function profileOpen() {
         <div class="bk-h">Accent color <span style="font-weight:400;color:var(--muted)">(Auto uses your type)</span></div>
         <div class="prof-colors" id="profColors"></div>
         </details>
-        <details class="prof-sec"><summary>🏅 Badges</summary><div id="profBadges"></div></details>
+        <details class="prof-sec"><summary>Badges</summary><div id="profBadges"></div></details>
         <div class="bk-h">Sync</div><div id="syncModalBody"></div>
         <button class="modal-cancel" type="button">Done</button></div>`;
     document.body.appendChild(ov);
@@ -5981,7 +5988,7 @@ function profileOpen() {
     if (!B.list.length) bd.innerHTML = `<div class="prof-stat">No badges yet. Open the <b>Guide</b>, pick a game, and tick <b>Defeated</b> on gym leaders. Their badges show up here, and you can pick a favorite. Beat every trainer in every game to become a <b>Master Trainer</b>.</div>`;
     else {
         const paintBg = () => { const c = curNo(); $('#profBg').innerHTML = earned.map(x => `<button type="button" class="${x.no === c ? 'on' : ''}" data-n="${x.no}" title="${calcEsc(profileBadgeName(x.no))}"><img src="${profileBadgeImg(x.no)}" alt="" loading="lazy" onerror="this.closest('button').remove()"></button>`).join(''); $('#profBgName').textContent = c ? profileBadgeName(c) : 'Tap a badge to pick your favorite'; };
-        bd.innerHTML = `<div class="prof-stat">Rank: <b>${profileRank(B)}</b><br>🏅 <b>${B.list.length}</b> gym badge${B.list.length === 1 ? '' : 's'} · ${B.full}/${B.games} games complete</div>
+        bd.innerHTML = `<div class="prof-stat">Rank: <b>${profileRank(B)}</b><br><b>${B.list.length}</b> gym badge${B.list.length === 1 ? '' : 's'} · ${B.full}/${B.games} games complete</div>
             <div class="bk-h">Favorite badge</div><div class="prof-stat" id="profBgName"></div><div class="prof-bg" id="profBg"></div>
             <button type="button" class="pill-btn" id="profBgX">Clear favorite</button>`;
         $('#profBg').addEventListener('click', e => { const b = e.target.closest('button[data-n]'); if (!b) return; st.badge = 'n:' + b.dataset.n; paintBg(); commit(); });
@@ -6378,7 +6385,7 @@ function guideJumpNext() {
 function guideProgOf(id) { const g = GAME_TEAMS[id], d = guideDone(); const p = g.trainers.map((t, i) => [t, i]).filter(([t]) => !guideNoProg(t.c)); return [p.filter(([t, i]) => d[id + ':' + i]).length, p.length]; }
 function guideRing(pct, title) { return `<span class="gp-ring" style="--p:${pct}" title="${calcEsc(title || '')}"><b>${pct}%</b></span>`; }
 /* search any trainer in any game */
-function guideSearchBox() { return `<div class="gq-wrap"><input type="search" id="guideQ" class="gq-in" placeholder="🔍 Find a trainer in any game… (e.g. Cynthia)" autocomplete="off" value="${calcEsc(guideState.gq || '')}" oninput="guideSearch(this.value)"><div id="guideSrch" class="gq-res"></div></div>`; }
+function guideSearchBox() { return `<div class="gq-wrap"><input type="search" id="guideQ" class="gq-in" placeholder="Find a trainer in any game… (e.g. Cynthia)" autocomplete="off" value="${calcEsc(guideState.gq || '')}" oninput="guideSearch(this.value)"><div id="guideSrch" class="gq-res"></div></div>`; }
 function guideSearch(q) {
     guideState.gq = q; const box = document.getElementById('guideSrch'); if (!box) return;
     const ql = String(q || '').trim().toLowerCase(); if (ql.length < 2) { box.innerHTML = ''; return; }
@@ -6404,7 +6411,7 @@ function guideCapRender() {
         msg = over.length ? `<span class="gc-bad">⚠️ Over the cap: ${over.map(p => `${calcEsc(p.nickname || p.name)} Lv ${+p.level}`).join(', ')}</span>` : '<span class="gc-ok">✅ Whole team is at or under the cap</span>';
     }
     const sel = teams.length > 1 ? `<div class="gc-teamrow"><label for="guideCapSel">Team</label><select id="guideCapSel" onchange="guideCapPick(this.value)" aria-label="Team for level cap">${teams.map(x => `<option value="${calcEsc(x.key)}" ${tm && x.key === tm.key ? 'selected' : ''}>${calcEsc(x.label)}</option>`).join('')}</select></div>` : '';
-    box.innerHTML = `<div class="gc-capbox"><div class="gc-caphead"><span class="guide-cap">📈 Next gym: ${calcEsc(t.n)} · cap Lv ${cap}</span></div><div class="gc-capmsg">${msg}</div>${sel}</div>`;
+    box.innerHTML = `<div class="gc-capbox"><div class="gc-caphead"><span class="guide-cap">Next gym: ${calcEsc(t.n)} · cap Lv ${cap}</span></div><div class="gc-capmsg">${msg}</div>${sel}</div>`;
 }
 /* what to bring: which types hit this trainer's team hardest */
 async function guideWeakRender(t, tok) {
@@ -6417,7 +6424,7 @@ async function guideWeakRender(t, tok) {
     const best = stats.filter(x => x.w > 0).sort((a, b) => (b.w - b.r) - (a.w - a.r) || b.w - a.w).slice(0, 6);
     const avoid = stats.filter(x => x.r >= 2 && x.r > x.w).sort((a, b) => (b.r - b.w) - (a.r - a.w)).slice(0, 4);
     const chip = (x, n) => { const c = typeColors[x.ty] || {}; return `<span class="gw-chip" style="background:${c.bg || '#333'};border-color:${c.border || '#888'};color:${c.text || '#ddd'}">${x.ty}<i>${n}</i></span>`; };
-    box.innerHTML = `<div class="gw-row"><b>🎯 Bring</b>${best.map(x => chip(x, x.w + '/' + mons.length)).join('') || '<span class="gc-dim">no clear weakness</span>'}</div>${avoid.length ? `<div class="gw-row"><b>🛡️ Weak attacks</b>${avoid.map(x => chip(x, x.r + '/' + mons.length)).join('')}</div>` : ''}`;
+    box.innerHTML = `<div class="gw-row"><b>Bring</b>${best.map(x => chip(x, x.w + '/' + mons.length)).join('') || '<span class="gc-dim">no clear weakness</span>'}</div>${avoid.length ? `<div class="gw-row"><b>Weak attacks</b>${avoid.map(x => chip(x, x.r + '/' + mons.length)).join('')}</div>` : ''}`;
 }
 const guideCap = w => String(w).split('-').map(x => x.charAt(0).toUpperCase() + x.slice(1)).join('-');
 const guideCapOf = t => t.cap || Math.max(...t.m.map(x => x[1]));
@@ -6476,12 +6483,12 @@ function guideCelebrate(kind, gid) {
     let mons = meta[2], title, sub, tag, unlock = '';
     if (kind === 'all') { unlock = 'Pokémon Master'; tag = '👑 Master Trainer'; title = 'You beat every game!'; sub = `All ${Object.keys(GAME_TEAMS).length} games cleared. Nothing left to prove.`; mons = Object.keys(GAME_TEAMS).map(i => (GAME_META[i] || [0, 0, []])[2][0]).filter(Boolean).slice(0, 5); }
     else if (kind === 'region') { unlock = region + ' Master'; tag = '🏆 Region cleared'; title = `${calcEsc(region)} complete!`; sub = `Every ${calcEsc(grp)} game is done: ` + guideGroupIds(grp).map(i => GAME_TEAMS[i].name).join(', '); mons = [].concat(...guideGroupIds(grp).map(i => (GAME_META[i] || [0, 0, []])[2])).filter((m, i, a) => m && a.indexOf(m) === i).slice(0, 4); }
-    else { unlock = guideGameTitleName(gid) + ' Master'; const p = guideProgOf(gid); tag = '🎉 Game complete'; title = g.name; sub = `All ${p[1]} trainers beaten${GAME_YEAR[gid] ? ' · Released ' + GAME_YEAR[gid] : ''}`; }
+    else { unlock = guideGameTitleName(gid) + ' Master'; const p = guideProgOf(gid); tag = 'Game complete'; title = g.name; sub = `All ${p[1]} trainers beaten${GAME_YEAR[gid] ? ' · Released ' + GAME_YEAR[gid] : ''}`; }
     const old = document.getElementById('gcPop'); if (old) old.remove();
     const cols = ['#ffd54f', '#ff8a65', '#4fc3f7', '#ba68c8', '#81c784', '#fff'];
     const conf = Array.from({ length: 44 }, () => `<i style="left:${Math.random() * 100}%;background:${cols[(Math.random() * cols.length) | 0]};animation-delay:${(Math.random() * 1.2).toFixed(2)}s;animation-duration:${(2.2 + Math.random() * 1.8).toFixed(2)}s;transform:rotate(${(Math.random() * 360) | 0}deg)"></i>`).join('');
     const ov = document.createElement('div'); ov.id = 'gcPop'; ov.className = 'gcpop-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
-    ov.innerHTML = `<div class="gcpop-conf" aria-hidden="true">${conf}</div><div class="gcpop-box" style="--g1:${meta[0]};--g2:${meta[1]}"><div class="gcpop-tag">${tag}</div><div class="gcpop-mons">${mons.map(m => `<img src="${profileImg(m)}" alt="" onerror="this.remove()">`).join('')}</div><h3>${title}</h3><p>${sub}</p>${unlock ? `<div class="gcpop-new">🔓 New title unlocked: <b>${profileTitleHTML(unlock)}</b></div>` : ''}<div class="gcpop-btns">${unlock ? `<button type="button" class="gcpop-btn eq" data-t="${calcEsc(unlock)}">Equip title</button>` : ''}<button type="button" class="gcpop-btn">${unlock ? 'Later' : 'Nice!'}</button></div></div>`;
+    ov.innerHTML = `<div class="gcpop-conf" aria-hidden="true">${conf}</div><div class="gcpop-box" style="--g1:${meta[0]};--g2:${meta[1]}"><div class="gcpop-tag">${tag}</div><div class="gcpop-mons">${mons.map(m => `<img src="${profileImg(m)}" alt="" onerror="this.remove()">`).join('')}</div><h3>${title}</h3><p>${sub}</p>${unlock ? `<div class="gcpop-new">New title unlocked: <b>${profileTitleHTML(unlock)}</b></div>` : ''}<div class="gcpop-btns">${unlock ? `<button type="button" class="gcpop-btn eq" data-t="${calcEsc(unlock)}">Equip title</button>` : ''}<button type="button" class="gcpop-btn">${unlock ? 'Later' : 'Nice!'}</button></div></div>`;
     const close = () => { ov.remove(); document.removeEventListener('keydown', esc); }, esc = e => { if (e.key === 'Escape') close(); };
     ov.addEventListener('click', e => { const b = e.target.closest && e.target.closest('.gcpop-btn'); if (b && b.dataset.t) guideEquipTitle(b.dataset.t); if (e.target === ov || b) close(); });
     document.addEventListener('keydown', esc);
@@ -6554,7 +6561,7 @@ function guideHeroHtml(gid, g, prog, nDone, next) {
     let nx = '';
     if (next) {
         const t = next[0], img = cxSpr(gid, t), loc = guideLoc(gid, t);
-        nx = `<button type="button" class="gv-next" onclick="guidePick(${next[1]})">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<div><small>Up next</small><b>${calcEsc(t.n)}</b><span>Level cap ${guideCapOf(t)}${loc ? ' · 📍 ' + calcEsc(loc[0]) : ''}</span></div></button>`;
+        nx = `<button type="button" class="gv-next" onclick="guidePick(${next[1]})">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<div><small>Up next</small><b>${calcEsc(t.n)}</b><span>Level cap ${guideCapOf(t)}${loc ? ' · ' + calcEsc(loc[0]) : ''}</span></div></button>`;
     } else if (prog.length) nx = `<div class="gv-next" style="cursor:default"><div><small>All done</small><b>🏆 Complete!</b></div></div>`;
     return `<div class="gv-hero${GAME_PIC[gid] ? ' has-pic' : ''}">${GAME_PIC[gid] ? `<div class="gv-pic" style="background-image:url(${GAME_PIC[gid]})${GAME_PIC_POS_HERO[gid] ? ';background-position:' + GAME_PIC_POS_HERO[gid] : ''}"></div>` : ''}<div class="gv-heroL"><div class="gv-reg">${calcEsc(reg)}${GAME_YEAR[gid] ? ' · ' + GAME_YEAR[gid] : ''}</div><div class="gv-title">${calcEsc(g.name)}</div>${tag ? `<div class="gv-tag">${calcEsc(tag)}</div>` : ''}<div class="gv-prog"><div style="width:${pct}%"></div></div><div class="gv-count">${nDone} / ${prog.length} defeated</div></div>${mons ? `<div class="gv-mons">${mons}</div>` : ''}${nx}</div>`;
 }
@@ -6769,13 +6776,13 @@ async function guideCheckRender() {
     if (tok !== _gcTok || guideState.ti !== ti || !document.getElementById('guideCheck')) return;
     const cap = guideCapOf(t);
     const r = guideCheckCalc(t.m.map(([sp, lv], i) => ({ sp, lv, types: types[i] })), team.mons.map(p => ({ name: p.nickname || p.name, types: p._data.type, ability: p.ability, level: p.level })), cap);
-    const label = { ready: '✅ Looks ready', caution: '⚠️ A few gaps', risky: '🚨 Risky' }[r.verdict];
+    const label = { ready: 'Looks ready', caution: 'A few gaps', risky: 'Risky' }[r.verdict];
     const tp = ty => `<span class="gc-ty" style="color:${(typeColors[ty] || {}).text || '#aaa'}">${ty}</span>`;
     const rows = r.rows.map(x => `<div class="gc-row"><div class="gc-t"><b>${calcEsc(guideCap(x.sp))}</b> <small>Lv ${x.lv}</small>${x.types.map(tp).join('')}</div><div>${
         x.unknown ? '<span class="gc-meh">Types unavailable (offline?)</span>'
         : x.good.length ? `<span class="gc-ok">✅ ${calcEsc(x.good.slice(0, 3).join(', '))}</span>`
         : x.okay.length ? `<span class="gc-meh">⚠️ No clean answer. Best bet: ${calcEsc(x.okay.slice(0, 2).join(', '))}</span>`
-        : '<span class="gc-bad">🚨 Nothing on your team hits this well</span>'}</div></div>`).join('');
+        : '<span class="gc-bad">Nothing on your team hits this well</span>'}</div></div>`).join('');
     const lv = r.levelWarn ? `<div class="gc-sum gc-bad">Your highest level is ${r.umax} but their top Pokémon is Lv ${cap}. You're under the level cap.</div>`
         : `<div class="gc-sum">Your levels: ${r.umin === r.umax ? r.umax : r.umin + '–' + r.umax} · their top Pokémon: Lv ${cap}.</div>`;
     const ex = r.exposed.length ? `<div class="gc-sum gc-meh">Most exposed: ${r.exposed.slice(0, 3).map(e => `${calcEsc(e.name)} (weak to ${e.n} of their Pokémon)`).join(', ')}.</div>` : '';
@@ -6797,11 +6804,11 @@ async function guideDetail() {
         return `<div class="guide-mon"><img class="dx-link" title="Open in Dex" onclick="openInDex('${slug}${x.mg ? '-mega' : ''}')" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" alt="" onerror="this.style.visibility='hidden'">
             <div class="gm-name dx-link" title="Open in Dex" onclick="openInDex('${slug}${x.mg ? '-mega' : ''}')">${calcEsc(guideCap(sp))}${x.mg ? ' (Mega)' : ''} <small>Lv ${lv}</small></div><div class="gm-types" data-sp="${slug}"></div>${bits}<div class="gm-mvs" data-i="${mi}">${(x.m || []).map(m => `<span class="guide-mv">${calcEsc(pretty(m))}</span>`).join('')}</div></div>`;
     }).join('');
-    el.innerHTML = `<div class="guide-head">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<div><div class="gh-name">${calcEsc(t.n)}</div><div class="gh-sub">${calcEsc(GAME_TEAMS[gid].name)} · ${calcEsc(t.c)}</div>${guideBadgeHtml(t)}<div class="gh-row"><span class="guide-cap">Level cap ${cap}</span>${loc ? `<span class="gh-loc">📍 ${calcEsc(loc[0])} · ${calcEsc(loc[1])}</span>` : `<span class="gh-loc none">📍 Location not confirmed</span>`}</div></div>
+    el.innerHTML = `<div class="guide-head">${img ? `<img src="${img}" data-a="${cxSprAlt(t)}" data-n="${calcEsc(String(t.n).charAt(0))}" alt="" onerror="cxSprErr(this)">` : ''}<div><div class="gh-name">${calcEsc(t.n)}</div><div class="gh-sub">${calcEsc(GAME_TEAMS[gid].name)} · ${calcEsc(t.c)}</div>${guideBadgeHtml(t)}<div class="gh-row"><span class="guide-cap">Level cap ${cap}</span>${loc ? `<span class="gh-loc">${calcEsc(loc[0])} · ${calcEsc(loc[1])}</span>` : `<span class="gh-loc none">Location not confirmed</span>`}</div></div>
         <label class="guide-def"><input type="checkbox" ${guideDone()[k] ? 'checked' : ''} onchange="guideToggle('${k}')"> Defeated</label>
-        <button class="guide-send" onclick="guideSend('opp')">⚔️ Load as Opponent</button><button class="guide-send alt" onclick="guideSend('you')">Load as Your Team</button><button class="guide-send alt" onclick="guideCheckToggle()">✅ Is my team ready?</button><button class="guide-send alt" onclick="guideCounterToggle()">🎯 Counter team</button></div>
+        <button class="guide-send" onclick="guideSend('opp')">Load as Opponent</button><button class="guide-send alt" onclick="guideSend('you')">Load as Your Team</button><button class="guide-send alt" onclick="guideCheckToggle()">✅ Is my team ready?</button><button class="guide-send alt" onclick="guideCounterToggle()">Counter team</button></div>
         <div id="guideCheck"></div><div id="guideCounter"></div>
-        ${full ? '' : needDef ? '<div class="guide-hint" id="guidePredHint">Dashed moves are predicted (last four level-up moves at that level). Items and abilities aren\'t filled in for this trainer yet.</div>' : '<div class="guide-hint">Moves, items and abilities aren\'t filled in for this game yet — only species and levels.</div>'}<div id="guideWeak" class="gw-strip"></div><div class="guide-team">${cards}</div><div class="gn-box"><label for="guideNote">📝 My notes</label><textarea id="guideNote" rows="6" maxlength="600" placeholder="e.g. bring a Ground type, save before this fight" oninput="guideNoteSave(this.value)"></textarea></div>`;
+        ${full ? '' : needDef ? '<div class="guide-hint" id="guidePredHint">Dashed moves are predicted (last four level-up moves at that level). Items and abilities aren\'t filled in for this trainer yet.</div>' : '<div class="guide-hint">Moves, items and abilities aren\'t filled in for this game yet — only species and levels.</div>'}<div id="guideWeak" class="gw-strip"></div><div class="guide-team">${cards}</div><div class="gn-box"><label for="guideNote">My notes</label><textarea id="guideNote" rows="6" maxlength="600" placeholder="e.g. bring a Ground type, save before this fight" oninput="guideNoteSave(this.value)"></textarea></div>`;
     { const nt = el.querySelector('#guideNote'); if (nt) nt.value = guideNotesAll()[k] || ''; }
     guideWeakRender(t, tok);
     guideCheckRender(); guideCounterRender();
@@ -6901,7 +6908,7 @@ function dexRender() {
         <input id="dxQ" placeholder="Search Pokémon…" value="${calcEsc(dexState.q)}" oninput="dexSet('q',this.value)">
         <select onchange="dexSet('type',this.value)"><option value="">All types</option>${DEX_TYPES.map(t => `<option value="${t}" ${dexState.type === t ? 'selected' : ''}>${dexCap(t)}</option>`).join('')}</select>
         <select onchange="dexSet('sort',this.value)">${Object.entries(DEX_SORTS).map(([k, l]) => `<option value="${k}" ${dexState.sort === k ? 'selected' : ''}>Sort: ${l}</option>`).join('')}</select>
-        <button class="dx-shinebtn${dexState.shiny ? ' on' : ''}" id="dxShBtn" onclick="dexShiny()" title="Show shiny sprites">✨ Shiny</button></div>
+        <button class="dx-shinebtn${dexState.shiny ? ' on' : ''}" id="dxShBtn" onclick="dexShiny()" title="Show shiny sprites">Shiny</button></div>
         <div class="dx-move"><input id="dxM" placeholder="Search a move to see who learns it — e.g. Strength Sap" autocomplete="off" value="${dexState.move ? calcEsc(dexName(dexState.move)) : ''}" oninput="dexMoveSug(this.value)" onblur="setTimeout(() => { const b = document.getElementById('dxSug'); if (b) b.style.display = 'none'; }, 180)"><div class="dx-sug" id="dxSug" style="display:none"></div></div>
         <div class="dx-move"><input id="dxA" placeholder="Search an ability to see who has it — e.g. Levitate" autocomplete="off" value="${dexState.abil ? calcEsc(dexName(dexState.abil)) : ''}" oninput="dexAbilSug(this.value)" onblur="setTimeout(() => { const b = document.getElementById('dxSugA'); if (b) b.style.display = 'none'; }, 180)"><div class="dx-sug" id="dxSugA" style="display:none"></div></div>
         <div id="dxBody"><div class="dx-note">Loading…</div></div>`;
@@ -7692,7 +7699,7 @@ function tkScopeInfo() {   // what the "game or region" dropdown currently means
 const tkAgo = ts => { if (!ts) return ''; const m = Math.round((Date.now() - ts) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' }); };
 function tkFlashSaved(box) { const el = box.querySelector('.tk-saved'); if (!el) return; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 900); }
 function tkOpen() {
-    const ui = tkOverlay(`<h3><img class="tk-h-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png" alt="" onerror="this.remove()">Hunts &amp; Dex</h3><div class="tk-tabs" role="tablist"><button type="button" class="tk-tab" data-t="hunt">Hunt counter</button><button type="button" class="tk-tab" data-t="shiny">Shiny dex</button><button type="button" class="tk-tab" data-t="live">Living dex</button></div><div id="tkBody"></div>`);
+    const ui = tkOverlay(`<h3><img class="tk-h-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-radar.png" alt="" onerror="this.remove()">Hunts &amp; Dex</h3><div class="tk-tabs" role="tablist"><button type="button" class="tk-tab" data-t="hunt">Hunt counter</button><button type="button" class="tk-tab" data-t="shiny">Shiny dex</button><button type="button" class="tk-tab" data-t="live">Living dex</button></div><div id="tkBody"></div>`);
     const body = () => ui.box.querySelector('#tkBody');
     const render = () => {
         const y = ui.box.scrollTop;
@@ -7720,7 +7727,7 @@ function tkOpen() {
             const n = ui.box.querySelector('#tkN-' + h.id), p = ui.box.querySelector('#tkP-' + h.id); if (n) n.textContent = tkN(h.n); if (p) p.innerHTML = tkProbHtml(h); tkFlashSaved(ui.box); return;
         }
         if (a === 'pause' || a === 'resume') { h.paused = a === 'pause'; h.tl = Date.now(); tkHuntsSave(hs); showToast(a === 'pause' ? '⏸ Hunt paused. It stays saved under “Paused hunts”.' : '▶ Hunt resumed.'); render(); return; }
-        if (a === 'found') { h.done = true; h.paused = false; h.tf = Date.now(); tkHuntsSave(hs); tkDexSet('s' + h.sp, true); showToast('✨ Shiny logged!'); render(); return; }
+        if (a === 'found') { h.done = true; h.paused = false; h.tf = Date.now(); tkHuntsSave(hs); tkDexSet('s' + h.sp, true); showToast('Shiny logged!'); render(); return; }
         if (a === 'del') { showConfirm('Delete this hunt?', 'Its count will be lost. (Use Pause instead if you want to come back to it.)', () => { tkHuntsSave(tkHunts().filter(x => String(x.id) !== b.dataset.id)); render(); }); return; }
         if (a === 'rmlog') { showConfirm('Remove this from your log?', 'The shiny stays ticked in your Shiny Dex.', () => { tkHuntsSave(tkHunts().filter(x => String(x.id) !== b.dataset.id)); render(); }); return; }
     });
@@ -7756,12 +7763,12 @@ function tkHuntHtml() {
         <button type="button" class="pill-btn wide" data-a="start">▶ Start hunt</button></div>
         <div class="bk-msg" id="tkMsg" role="status"></div>
         <div class="dx-note" style="font-size:.7rem;color:var(--muted)">Odds are the commonly quoted values. Pick Custom if your method differs.</div>`;
-    const card = (h, isP) => `<div class="tk-hunt${isP ? ' paused' : ''}"><img src="${TK_IMG}${h.sp}.png" alt=""><div class="tk-hm"><b>${calcEsc(h.name)}</b>${isP ? ' <span class="tk-badge">Paused</span>' : ''}<small>${calcEsc(gl(h.game))} · ${calcEsc(h.method)} · 1/${tkN(h.odds)}</small><div class="tk-c"><span id="tkN-${h.id}">${tkN(h.n)}</span> <small id="tkP-${h.id}">${tkProbHtml(h)}</small></div><small>Last updated ${tkAgo(h.tl || h.t0)}</small></div><div class="tk-hb">${isP ? `<button type="button" class="tk-plus" data-a="resume" data-id="${h.id}">▶ Resume</button>` : `<button type="button" class="tk-plus" data-a="+" data-id="${h.id}" aria-label="Add one encounter to ${calcEsc(h.name)}">+1</button><button type="button" data-a="-" data-id="${h.id}" aria-label="Remove one encounter">−1</button>`}<button type="button" data-a="found" data-id="${h.id}">✨ Found it!</button>${isP ? '' : `<button type="button" data-a="pause" data-id="${h.id}">⏸ Pause</button>`}<button type="button" data-a="del" data-id="${h.id}" aria-label="Delete hunt">✕</button></div></div>`;
-    const saved = (act.length + paused.length) ? `<div class="tk-saved">💾 Hunts save automatically on this device, so you can close this and come back any time. Use <b>Pause</b> to put one aside.</div>` : '';
+    const card = (h, isP) => `<div class="tk-hunt${isP ? ' paused' : ''}"><img src="${TK_IMG}${h.sp}.png" alt=""><div class="tk-hm"><b>${calcEsc(h.name)}</b>${isP ? ' <span class="tk-badge">Paused</span>' : ''}<small>${calcEsc(gl(h.game))} · ${calcEsc(h.method)} · 1/${tkN(h.odds)}</small><div class="tk-c"><span id="tkN-${h.id}">${tkN(h.n)}</span> <small id="tkP-${h.id}">${tkProbHtml(h)}</small></div><small>Last updated ${tkAgo(h.tl || h.t0)}</small></div><div class="tk-hb">${isP ? `<button type="button" class="tk-plus" data-a="resume" data-id="${h.id}">▶ Resume</button>` : `<button type="button" class="tk-plus" data-a="+" data-id="${h.id}" aria-label="Add one encounter to ${calcEsc(h.name)}">+1</button><button type="button" data-a="-" data-id="${h.id}" aria-label="Remove one encounter">−1</button>`}<button type="button" data-a="found" data-id="${h.id}">Found it!</button>${isP ? '' : `<button type="button" data-a="pause" data-id="${h.id}">⏸ Pause</button>`}<button type="button" data-a="del" data-id="${h.id}" aria-label="Delete hunt">✕</button></div></div>`;
+    const saved = (act.length + paused.length) ? `<div class="tk-saved">Hunts save automatically on this device, so you can close this and come back any time. Use <b>Pause</b> to put one aside.</div>` : '';
     const active = act.length ? `<div class="tk-sec-h">Active hunts</div>` + act.map(h => card(h, false)).join('') : '';
     const pausedHtml = paused.length ? `<div class="tk-sec-h">Paused hunts</div>` + paused.map(h => card(h, true)).join('') : '';
     const enc = done.filter(h => h.n > 0), avg = enc.length ? Math.round(enc.reduce((a, h) => a + h.n, 0) / enc.length) : 0, best = enc.length ? Math.min(...enc.map(h => h.n)) : 0;
-    const log = done.length ? `<div class="tk-sec-h">Shiny log</div><div class="tk-stats"><span>✨ ${done.length} found</span>${enc.length ? `<span>Avg ${tkN(avg)} encounters</span><span>Fastest ${tkN(best)}</span>` : ''}</div>` + done.map(h => `<div class="tk-log"><img src="${TK_IMG}shiny/${h.sp}.png" alt=""><div class="tk-lm"><b>${calcEsc(h.name)}</b><small>${calcEsc(gl(h.game))} · ${calcEsc(h.method)} · ${tkN(h.n)} encounters · ${new Date(h.tf || h.t0).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' })}</small></div><button type="button" class="pill-btn" data-a="rmlog" data-id="${h.id}" aria-label="Remove from log">✕</button></div>`).join('') : '';
+    const log = done.length ? `<div class="tk-sec-h">Shiny log</div><div class="tk-stats"><span>${done.length} found</span>${enc.length ? `<span>Avg ${tkN(avg)} encounters</span><span>Fastest ${tkN(best)}</span>` : ''}</div>` + done.map(h => `<div class="tk-log"><img src="${TK_IMG}shiny/${h.sp}.png" alt=""><div class="tk-lm"><b>${calcEsc(h.name)}</b><small>${calcEsc(gl(h.game))} · ${calcEsc(h.method)} · ${tkN(h.n)} encounters · ${new Date(h.tf || h.t0).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' })}</small></div><button type="button" class="pill-btn" data-a="rmlog" data-id="${h.id}" aria-label="Remove from log">✕</button></div>`).join('') : '';
     return form + saved + active + pausedHtml + log;
 }
 async function tkStart(box, render) {
@@ -7807,7 +7814,7 @@ const thGet = () => { const t = tkJ('beanTheme', {}); return (t && t.accent) || 
 function thApply(c) { document.documentElement.style.setProperty('--accent', c); }
 function thLum(hex) { const n = parseInt(hex.slice(1), 16), f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(n >> 16 & 255) + .7152 * f(n >> 8 & 255) + .0722 * f(n & 255); }
 function thOpen() {
-    const ui = tkOverlay(`<h3>🎨 Accent colour</h3><p>Changes the highlight colour across the whole site. It saves with your account.</p>
+    const ui = tkOverlay(`<h3>Accent colour</h3><p>Changes the highlight colour across the whole site. It saves with your account.</p>
         <div class="th-sw">${TH_SW.map(([n, c]) => `<button type="button" data-c="${c}" style="background:${c}" class="${thGet().toLowerCase() === c ? 'on' : ''}" aria-label="${n}" aria-pressed="${thGet().toLowerCase() === c}">${n}</button>`).join('')}</div>
         <div class="bk-row"><label class="pill-btn" style="gap:8px">Custom <input type="color" id="thC" value="${thGet()}" style="width:28px;height:20px;border:0;padding:0;background:none"></label><button type="button" class="pill-btn" data-a="reset">Reset</button></div>
         <div class="bk-msg" id="thMsg" role="status"></div>`);
@@ -7838,7 +7845,7 @@ const GS_TOOLS = [
     ['☁️', 'Google sync', 'Sync across devices', 'google sync login sign in drive', () => { try { syncOpen(); } catch (e) {} }]
 ];
 function gsOpen() {
-    const ui = tkOverlay(`<h3>🔍 Search</h3><input class="tk-in gs-in" id="gsQ" placeholder="Pokémon, trainers, moves, abilities, your teams…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search"><div class="gs-res" id="gsRes" aria-live="polite"></div>`);
+    const ui = tkOverlay(`<h3>Search</h3><input class="tk-in gs-in" id="gsQ" placeholder="Pokémon, trainers, moves, abilities, your teams…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search"><div class="gs-res" id="gsRes" aria-live="polite"></div>`);
     const q = ui.box.querySelector('#gsQ'), out = ui.box.querySelector('#gsRes');
     const rank = (name, nq) => { const n = dexNorm(name); if (!nq) return -1; if (n === nq) return 0; if (n.startsWith(nq)) return 1; return n.includes(nq) ? 2 : -1; };
     const pick = (list, getName, nq, max) => { const h = list.map(x => [rank(getName(x), nq), x]).filter(a => a[0] >= 0).sort((a, b) => a[0] - b[0]); return { n: h.length, items: h.slice(0, max).map(a => a[1]) }; };
@@ -7899,8 +7906,8 @@ const RG_LEGS = new Set([144,145,146,150,151,243,244,245,249,250,251,377,378,379
 const RG_PSEUDO = new Set([149,248,373,376,445,635,706,784,887,998]);   // Dragonite, Tyranitar, Salamence, Metagross, Garchomp, Hydreigon, Goodra, Kommo-o, Dragapult, Baxcalibur
 const rgTier = id => RG_LEGS.has(id) ? 2 : RG_PSEUDO.has(id) ? 1 : 0;   // 2 = legendary/mythical boss, 1 = mini-boss
 const rgIsBoss = id => rgTier(id) > 0;
-const RG_ENV = { normal:['🌾','Open field','#a8a77a'], fire:['🌋','Volcano','#ee8130'], water:['🌊','Shoreline','#6390f0'], electric:['⚡','Power plant','#f7d02c'], grass:['🌿','Tall grass','#7ac74c'], ice:['❄️','Snowfield','#96d9d6'], fighting:['🥋','Dojo','#c22e28'], poison:['☣️','Swamp','#a33ea1'], ground:['⛰️','Canyon','#e2bf65'], flying:['☁️','Sky','#a98ff3'], psychic:['🔮','Mystic ruins','#f95587'], bug:['🌳','Forest','#a6b91a'], rock:['🪨','Cave','#b6a136'], ghost:['👻','Haunted tower','#735797'], dragon:['🐉','Dragon’s den','#6f35fc'], dark:['🌑','Night alley','#705746'], steel:['⚙️','Iron works','#b7b7ce'], fairy:['🌸','Flower meadow','#d685ad'] };
-const RG_SC = { plains:['🌾','Open plains'], forest:['🌳','Forest'], cave:['🪨','Cave'], sky:['☁️','Open sky'], ocean:['🌊','Ocean'], swamp:['🐸','Swamp'], cliffs:['⛰️','Cliffs'], savanna:['🦁','Savanna'], desert:['🏜️','Desert'], city:['🏙️','City'], snow:['❄️','Snowfield'], volcano:['🌋','Volcano'], night:['🌙','Haunted night'] };
+const RG_ENV = { normal:['','Open field','#a8a77a'], fire:['','Volcano','#ee8130'], water:['','Shoreline','#6390f0'], electric:['','Power plant','#f7d02c'], grass:['','Tall grass','#7ac74c'], ice:['','Snowfield','#96d9d6'], fighting:['','Dojo','#c22e28'], poison:['','Swamp','#a33ea1'], ground:['','Canyon','#e2bf65'], flying:['','Sky','#a98ff3'], psychic:['','Mystic ruins','#f95587'], bug:['','Forest','#a6b91a'], rock:['','Cave','#b6a136'], ghost:['','Haunted tower','#735797'], dragon:['','Dragon’s den','#6f35fc'], dark:['','Night alley','#705746'], steel:['','Iron works','#b7b7ce'], fairy:['','Flower meadow','#d685ad'] };
+const RG_SC = { plains:['','Open plains'], forest:['','Forest'], cave:['','Cave'], sky:['','Open sky'], ocean:['','Ocean'], swamp:['','Swamp'], cliffs:['','Cliffs'], savanna:['','Savanna'], desert:['','Desert'], city:['','City'], snow:['','Snowfield'], volcano:['','Volcano'], night:['','Haunted night'] };
 const RG_T2S = { normal:'plains', fire:'volcano', water:'ocean', electric:'city', grass:'forest', ice:'snow', fighting:'cliffs', poison:'swamp', ground:'desert', flying:'sky', psychic:'sky', bug:'forest', rock:'cave', ghost:'night', dragon:'cliffs', dark:'night', steel:'city', fairy:'plains' };
 const RG_H2S = { cave:'cave', forest:'forest', grassland:'plains', mountain:'cliffs', 'rough-terrain':'savanna', sea:'ocean', urban:'city', 'waters-edge':'swamp' };
 function rgScene(ty, hab) {   // strong types always get their own scene; otherwise the Pokémon's habitat decides
@@ -7998,8 +8005,8 @@ function rgRecord(id, shiny) {
     try { localStorage.setItem('beanRangerCaught', JSON.stringify(c)); } catch (er) {}
     const n = Object.keys(c).length, anyShiny = Object.values(c).reduce((a, x) => a + x[1], 0), TT = { 1: 'Fledgling Ranger', 20: 'Field Ranger', 50: 'Senior Ranger', 100: 'Elite Ranger', 150: 'Ranger Captain', 200: 'Ranger Commander' };
     const out = [];
-    if (shiny && anyShiny === 1) out.push('✨ First shiny caught! Title unlocked: Shiny Spotter.');
-    if (n > had && (n === 1 || n === 20 || n === 50 || (n >= 100 && n % 50 === 0))) out.push('🏅 Ranger milestone: ' + n + ' species caught!' + (TT[n] ? ' Title unlocked: ' + TT[n] + '.' : ''));
+    if (shiny && anyShiny === 1) out.push('First shiny caught! Title unlocked: Shiny Spotter.');
+    if (n > had && (n === 1 || n === 20 || n === 50 || (n >= 100 && n % 50 === 0))) out.push('Ranger milestone: ' + n + ' species caught!' + (TT[n] ? ' Title unlocked: ' + TT[n] + '.' : ''));
     return out.join(' ');
 }
 function rgBattle(id, shiny) {
@@ -8010,7 +8017,7 @@ function rgBattle(id, shiny) {
     const showHint = boss ? seen.b < 2 : seen.n < 2; if (boss) seen.b++; else seen.n++;      // the tip only shows for your first 2 encounters (and first 2 bosses)
     try { localStorage.setItem('beanRangerSeen', JSON.stringify(seen)); } catch (e) {}
     const ov = document.createElement('div'); ov.className = 'rg-ov'; rgLock();
-    ov.innerHTML = `<div class="rg-box" style="${mt ? `--rg1:color-mix(in srgb,${mt[0]} 40%,#0b1530);--rg2:color-mix(in srgb,${mt[1]} 30%,#0b1530)` : ''}"><button class="rg-x" aria-label="Let it go">✕</button><div class="rg-hd">${tier === 2 ? '⚠️ Boss: ' : tier === 1 ? '⚠️ Mini-boss: ' : ''}A wild ${shiny ? '✨ shiny ' : ''}${calcEsc(rgName(id))}!<small>${gm ? calcEsc(gm.name) + ' route' : 'Draw loops around it!'}</small></div><div class="rg-bars"><div class="rg-row"><span class="rg-lab">Health</span><div class="rg-bar" id="rgHp"><i></i></div><b class="rg-num" id="rgHpN">${hpMax}/${hpMax}</b></div><div class="rg-row"><span class="rg-lab">Time</span><div class="rg-bar" id="rgTm"><i></i></div><b class="rg-num" id="rgTmN">${tMax}s</b></div></div><canvas class="rg-cv" width="320" height="320"></canvas>${showHint ? `<div class="rg-hint" id="rgHint">${boss ? '⚠️ Dodge the shockwaves! If a ring touches your line, you lose that loop.' : '👆 Draw a loop around it to catch it.'}<br><small>The timer starts when you touch the screen.</small></div>` : ''}</div>`;
+    ov.innerHTML = `<div class="rg-box" style="${mt ? `--rg1:color-mix(in srgb,${mt[0]} 40%,#0b1530);--rg2:color-mix(in srgb,${mt[1]} 30%,#0b1530)` : ''}"><button class="rg-x" aria-label="Let it go">✕</button><div class="rg-hd">${tier === 2 ? '<span class="rg-warn boss">Boss</span> ' : tier === 1 ? '<span class="rg-warn mini">Mini-boss</span> ' : ''}A wild ${shiny ? 'shiny ' : ''}${calcEsc(rgName(id))}!<small>${gm ? calcEsc(gm.name) + ' route' : 'Draw loops around it!'}</small></div><div class="rg-bars"><div class="rg-row"><span class="rg-lab">Health</span><div class="rg-bar" id="rgHp"><i></i></div><b class="rg-num" id="rgHpN">${hpMax}/${hpMax}</b></div><div class="rg-row"><span class="rg-lab">Time</span><div class="rg-bar" id="rgTm"><i></i></div><b class="rg-num" id="rgTmN">${tMax}s</b></div></div><canvas class="rg-cv" width="320" height="320"></canvas>${showHint ? `<div class="rg-hint" id="rgHint">${boss ? '⚠️ Dodge the shockwaves! If a ring touches your line, you lose that loop.' : '👆 Draw a loop around it to catch it.'}<br><small>The timer starts when you touch the screen.</small></div>` : ''}</div>`;
     document.body.appendChild(ov);
     const box = ov.querySelector('.rg-box'), sub = ov.querySelector('.rg-hd small'), hpEl = ov.querySelector('#rgHp i'), tmEl = ov.querySelector('#rgTm i'), hpN = ov.querySelector('#rgHpN'), tmN = ov.querySelector('#rgTmN');
     const cv = ov.querySelector('canvas'), cx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), img = new Image(); img.src = profileImg(id, shiny);
@@ -8024,7 +8031,7 @@ function rgBattle(id, shiny) {
         if (!gm) {
             const e = RG_ENV[ty[0]], e2 = ty[1] && RG_ENV[ty[1]];
             if (e) { box.style.setProperty('--rg1', `color-mix(in srgb,${e[2]} 38%,#0b1530)`); box.style.setProperty('--rg2', `color-mix(in srgb,${(e2 || e)[2]} 26%,#0b1530)`); }
-            sub.textContent = sc[1] + ' ' + sc[2] + (boss ? ' · ' + (tier === 2 ? 'dodge the shockwaves!' : 'tougher than usual') : '');
+            sub.innerHTML = '<i class="rg-dot" style="background:' + ((RG_ENV[ty[0]] || [])[2] || '#8aa') + '"></i>' + calcEsc(sc[2]) + (boss ? ' · ' + (tier === 2 ? 'dodge the shockwaves!' : 'tougher than usual') : '');
         }
     });
     if (_rgBst[id] === undefined) rgBstLoad(id).then(b => { if (!b || started || done) return; hpMax = hp = rgCircles(b); tMax = rgSecs(b); if (hpN) hpN.textContent = hpMax + '/' + hpMax; if (tmN) tmN.textContent = tMax + 's'; });
@@ -8032,7 +8039,7 @@ function rgBattle(id, shiny) {
         if (won) { hpEl.style.width = '0%'; if (hpN) hpN.textContent = '0/' + hpMax; } else { tmEl.style.width = '0%'; if (tmN) tmN.textContent = '0s'; }   // the bar goes all the way down on the result screen
         const hh = ov.querySelector('#rgHint'); if (hh) hh.remove(); const note = won ? rgRecord(id, shiny) : '';
         const res = document.createElement('div'); res.className = 'rg-res';
-        res.innerHTML = won ? `<h3>🎉 Caught ${shiny ? '✨ ' : ''}${calcEsc(rgName(id))}!</h3><p>${note ? calcEsc(note) : 'Added to Bean’s Pokédex.'}</p>` : '<h3>It got away…</h3><p>Try again next time!</p>';
+        res.innerHTML = won ? `<h3>Caught ${calcEsc(rgName(id))}!</h3><p>${note ? calcEsc(note) : 'Added to Bean’s Pokédex.'}</p>` : '<h3>It got away…</h3><p>Try again next time!</p>';
         const b = document.createElement('button'); b.className = 'rg-btn2'; b.textContent = 'OK'; b.onclick = close; res.appendChild(b); cv.replaceWith(res); };
     document.addEventListener('keydown', esc); ov.querySelector('.rg-x').onclick = close;
     ov.addEventListener('touchmove', e => { if (e.target === cv || e.target === ov) e.preventDefault(); }, { passive: false });
@@ -8087,19 +8094,19 @@ function rgOpen() {
         const c = rgCaught(), set = rgSet(), ids = Object.keys(c), sh = ids.reduce((a, k) => a + c[k][1], 0), tot = ids.reduce((a, k) => a + c[k][0], 0); let body = '';
         if (_rgTab === 'caught') {
             const gens = Object.entries(DEX_GENS).map(([g, v]) => { const have = ids.map(Number).filter(k => k >= v[0] && k <= v[1]).sort((a, b) => a - b); return { g: +g, v, have, size: v[1] - v[0] + 1, miss: v[1] - v[0] + 1 - have.length }; });
-            const cell = i => { const e = c[i], f = set.fav.includes(i); return `<button class="rg-cell${f ? ' fav' : ''}" data-i="${i}" title="${calcEsc(rgName(i))} ×${e[0]}"><img loading="lazy" src="${profileImg(i, e[1] > 0)}" alt="">${e[1] ? '<b>✨</b>' : ''}</button>`; };
+            const cell = i => { const e = c[i], f = set.fav.includes(i); return `<button class="rg-cell${f ? ' fav' : ''}${e[1] ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(rgName(i))} ×${e[0]}"><img loading="lazy" src="${profileImg(i, e[1] > 0)}" alt=""></button>`; };
             body = ids.length
                 ? `<div class="rg-miss">${gens.map(x => `<button class="rg-chip${x.miss ? '' : ' full'}" data-g="${x.g}">${x.v[2]} ${x.have.length}/${x.size}${x.miss && x.have.length ? ' · missing ' + x.miss : x.miss ? '' : ' ✓'}</button>`).join('')}</div>`
-                  + gens.filter(x => x.have.length).map(x => `<div class="rg-gh"><span>${x.v[2]} · Gen ${x.g}<small>${x.have.length} caught · ${x.miss ? x.miss + ' still missing' : 'complete! 🎉'}</small></span><button class="rg-link" data-g="${x.g}">See all ›</button></div><div class="rg-grid">${x.have.map(cell).join('')}</div>`).join('')
-                  + `<p>Tap a Pokémon to ⭐ favorite it (max 6). Tap a region to see exactly which ones you're missing.</p>`
+                  + gens.filter(x => x.have.length).map(x => `<div class="rg-gh"><span>${x.v[2]} · Gen ${x.g}<small>${x.have.length} caught · ${x.miss ? x.miss + ' still missing' : 'complete!'}</small></span><button class="rg-link" data-g="${x.g}">See all ›</button></div><div class="rg-grid">${x.have.map(cell).join('')}</div>`).join('')
+                  + `<p>Tap a Pokémon to favorite it (max 6). Tap a region to see exactly which ones you're missing.</p>`
                 : `<p>You haven't caught anything yet. Tap a Pokémon that peeks or runs onto your screen to start your collection!</p>`;
         } else if (_rgTab === 'dex') {
-            const [lo, hi] = DEX_GENS[_rgGen], cells = [], favRow = set.fav.length ? `<div class="rg-gh"><span>⭐ Favorites<small>${set.fav.length}/6 · tap one to remove it</small></span></div><div class="rg-grid" style="margin-bottom:12px">${set.fav.map(i => `<button class="rg-cell fav" data-i="${i}" title="${calcEsc(rgName(i))}"><img loading="lazy" src="${profileImg(i, c[i] && c[i][1] > 0)}" alt=""></button>`).join('')}</div>` : ''; for (let i = lo; i <= hi; i++) { const e = c[i], f = set.fav.includes(i); cells.push(e ? `<button class="rg-cell${f ? ' fav' : ''}" data-i="${i}" title="${calcEsc(rgName(i))} ×${e[0]}"><img loading="lazy" src="${profileImg(i, e[1] > 0)}" alt="">${e[1] ? '<b>✨</b>' : ''}</button>` : '<button class="rg-cell" disabled>?</button>'); }
-            body = favRow + `<select id="rgGen" class="ab-modal-input" style="margin-bottom:8px">${Object.entries(DEX_GENS).map(([g, v]) => `<option value="${g}" ${+g === _rgGen ? 'selected' : ''}>Gen ${g} · ${v[2]} (${ids.filter(k => +k >= v[0] && +k <= v[1]).length}/${v[1] - v[0] + 1})</option>`).join('')}</select><div class="rg-grid">${cells.join('')}</div><p>Tap a caught Pokémon to ⭐ favorite it (max 6). The Caught tab shows only what you have.</p>`;
+            const [lo, hi] = DEX_GENS[_rgGen], cells = [], favRow = set.fav.length ? `<div class="rg-gh"><span><img class="hs-ico" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/heart-scale.png" alt="" onerror="this.remove()">Favorites<small>${set.fav.length}/6 · tap one to remove it</small></span></div><div class="rg-grid" style="margin-bottom:12px">${set.fav.map(i => `<button class="rg-cell fav${c[i] && c[i][1] > 0 ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(rgName(i))}"><img loading="lazy" src="${profileImg(i, c[i] && c[i][1] > 0)}" alt=""></button>`).join('')}</div>` : ''; for (let i = lo; i <= hi; i++) { const e = c[i], f = set.fav.includes(i); cells.push(e ? `<button class="rg-cell${f ? ' fav' : ''}${e[1] ? ' shiny' : ''}" data-i="${i}" title="${calcEsc(rgName(i))} ×${e[0]}"><img loading="lazy" src="${profileImg(i, e[1] > 0)}" alt=""></button>` : '<button class="rg-cell" disabled>?</button>'); }
+            body = favRow + `<select id="rgGen" class="ab-modal-input" style="margin-bottom:8px">${Object.entries(DEX_GENS).map(([g, v]) => `<option value="${g}" ${+g === _rgGen ? 'selected' : ''}>Gen ${g} · ${v[2]} (${ids.filter(k => +k >= v[0] && +k <= v[1]).length}/${v[1] - v[0] + 1})</option>`).join('')}</select><div class="rg-grid">${cells.join('')}</div><p>Tap a caught Pokémon to favorite it (max 6). The Caught tab shows only what you have.</p>`;
         } else if (_rgTab === 'fav') {
-            body = `<div class="rg-grid" style="grid-template-columns:repeat(6,1fr)">${[0, 1, 2, 3, 4, 5].map(i => { const f = set.fav[i]; return f ? `<button class="rg-cell fav" data-f="${i}"><img src="${profileImg(f, c[f] && c[f][1] > 0)}" alt=""></button>` : '<button class="rg-cell" disabled>+</button>'; }).join('')}</div><p>Pick favorites in the Pokédex tab. Tap one here to remove it.</p><button class="rg-btn2" id="rgUse" ${set.fav.length ? '' : 'disabled'}>Use as my Top 6</button>`;
-        } else body = `<p><b>How to play</b></p><ul><li>About every 5 minutes a Pokémon sits at the bottom of your screen, peeks in from the side, or (less often) runs across for ~10 seconds. Tap it to start a catch. There's a ✕ to let it go, and the page behind never scrolls.</li><li>Draw a loop around it with your finger or mouse. Each closed loop takes 1 HP off the red bar. Empty the bar to catch it. Stronger Pokémon take more loops, based on total base stats: under 450 = 3 loops, 450–499 = 4, 500–549 = 5, 550–600 = 6, over 600 = 8.</li><li>The timer (blue bar) starts when you first touch the screen. Stronger Pokémon give you less time: 30 seconds under 400 base stats, 25 seconds for 400–549, 20 seconds for 550 and up.</li><li>If the Pokémon touches your line, the line breaks and you restart that loop.</li><li><b>Mini-bosses</b> (pseudo-legendaries like Garchomp and Dragonite) show up after 12 species caught: loops by their base stats (usually 5–6), and now and then a shockwave.</li><li><b>Bosses</b> (legendaries and mythicals) show up after 25 species: usually 6–8 loops, faster, with shockwaves. A dashed ring warns you, then a ring sweeps out and breaks any line it touches.</li><li>The background matches the Pokémon's habitat (or the game you have open in the Guide).</li><li>Shiny odds are 1 in 250. Your first shiny shows ✨ and unlocks the Shiny Spotter title.</li><li>Ranger titles unlock at 1, 20, 50, 100, 150 and 200 species caught. Pick them in your profile.</li><li>Tap a caught Pokémon in the Pokédex tab to ⭐ it (up to 6), then use them as your Top 6 from the Favorites tab.</li><li>Use the Rangers switch above to turn the roaming Pokémon on or off.</li></ul>`;
-        ov.innerHTML = `<div class="rg-box rg-win"><button class="rg-x" aria-label="Close">✕</button><div class="rg-hd">🌿 Bean’s Rangers<small>Roaming Pokémon side game</small></div><div class="rg-stats"><span>Caught: <b>${ids.length}/1025</b></span><span>✨ Shinies: <b>${sh}</b></span><span>Catches: <b>${tot}</b></span><label class="rg-sw"><input type="checkbox" id="rgOn" ${set.on ? 'checked' : ''}> Rangers on</label></div><div class="rg-tabs">${[['caught', 'Caught'], ['dex', 'Pokédex'], ['fav', 'Favorites'], ['how', 'How to play']].map(([k, l]) => `<button class="rg-tab${_rgTab === k ? ' on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>${body}</div>`;
+            body = `<div class="rg-grid" style="grid-template-columns:repeat(6,1fr)">${[0, 1, 2, 3, 4, 5].map(i => { const f = set.fav[i]; return f ? `<button class="rg-cell fav${c[f] && c[f][1] > 0 ? ' shiny' : ''}" data-f="${i}"><img src="${profileImg(f, c[f] && c[f][1] > 0)}" alt=""></button>` : '<button class="rg-cell" disabled>+</button>'; }).join('')}</div><p>Pick favorites in the Pokédex tab. Tap one here to remove it.</p><button class="rg-btn2" id="rgUse" ${set.fav.length ? '' : 'disabled'}>Use as my Top 6</button>`;
+        } else body = `<p><b>How to play</b></p><ul><li>About every 5 minutes a Pokémon sits at the bottom of your screen, peeks in from the side, or (less often) runs across for ~10 seconds. Tap it to start a catch. There's a ✕ to let it go, and the page behind never scrolls.</li><li>Draw a loop around it with your finger or mouse. Each closed loop takes 1 HP off the red bar. Empty the bar to catch it. Stronger Pokémon take more loops, based on total base stats: under 450 = 3 loops, 450–499 = 4, 500–549 = 5, 550–600 = 6, over 600 = 8.</li><li>The timer (blue bar) starts when you first touch the screen. Stronger Pokémon give you less time: 30 seconds under 400 base stats, 25 seconds for 400–549, 20 seconds for 550 and up.</li><li>If the Pokémon touches your line, the line breaks and you restart that loop.</li><li><b>Mini-bosses</b> (pseudo-legendaries like Garchomp and Dragonite) show up after 12 species caught: loops by their base stats (usually 5–6), and now and then a shockwave.</li><li><b>Bosses</b> (legendaries and mythicals) show up after 25 species: usually 6–8 loops, faster, with shockwaves. A dashed ring warns you, then a ring sweeps out and breaks any line it touches.</li><li>The background matches the Pokémon's habitat (or the game you have open in the Guide).</li><li>Shiny odds are 1 in 250. Shinies get a gold outline, and your first one unlocks the Shiny Spotter title.</li><li>Ranger titles unlock at 1, 20, 50, 100, 150 and 200 species caught. Pick them in your profile.</li><li>Tap a caught Pokémon in the Pokédex tab to favorite it (up to 6), then use them as your Top 6 from the Favorites tab.</li><li>Use the Rangers switch above to turn the roaming Pokémon on or off.</li></ul>`;
+        ov.innerHTML = `<div class="rg-box rg-win"><button class="rg-x" aria-label="Close">✕</button><div class="rg-hd"><img class="hs-ico" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/safari-ball.png" alt="" onerror="this.remove()">Bean’s Rangers<small>Roaming Pokémon side game</small></div><div class="rg-stats"><span>Caught: <b>${ids.length}/1025</b></span><span><img class="hs-ico" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png" alt="" onerror="this.remove()">Shinies: <b>${sh}</b></span><span>Catches: <b>${tot}</b></span><label class="rg-sw"><input type="checkbox" id="rgOn" ${set.on ? 'checked' : ''}> Rangers on</label></div><div class="rg-tabs">${[['caught', 'Caught'], ['dex', 'Pokédex'], ['fav', 'Favorites'], ['how', 'How to play']].map(([k, l]) => `<button class="rg-tab${_rgTab === k ? ' on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>${body}</div>`;
         const nb = ov.querySelector('.rg-box'); if (nb) nb.scrollTop = keepY;
     };
     ov.addEventListener('click', e => {
@@ -8110,7 +8117,7 @@ function rgOpen() {
         const set = rgSet();
         if (t.dataset.i) { const i = +t.dataset.i, k = set.fav.indexOf(i); if (k >= 0) set.fav.splice(k, 1); else if (set.fav.length < 6) set.fav.push(i); else showToast('6 favorites max'); rgSetSave(set); return draw(); }
         if (t.dataset.f) { set.fav.splice(+t.dataset.f, 1); rgSetSave(set); return draw(); }
-        if (t.id === 'rgUse') { const c = rgCaught(), p = profileGet(), names = set.fav.map(id => allPokemonNames.find(n => pokemonIdMap[n.toLowerCase()] === id) || ''); p.top = [0, 1, 2, 3, 4, 5].map(i => names[i] || ''); p.ts = [0, 1, 2, 3, 4, 5].map(i => !!(set.fav[i] && c[set.fav[i]] && c[set.fav[i]][1] > 0)); profileSave(p); profileRender(); showToast('Top 6 updated ⭐'); }
+        if (t.id === 'rgUse') { const c = rgCaught(), p = profileGet(), names = set.fav.map(id => allPokemonNames.find(n => pokemonIdMap[n.toLowerCase()] === id) || ''); p.top = [0, 1, 2, 3, 4, 5].map(i => names[i] || ''); p.ts = [0, 1, 2, 3, 4, 5].map(i => !!(set.fav[i] && c[set.fav[i]] && c[set.fav[i]][1] > 0)); profileSave(p); profileRender(); showToast('Top 6 updated'); }
     });
     ov.addEventListener('change', e => { if (e.target.id === 'rgGen') { _rgGen = +e.target.value; draw(); } if (e.target.id === 'rgOn') { const s = rgSet(); s.on = e.target.checked; rgSetSave(s); } });
     draw();
