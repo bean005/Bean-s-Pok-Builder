@@ -1166,7 +1166,7 @@ img.zk-p[src^="data:image/png"],img.zk-t[src^="data:image/png"]{transform:none;o
 .hc-title{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);font-weight:700}
 .hc-region{font-size:1rem;font-weight:700}
 .hc-fav{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted2)}
-.hc-fav b{color:var(--text)}
+.hc-fav b{color:var(--text)}.hc-favrow{flex-wrap:wrap;justify-content:center;column-gap:22px;row-gap:4px}.hc-ty{display:inline-flex;align-items:center;gap:6px}.hc-typill{font-style:normal;font-weight:800;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;padding:2px 9px;border-radius:999px;background:var(--tc);color:#101820;text-shadow:none}
 .prof-ava.big{width:72px;height:72px}
 .prof-ava.bk{background:#000}.prof-ava.wh{background:#fff}
 .prof-avwrap{position:relative;display:inline-flex;flex:none}
@@ -1234,12 +1234,12 @@ details.prof-sec[open]{padding-bottom:10px}
 .prof-shiny{font-size:.78rem;color:var(--muted2);white-space:nowrap;display:flex;gap:6px;align-items:center}
 .home-bar{display:contents}
 @media (max-width:768px){
-.home-bar{position:absolute;top:10px;left:10px;right:10px;z-index:5;display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:nowrap}
+.home-bar{position:absolute;top:10px;left:10px;right:14px;z-index:5;display:flex;flex-direction:column;align-items:flex-end;gap:6px}.home-bar .profile-chip{order:1}.home-bar .home-qrow{order:2;flex-direction:column;align-items:flex-end;gap:6px}
 .home-bar .home-qrow,.home-bar .profile-chip{position:static;top:auto;right:auto}
 .home-bar .rg-btn{padding:0 9px;white-space:nowrap}
 .home-bar .prof-btn{height:40px;max-width:150px}
 }
-@media (max-width:768px){#homeScreen{padding-top:62px}.prof-nm{max-width:80px}}
+@media (max-width:768px){#homeScreen{padding-top:128px}.prof-nm{max-width:80px}}
 
 /* scenes redrawn: forest, swamp, cliffs, desert, sky (layered, original artwork) */
 /* ===== Rangers v2: fixed-position Pokémon, labeled bars, habitat scenes, Caught tab ===== */
@@ -1486,6 +1486,44 @@ details.prof-sec[open]{padding-bottom:10px}
 .tk-hunt.paused{opacity:.78;border-style:dashed}
 .tk-badge{display:inline-block;font-size:.6rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fbbf24;border:1px solid #fbbf24;border-radius:999px;padding:0 7px;vertical-align:middle}
 </style>
+<script>
+/* PokeAPI backup: (1) sprites retry through jsDelivr if GitHub's copy fails, (2) API answers are remembered so the site still works when PokeAPI is down */
+(function () {
+    var RAW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/', CDN = 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/';
+    window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (!t || t.tagName !== 'IMG' || !t.src || t.src.indexOf(RAW) !== 0 || t.dataset.spFb) return;
+        t.dataset.spFb = '1';
+        e.stopImmediatePropagation();   // hold back the image's own fallback until the backup source has had a go
+        t.src = CDN + t.src.slice(RAW.length);
+    }, true);
+    if (!window.caches || !window.fetch || location.protocol === 'file:') return;
+    var API = 'https://pokeapi.co/api/v2/', NAME = 'bean-pokeapi-v1', realFetch = window.fetch.bind(window);
+    window.fetch = function (input, init) {
+        var url = typeof input === 'string' ? input : (input && input.url) || '';
+        var get = !init || !init.method || String(init.method).toUpperCase() === 'GET';
+        if (url.indexOf(API) !== 0 || !get) return realFetch(input, init);
+        return new Promise(function (resolve, reject) {
+            var ctl = typeof AbortController === 'function' ? new AbortController() : null, done = false;
+            var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 12000);
+            var fromCache = function (err) {
+                caches.open(NAME).then(function (c) { return c.match(url); }).then(function (hit) {
+                    if (hit) { console.warn('PokeAPI unreachable, using saved copy:', url); resolve(hit); } else reject(err);
+                }, function () { reject(err); });
+            };
+            realFetch(url, ctl ? { signal: ctl.signal } : undefined).then(function (r) {
+                clearTimeout(timer);
+                if (r.ok) {
+                    var copy = r.clone();
+                    caches.open(NAME).then(function (c) { return c.put(url, copy); }).catch(function () {});
+                    resolve(r);
+                } else if (r.status >= 500) fromCache(new Error('PokeAPI ' + r.status));
+                else resolve(r);
+            }, function (err) { clearTimeout(timer); fromCache(err); });
+        });
+    };
+})();
+</script>
 <script>try{var _t=JSON.parse(localStorage.getItem("beanTheme")||"null");if(_t&&_t.accent)document.documentElement.style.setProperty("--accent",_t.accent)}catch(e){}</script>
 </head>
 <body>
@@ -1741,6 +1779,8 @@ const abilityImmunityMap = {
 };
 
 const abilityDescriptions = {
+    'water compaction': 'Sharply raises Defense (+2 stages) when hit by a Water-type move.',
+    'premium grade': 'Raises Sp. Atk by 1 stage every time this Pokémon enters battle.',
     'levitate': 'Full immunity to Ground-type moves (Earthquake, Earth Power, etc.) and Arena Trap. The Pokémon floats, bypassing Spikes and Toxic Spikes as well.',
     'volt absorb': 'Restores 25% max HP if hit by an Electric-type move instead of taking damage. Also nullifies Thunder Wave.',
     'lightning rod': 'Draws all Electric-type moves to this Pokémon (including ally attacks in doubles). Raises Sp. Atk by 1 stage instead of taking damage.',
@@ -1898,12 +1938,12 @@ const zaMegaDB = {
     "Magearna-Mega":          {id:801, zaSprite:true, type:["Steel","Fairy"],     gender:"none",abilities:["Unknown — see base form"],baseAbilities:["Soul-Heart"],                        baseStats:{hp:80, atk:125,def:115,spa:170,spd:115,spe:95}},
     "Zeraora-Mega":           {id:807, zaSprite:true, type:["Electric"],          gender:"none",abilities:["Unknown — see base form"],baseAbilities:["Volt Absorb"],                       baseStats:{hp:88, atk:157,def:75, spa:147,spd:80, spe:153}},
     "Falinks-Mega":           {id:863, zaSprite:true, type:["Fighting"],          gender:"none",abilities:["Defiant"],baseAbilities:["Battle Armor","Defiant"],            baseStats:{hp:65, atk:135,def:135,spa:70, spd:65, spe:100}},
-    "Tatsugiri-Mega-Curly":   {id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
-    "Tatsugiri-Mega-Droopy":  {id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
-    "Tatsugiri-Mega-Stretchy":{id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
+    "Tatsugiri-Mega-Curly":   {id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Premium Grade"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
+    "Tatsugiri-Mega-Droopy":  {id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Premium Grade"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
+    "Tatsugiri-Mega-Stretchy":{id:978, zaSprite:true, type:["Dragon","Water"],    gender:"mf",  abilities:["Premium Grade"],baseAbilities:["Commander","Storm Drain"],           baseStats:{hp:68, atk:65, def:90, spa:135,spd:125,spe:92}},
     "Garchomp-Mega-Z":        {id:445, zaSprite:true, type:["Dragon"],            gender:"mf",  abilities:["Levitate"],baseAbilities:["Sand Veil","Rough Skin"],            baseStats:{hp:108,atk:130,def:85, spa:141,spd:85, spe:151}},
     "Lucario-Mega-Z":         {id:448, zaSprite:true, type:["Fighting","Steel"],  gender:"mf",  abilities:["Aura Guard"],baseAbilities:["Steadfast","Inner Focus","Justified"],baseStats:{hp:70, atk:100,def:70, spa:164,spd:70, spe:151}},
-    "Heatran-Mega":           {id:485, zaSprite:true, type:["Fire","Steel"],      gender:"mf",  abilities:["Unknown — see base form"],baseAbilities:["Flash Fire","Flame Body"],           baseStats:{hp:91, atk:120,def:106,spa:175,spd:141,spe:67}},
+    "Heatran-Mega":           {id:485, zaSprite:true, type:["Fire","Steel"],      gender:"mf",  abilities:["Water Compaction"],baseAbilities:["Flash Fire","Flame Body"],           baseStats:{hp:91, atk:120,def:106,spa:175,spd:141,spe:67}},
     "Darkrai-Mega":           {id:491, zaSprite:true, type:["Dark"],              gender:"none",abilities:["Bad Dreams"],           baseAbilities:["Bad Dreams"],                           baseStats:{hp:70, atk:120,def:130,spa:165,spd:130,spe:85}},
     "Zygarde-Mega":           {id:718, zaSprite:true, type:["Dragon","Ground"],   gender:"none",abilities:["Unknown — see base form"],baseAbilities:["Aura Break","Power Construct"],     baseStats:{hp:216,atk:70, def:91, spa:216,spd:85, spe:100}},
     "Baxcalibur-Mega":        {id:997, zaSprite:true, type:["Dragon","Ice"],      gender:"mf",  abilities:["Thermal Exchange"],baseAbilities:["Thermal Exchange","Ice Body","Unaware"],baseStats:{hp:115,atk:175,def:117,spa:105,spd:101,spe:87}},
@@ -2063,7 +2103,10 @@ function openSection(name, opts) {
         host.innerHTML = `<div class="panel" id="guideRoot"></div>`;
         dexRender();
     }
-    if (!(opts && opts.noScroll)) host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!(opts && opts.noScroll)) {   // jump straight to the section (instant, no slow scroll over content that's still loading)
+        const jump = () => { const h = document.getElementById('sectionHost'); if (h) window.scrollTo({ top: Math.max(0, h.getBoundingClientRect().top + window.scrollY - 8), left: 0, behavior: 'instant' }); };
+        jump(); requestAnimationFrame(jump);
+    }
 }
 
 /* ===================== DAMAGE CALC ===================== */
@@ -5875,14 +5918,15 @@ function profileCard() {
     const p = profileGet(), B = profileBadges();
     const bm = /^n:(\d+)$/.exec(p.badge || ''); let fno = bm ? +bm[1] : 0; if (!fno) { const lg = B.list.find(x => x.k === p.badge); fno = lg ? lg.no : 0; }
     const fb = fno && B.list.some(x => x.no === fno) ? fno : 0;
-    const has = p.fav || p.region || p.top.some(Boolean) || p.title || fb || B.list.length;
+    const has = p.fav || p.type || p.region || p.top.some(Boolean) || p.title || fb || B.list.length;
     if (!syncWanted() || !has) { el.innerHTML = ''; el.style.display = 'none'; return; }
     const acc = profileAccent(p); if (acc) el.style.setProperty('--pa', acc); else el.style.removeProperty('--pa');
     const rank = profileRank(B), title = p.title || rank;
-    const line1 = `<div class="hc-line1">${rank === 'Master Trainer' && !p.title ? '👑 ' : ''}${profileTitleHTML(title)}${B.list.length ? ` · ${B.list.length} badge${B.list.length === 1 ? '' : 's'}` : ''}</div>`;
+    const line1 = `<div class="hc-line1">${rank === 'Master Trainer' && !p.title ? '👑 ' : ''}${profileTitleHTML(title)}${B.list.length ? ` · ${B.list.length} Badge${B.list.length === 1 ? '' : 's'}` : ''}</div>`;
     const img = (n, i) => { const id = profileMonId(n); return id ? `<span class="hc-mon${p.ts[i] ? ' shiny' : ''}" title="${calcEsc(n)}${p.ts[i] ? ' (shiny)' : ''}"><img class="zk-p" onload="profileFit(this)" src="${profileImg(id, p.ts[i])}" alt="${calcEsc(n)}" onerror="this.onerror=null;this.src='${PROFILE_BALL}'"></span>` : '<span class="hc-mon empty"></span>'; };
     const six = p.top.some(Boolean) ? `<div class="hc-six">${p.top.map(img).join('')}</div>` : '';
-    const fav = p.fav ? `<div class="hc-fav">Pokémon: <b>${calcEsc(p.fav)}</b></div>` : '';
+    const tyc = p.type && PROFILE_TYPES[p.type] ? `<span class="hc-ty">Type: <i class="hc-typill" style="--tc:${PROFILE_TYPES[p.type]}">${calcEsc(p.type)}</i></span>` : '';
+    const fav = (p.fav || tyc) ? `<div class="hc-fav hc-favrow">${p.fav ? `<span>Pokémon: <b>${calcEsc(p.fav)}</b></span>` : ''}${tyc}</div>` : '';
     const bad = fb ? `<div class="hc-fav hc-badge"><span>Badge: <b>${calcEsc(profileBadgeName(fb))}</b></span><img class="hc-bimg" src="${profileBadgeImg(fb)}" alt="" onerror="this.style.display='none'"></div>` : '';
     const html = line1 + `<div class="hc-title">My Favorites</div>` + (p.region ? `<div class="hc-fav">Region: <b>${calcEsc(p.region)}</b></div>` : '') + fav + six + bad;
     el.style.display = '';
@@ -5988,7 +6032,7 @@ function profileOpen() {
     if (!B.list.length) bd.innerHTML = `<div class="prof-stat">No badges yet. Open the <b>Guide</b>, pick a game, and tick <b>Defeated</b> on gym leaders. Their badges show up here, and you can pick a favorite. Beat every trainer in every game to become a <b>Master Trainer</b>.</div>`;
     else {
         const paintBg = () => { const c = curNo(); $('#profBg').innerHTML = earned.map(x => `<button type="button" class="${x.no === c ? 'on' : ''}" data-n="${x.no}" title="${calcEsc(profileBadgeName(x.no))}"><img src="${profileBadgeImg(x.no)}" alt="" loading="lazy" onerror="this.closest('button').remove()"></button>`).join(''); $('#profBgName').textContent = c ? profileBadgeName(c) : 'Tap a badge to pick your favorite'; };
-        bd.innerHTML = `<div class="prof-stat">Rank: <b>${profileRank(B)}</b><br><b>${B.list.length}</b> gym badge${B.list.length === 1 ? '' : 's'} · ${B.full}/${B.games} games complete</div>
+        bd.innerHTML = `<div class="prof-stat">Rank: <b>${profileRank(B)}</b><br><b>${B.list.length}</b> Gym Badge${B.list.length === 1 ? '' : 's'} · ${B.full}/${B.games} games complete</div>
             <div class="bk-h">Favorite badge</div><div class="prof-stat" id="profBgName"></div><div class="prof-bg" id="profBg"></div>
             <button type="button" class="pill-btn" id="profBgX">Clear favorite</button>`;
         $('#profBg').addEventListener('click', e => { const b = e.target.closest('button[data-n]'); if (!b) return; st.badge = 'n:' + b.dataset.n; paintBg(); commit(); });
@@ -7832,24 +7876,24 @@ function thOpen() {
 }
 
 const GS_TOOLS = [
-    ['🧮', 'Damage Calc', 'Run damage calcs', 'calc damage calculator', () => openSection('calc')],
-    ['📋', 'Draft Pool & Team Builder', 'Build and save teams', 'draft pool team builder teams', () => openSection('draft')],
-    ['🧭', 'Trainer Guide', 'Gym leaders, run tracker, counter team', 'guide gym leader elite four champion trainers run tracker', () => openSection('guide')],
-    ['📖', 'Pokédex', 'Browse, sort and compare', 'pokedex dex pokemon', () => openSection('dex')],
-    ['⚪', 'Randomizer', 'Roll random Pokémon & abilities', 'randomizer random roll nuzlocke', () => rzOpen()],
-    ['🔴', 'Hunts & Dex', 'Shiny counter, living dex', 'shiny hunt counter living dex catch log', () => tkOpen()],
-    ['🎨', 'Theme', 'Change the accent colour', 'theme colour color accent', () => thOpen()],
-    ['💾', 'Backup & Restore', 'Save or load your data', 'backup restore export import data', () => bkOpen()],
-    ['⇄', 'Showdown import / export', 'Teams as Showdown text', 'showdown import export paste', () => sdOpen()],
-    ['👤', 'Profile', 'Your name, title and badges', 'profile title badge avatar', () => { try { profileOpen(); } catch (e) {} }],
-    ['☁️', 'Google sync', 'Sync across devices', 'google sync login sign in drive', () => { try { syncOpen(); } catch (e) {} }]
+    ['@.calc-card .mode-img', 'Damage Calc', 'Run damage calcs', 'calc damage calculator', () => openSection('calc')],
+    ['@.draft-card .mode-img', 'Draft Pool & Team Builder', 'Build and save teams', 'draft pool team builder teams', () => openSection('draft')],
+    ['@.guide-card .mode-img', 'Trainer Guide', 'Gym leaders, run tracker, counter team', 'guide gym leader elite four champion trainers run tracker', () => openSection('guide')],
+    ['@.dex-card .mode-img', 'Pokédex', 'Browse, sort and compare', 'pokedex dex pokemon', () => openSection('dex')],
+    ['https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png', 'Randomizer', 'Roll random Pokémon & abilities', 'randomizer random roll nuzlocke', () => rzOpen()],
+    ['https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-radar.png', 'Hunts & Dex', 'Shiny counter, living dex', 'shiny hunt counter living dex catch log', () => tkOpen()],
+    ['https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/235.png', 'Theme', 'Change the accent colour', 'theme colour color accent', () => thOpen()],
+    ['', 'Backup & Restore', 'Save or load your data', 'backup restore export import data', () => bkOpen()],
+    ['', 'Showdown import / export', 'Teams as Showdown text', 'showdown import export paste', () => sdOpen()],
+    ['@profile', 'Profile', 'Your name, title and badges', 'profile title badge avatar', () => { try { profileOpen(); } catch (e) {} }],
+    ['', 'Google sync', 'Sync across devices', 'google sync login sign in drive', () => { try { syncOpen(); } catch (e) {} }]
 ];
 function gsOpen() {
     const ui = tkOverlay(`<h3>Search</h3><input class="tk-in gs-in" id="gsQ" placeholder="Pokémon, trainers, moves, abilities, your teams…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search"><div class="gs-res" id="gsRes" aria-live="polite"></div>`);
     const q = ui.box.querySelector('#gsQ'), out = ui.box.querySelector('#gsRes');
     const rank = (name, nq) => { const n = dexNorm(name); if (!nq) return -1; if (n === nq) return 0; if (n.startsWith(nq)) return 1; return n.includes(nq) ? 2 : -1; };
     const pick = (list, getName, nq, max) => { const h = list.map(x => [rank(getName(x), nq), x]).filter(a => a[0] >= 0).sort((a, b) => a[0] - b[0]); return { n: h.length, items: h.slice(0, max).map(a => a[1]) }; };
-    const item = (k, v, icon, label, sub, extra) => `<button type="button" class="gs-item ${extra || ''}" data-k="${k}" data-v="${calcEsc(String(v))}">${icon.startsWith('http') ? `<img src="${icon}" alt="" loading="lazy">` : `<span class="gs-i" aria-hidden="true">${icon}</span>`}<span><span>${calcEsc(label)}</span>${sub ? `<small>${calcEsc(sub)}</small>` : ''}</span></button>`;
+    const item = (k, v, icon, label, sub, extra) => { if (icon === '@profile') { try { const pv = profileGet(); icon = profileImg(pv.av || 0, false); } catch (e) { icon = ''; } } else if (icon && icon[0] === '@') { const el = document.querySelector(icon.slice(1)); icon = el ? el.src : ''; } return `<button type="button" class="gs-item ${extra || ''}" data-k="${k}" data-v="${calcEsc(String(v))}">${/^(https?:|data:)/.test(icon) ? `<img src="${icon}" alt="" loading="lazy">` : `<span class="gs-i" aria-hidden="true" style="width:34px;flex:0 0 auto">${icon}</span>`}<span><span>${calcEsc(label)}</span>${sub ? `<small>${calcEsc(sub)}</small>` : ''}</span></button>`; };
     const run = () => {
         const raw = q.value.trim(), nq = dexNorm(raw); let h = '';
         if (!nq) {
@@ -7979,7 +8023,7 @@ function rgSitX() {   // pick a spot along the bottom edge that isn't covering a
 }
 function rgSpawn() {
     if (!rgSet().on || document.hidden || rgBusy() || document.querySelector('.rg-roam') || /INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '')) return false;
-    const id = rgPick(), shiny = Math.random() < 1 / 250; rgBstLoad(id);
+    const id = rgPick(), shiny = Math.random() < 1 / 151; rgBstLoad(id);
     const src = profileImg(id, shiny), H = window.innerHeight, Y = window.scrollY, X = window.scrollX, r0 = Math.random();
     let kind = r0 < 0.3 ? 'hide' : r0 < 0.65 ? 'sit' : r0 < 0.85 ? 'peek' : 'run', el = null, im = null;
     const wrap = k => { el = document.createElement('div'); el.className = 'rg-roam ' + k; im = document.createElement('img'); im.src = src; im.alt = ''; im.draggable = false; el.appendChild(im); };
@@ -8105,7 +8149,7 @@ function rgOpen() {
             body = favRow + `<select id="rgGen" class="ab-modal-input" style="margin-bottom:8px">${Object.entries(DEX_GENS).map(([g, v]) => `<option value="${g}" ${+g === _rgGen ? 'selected' : ''}>Gen ${g} · ${v[2]} (${ids.filter(k => +k >= v[0] && +k <= v[1]).length}/${v[1] - v[0] + 1})</option>`).join('')}</select><div class="rg-grid">${cells.join('')}</div><p>Tap a caught Pokémon to favorite it (max 6). The Caught tab shows only what you have.</p>`;
         } else if (_rgTab === 'fav') {
             body = `<div class="rg-grid" style="grid-template-columns:repeat(6,1fr)">${[0, 1, 2, 3, 4, 5].map(i => { const f = set.fav[i]; return f ? `<button class="rg-cell fav${c[f] && c[f][1] > 0 ? ' shiny' : ''}" data-f="${i}"><img src="${profileImg(f, c[f] && c[f][1] > 0)}" alt=""></button>` : '<button class="rg-cell" disabled>+</button>'; }).join('')}</div><p>Pick favorites in the Pokédex tab. Tap one here to remove it.</p><button class="rg-btn2" id="rgUse" ${set.fav.length ? '' : 'disabled'}>Use as my Top 6</button>`;
-        } else body = `<p><b>How to play</b></p><ul><li>About every 5 minutes a Pokémon sits at the bottom of your screen, peeks in from the side, or (less often) runs across for ~10 seconds. Tap it to start a catch. There's a ✕ to let it go, and the page behind never scrolls.</li><li>Draw a loop around it with your finger or mouse. Each closed loop takes 1 HP off the red bar. Empty the bar to catch it. Stronger Pokémon take more loops, based on total base stats: under 450 = 3 loops, 450–499 = 4, 500–549 = 5, 550–600 = 6, over 600 = 8.</li><li>The timer (blue bar) starts when you first touch the screen. Stronger Pokémon give you less time: 30 seconds under 400 base stats, 25 seconds for 400–549, 20 seconds for 550 and up.</li><li>If the Pokémon touches your line, the line breaks and you restart that loop.</li><li><b>Mini-bosses</b> (pseudo-legendaries like Garchomp and Dragonite) show up after 12 species caught: loops by their base stats (usually 5–6), and now and then a shockwave.</li><li><b>Bosses</b> (legendaries and mythicals) show up after 25 species: usually 6–8 loops, faster, with shockwaves. A dashed ring warns you, then a ring sweeps out and breaks any line it touches.</li><li>The background matches the Pokémon's habitat (or the game you have open in the Guide).</li><li>Shiny odds are 1 in 250. Shinies get a gold outline, and your first one unlocks the Shiny Spotter title.</li><li>Ranger titles unlock at 1, 20, 50, 100, 150 and 200 species caught. Pick them in your profile.</li><li>Tap a caught Pokémon in the Pokédex tab to favorite it (up to 6), then use them as your Top 6 from the Favorites tab.</li><li>Use the Rangers switch above to turn the roaming Pokémon on or off.</li></ul>`;
+        } else body = `<p><b>How to play</b></p><ul><li>About every 5 minutes a Pokémon sits at the bottom of your screen, peeks in from the side, or (less often) runs across for ~10 seconds. Tap it to start a catch. There's a ✕ to let it go, and the page behind never scrolls.</li><li>Draw a loop around it with your finger or mouse. Each closed loop takes 1 HP off the red bar. Empty the bar to catch it. Stronger Pokémon take more loops, based on total base stats: under 450 = 3 loops, 450–499 = 4, 500–549 = 5, 550–600 = 6, over 600 = 8.</li><li>The timer (blue bar) starts when you first touch the screen. Stronger Pokémon give you less time: 30 seconds under 400 base stats, 25 seconds for 400–549, 20 seconds for 550 and up.</li><li>If the Pokémon touches your line, the line breaks and you restart that loop.</li><li><b>Mini-bosses</b> (pseudo-legendaries like Garchomp and Dragonite) show up after 12 species caught: loops by their base stats (usually 5–6), and now and then a shockwave.</li><li><b>Bosses</b> (legendaries and mythicals) show up after 25 species: usually 6–8 loops, faster, with shockwaves. A dashed ring warns you, then a ring sweeps out and breaks any line it touches.</li><li>The background matches the Pokémon's habitat (or the game you have open in the Guide).</li><li>Shiny odds are 1 in 151. Shinies get a gold outline, and your first one unlocks the Shiny Spotter title.</li><li>Ranger titles unlock at 1, 20, 50, 100, 150 and 200 species caught. Pick them in your profile.</li><li>Tap a caught Pokémon in the Pokédex tab to favorite it (up to 6), then use them as your Top 6 from the Favorites tab.</li><li>Use the Rangers switch above to turn the roaming Pokémon on or off.</li></ul>`;
         ov.innerHTML = `<div class="rg-box rg-win"><button class="rg-x" aria-label="Close">✕</button><div class="rg-hd"><img class="hs-ico" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/safari-ball.png" alt="" onerror="this.remove()">Bean’s Rangers<small>Roaming Pokémon side game</small></div><div class="rg-stats"><span>Caught: <b>${ids.length}/1025</b></span><span><img class="hs-ico" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png" alt="" onerror="this.remove()">Shinies: <b>${sh}</b></span><span>Catches: <b>${tot}</b></span><label class="rg-sw"><input type="checkbox" id="rgOn" ${set.on ? 'checked' : ''}> Rangers on</label></div><div class="rg-tabs">${[['caught', 'Caught'], ['dex', 'Pokédex'], ['fav', 'Favorites'], ['how', 'How to play']].map(([k, l]) => `<button class="rg-tab${_rgTab === k ? ' on' : ''}" data-t="${k}">${l}</button>`).join('')}</div>${body}</div>`;
         const nb = ov.querySelector('.rg-box'); if (nb) nb.scrollTop = keepY;
     };
