@@ -1584,8 +1584,8 @@ details.prof-sec[open]{padding-bottom:10px}
     </div>
     <div class="home-mini">
         <button type="button" class="gs-bar" onclick="gsOpen()" aria-label="Search everything"><span>Search Pokémon, trainers, moves, your teams…</span><kbd>/</kbd></button>
-        <button type="button" class="mini-tile" onclick="rzOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" onerror="this.replaceWith('⚪')"></span><span><b>Randomizer</b><small>Roll Pokémon &amp; abilities</small></span></button>
-        <button type="button" class="mini-tile" onclick="tkOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-radar.png" alt="" onerror="this.replaceWith('🔴')"></span><span><b>Hunts &amp; Dex</b><small id="tkTileSub">Shiny counter, living dex</small></span></button>
+        <button type="button" class="mini-tile" onclick="rzOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" onerror="this.remove()"></span><span><b>Randomizer</b><small>Roll Pokémon &amp; abilities</small></span></button>
+        <button type="button" class="mini-tile" onclick="tkOpen()"><span class="mt-i" aria-hidden="true"><img class="mt-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-radar.png" alt="" onerror="this.remove()"></span><span><b>Hunts &amp; Dex</b><small id="tkTileSub">Shiny counter, living dex</small></span></button>
     </div>
     <div class="scroll-hint">Click a mode above, then scroll down to get started</div>
     <div class="home-tools"><button type="button" class="pill-btn" onclick="bkOpen()">Backup &amp; Restore</button><button type="button" class="pill-btn" onclick="sdOpen()">Showdown</button><button type="button" class="pill-btn" onclick="thOpen()">Theme</button></div>
@@ -1779,8 +1779,8 @@ const abilityImmunityMap = {
 };
 
 const abilityDescriptions = {
-    'water compaction': 'Sharply raises Defense (+2 stages) when hit by a Water-type move.',
-    'premium grade': 'Raises Sp. Atk by 1 stage every time this Pokémon enters battle.',
+    'water compaction': 'Sharply raises Defense (+2 stages) when hit by a Water-type move. In the calc, turn on “Ability active” to apply the boost.',
+    'premium grade': 'Raises Sp. Atk by 1 stage every time this Pokémon enters battle. The calc applies it automatically.',
     'levitate': 'Full immunity to Ground-type moves (Earthquake, Earth Power, etc.) and Arena Trap. The Pokémon floats, bypassing Spikes and Toxic Spikes as well.',
     'volt absorb': 'Restores 25% max HP if hit by an Electric-type move instead of taking damage. Also nullifies Thunder Wave.',
     'lightning rod': 'Draws all Electric-type moves to this Pokémon (including ally attacks in doubles). Raises Sp. Atk by 1 stage instead of taking damage.',
@@ -2146,7 +2146,7 @@ function calcPrep(p) {
     if (p.cStatus === undefined) p.cStatus = '';
     if (p.cHP === undefined) p.cHP = 100;
     if (p.cTera === undefined) p.cTera = false;
-    if (p.cAbOn === undefined) p.cAbOn = true;
+    if (p.cAbOn === undefined) p.cAbOn = !/^water compaction$/i.test(String(p.ability || '').trim());
     if (!p.cCrit) p.cCrit = [false,false,false,false];
     if (!p.moves) p.moves = ['','','',''];
     return p;
@@ -2173,6 +2173,13 @@ function calcGenFor(a, d) {
     }
     return first;
 }
+/* stat changes from the newer Mega abilities, which the Smogon library doesn't know about */
+function calcAbilityBoosts(p) {
+    const b = Object.assign({}, p.cBoosts), ab = String(p.ability || '').toLowerCase().trim();
+    if (p.cAbOn && ab === 'premium grade') b.spa = Math.min(6, (b.spa || 0) + 1);       // +1 Sp. Atk on switch-in
+    if (p.cAbOn && ab === 'water compaction') b.def = Math.min(6, (b.def || 0) + 2);    // +2 Def once hit by Water
+    return b;
+}
 function calcBuildMon(gen, p) {
     const sp = calcSpecies(gen, p);
     if (!sp) throw new Error(p.name + " isn't in the Gen " + calcState.gen + ' data.');
@@ -2185,7 +2192,7 @@ function calcBuildMon(gen, p) {
         item: p.item ? calcCanon(gen, 'items', p.item) : undefined,
         evs: Object.assign({}, p.evs),
         ivs: Object.assign({}, p.ivs),
-        boosts: Object.assign({}, p.cBoosts),
+        boosts: calcAbilityBoosts(p),
         status: p.cStatus || undefined,
         teraType: (p.cTera && p.teraType) ? p.teraType : undefined,
         isDynamaxed: !!(p.cDmax && gen.num === 8)
@@ -2326,6 +2333,7 @@ function calcSet(side, i, field, val) {
     else if (field === 'tera') p.cTera = !!val;
     else if (field === 'dmax') p.cDmax = !!val;
     else if (field === 'abon') p.cAbOn = !!val;
+    else if (field === 'ability') { p.ability = val; p.cAbOn = !/^water compaction$/i.test(String(val).trim()); }   // Water Compaction only kicks in after a Water hit, so it starts switched off
     else p[field] = val;
     calcRefresh();
 }
@@ -7360,7 +7368,7 @@ async function dexDetail(body) {
         </div></div>${formRow}
         ${dexEntriesHtml(sp)}
         ${dexInfoBoxes(sp, d)}
-        <div class="dx-act"><button type="button" class="pill-btn" onclick="dexAddPool('${d.name}')">Add to Draft Pool</button><button type="button" class="pill-btn" onclick="dexCmpStart(${d.id})">⚖ Compare</button></div>
+        <div class="dx-act"><button type="button" class="pill-btn" onclick="dexAddPool('${d.name}')">Add to Draft Pool</button><button type="button" class="pill-btn" onclick="dexCmpStart(${d.id})">Compare</button></div>
         <div class="dx-note"><b>Base stats</b></div>${dexStatsHtml(d.stats)}${dexRangeHtml(d.stats)}${/-gmax/i.test(d.name) ? DEX_GMAX_NOTE : ''}
         <div class="dx-note"><b>Type matchups</b> · damage taken</div>${dexTypeChartHtml(d)}
         <div class="dx-note"><b>Evolution</b></div>${evoHtml ? `<div class="dx-evo">${evoHtml}</div>` : '<div class="dx-note">Does not evolve.</div>'}
@@ -7545,9 +7553,9 @@ function rzOpen() {
             <label>Abilities<select class="tk-in" id="rzAm"><option value="own" ${RZ.abil === 'own' ? 'selected' : ''}>From its own abilities</option><option value="any" ${RZ.abil === 'any' ? 'selected' : ''}>Any real ability (chaos)</option></select></label>
             <label class="ck"><input type="checkbox" id="rzHid" ${RZ.hid ? 'checked' : ''}> Allow hidden abilities</label>
         </div>
-        <div class="bk-row"><button type="button" class="pill-btn" id="rzRollBtn" data-a="roll">🎲 Roll Pokémon</button><button type="button" class="pill-btn" id="rzAbRoll" data-a="rollabs" hidden>🎲 Roll abilities</button><button type="button" class="pill-btn" id="rzAbBtn" data-a="rollab">🔀 Re-roll all abilities</button></div>
+        <div class="bk-row"><button type="button" class="pill-btn" id="rzRollBtn" data-a="roll">Roll Pokémon</button><button type="button" class="pill-btn" id="rzAbRoll" data-a="rollabs" hidden>Roll abilities</button><button type="button" class="pill-btn" id="rzAbBtn" data-a="rollab">Re-roll all abilities</button></div>
         <div id="rzList"></div>
-        <div class="bk-row" id="rzAct" hidden><button type="button" class="pill-btn" id="rzPoolBtn" data-a="pick">➕ Add to a draft</button><button type="button" class="pill-btn" id="rzNewBtn" data-a="newdraft">🆕 New draft</button><button type="button" class="pill-btn" data-a="copy">⧉ Copy list</button></div>
+        <div class="bk-row" id="rzAct" hidden><button type="button" class="pill-btn" id="rzPoolBtn" data-a="pick">Add to a draft</button><button type="button" class="pill-btn" id="rzNewBtn" data-a="newdraft">🆕 New draft</button><button type="button" class="pill-btn" data-a="copy">⧉ Copy list</button></div>
         <div id="rzPick" hidden></div>
         <div class="bk-msg" id="rzMsg" role="status"></div>`);
     const $ = id => ui.box.querySelector('#' + id), say = (t, c) => { const m = $('rzMsg'); if (m) { m.textContent = t; m.className = 'bk-msg ' + (c || ''); } };
@@ -7565,10 +7573,10 @@ function rzOpen() {
     const draw = () => {
         const L = $('rzList'); if (!L) return; const h = L.offsetHeight; if (h) L.style.minHeight = h + 'px';
         if (RZ.mode === 'abil') {
-            L.innerHTML = RZ.abRows.map((r, i) => `<div class="rz-abrow"><div class="rz-main"><b>${calcEsc(dexName(r.slug))}</b><div class="rz-d">${calcEsc(r.desc || 'No description available.')}</div></div><div class="rz-btns"><button type="button" data-a="dx" data-i="${i}" title="See in the Pokédex (who learns it, details)" aria-label="Open ${calcEsc(dexName(r.slug))} in the Pokédex"><svg style="width:1.2em;height:1.2em;vertical-align:-3px" aria-hidden="true"><use href="#ico-dex"/></svg></button><button type="button" data-a="ra" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="rl" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
+            L.innerHTML = RZ.abRows.map((r, i) => `<div class="rz-abrow"><div class="rz-main"><b>${calcEsc(dexName(r.slug))}</b><div class="rz-d">${calcEsc(r.desc || 'No description available.')}</div></div><div class="rz-btns"><button type="button" data-a="dx" data-i="${i}" title="See in the Pokédex (who learns it, details)" aria-label="Open ${calcEsc(dexName(r.slug))} in the Pokédex"><svg style="width:1.2em;height:1.2em;vertical-align:-3px" aria-hidden="true"><use href="#ico-dex"/></svg></button><button type="button" data-a="ra" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">Ability</button><button type="button" data-a="rl" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
             L.dataset.mode = RZ.mode; $('rzAct').hidden = !RZ.abRows.length; L.style.minHeight = ''; return;
         }
-        L.innerHTML = RZ.rows.map((r, i) => `<div class="rz-row"><img src="${TK_IMG}${r.id}.png" alt="" loading="lazy"><div class="rz-main"><b>${calcEsc(dexName(r.n))}</b> ${r.types.map(dexTypePill).join(' ')} <small>BST ${r.bst}</small><div class="rz-ab">${r.ab ? calcEsc(dexName(r.ab)) + (r.abH ? ' <small>(hidden)</small>' : '') : '—'}</div></div><div class="rz-btns"><button type="button" data-a="m" data-i="${i}" title="Re-roll this Pokémon" aria-label="Re-roll Pokémon ${i + 1}">🎲</button><button type="button" data-a="a" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">🔀</button><button type="button" data-a="l" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
+        L.innerHTML = RZ.rows.map((r, i) => `<div class="rz-row"><img src="${TK_IMG}${r.id}.png" alt="" loading="lazy"><div class="rz-main"><b>${calcEsc(dexName(r.n))}</b> ${r.types.map(dexTypePill).join(' ')} <small>BST ${r.bst}</small><div class="rz-ab">${r.ab ? calcEsc(dexName(r.ab)) + (r.abH ? ' <small>(hidden)</small>' : '') : '—'}</div></div><div class="rz-btns"><button type="button" data-a="m" data-i="${i}" title="Re-roll this Pokémon" aria-label="Re-roll Pokémon ${i + 1}">Roll</button><button type="button" data-a="a" data-i="${i}" title="Re-roll this ability" aria-label="Re-roll ability ${i + 1}">Ability</button><button type="button" data-a="l" data-i="${i}" class="${r.lock ? 'on' : ''}" title="Keep this one" aria-label="Lock ${i + 1}" aria-pressed="${!!r.lock}">🔒</button></div></div>`).join('');
         L.dataset.mode = RZ.mode; $('rzAct').hidden = !RZ.rows.length; L.style.minHeight = '';
     };
     ui.o.addEventListener('click', async e => {
@@ -7904,14 +7912,14 @@ function gsOpen() {
         if (tools.length) h += `<div class="gs-h">Go to</div>` + tools.slice(0, 4).map(([t, i]) => item('tool', i, t[0], t[1], t[2])).join('');
         const sp = (dexCache.species || []).filter(p => p.id <= 1025), num = /^\d+$/.test(nq) ? +nq : 0;
         const mons = num ? { n: sp.filter(p => p.id === num).length, items: sp.filter(p => p.id === num) } : pick(sp, p => dexName(p.n), nq, 5);
-        if (mons.items.length) h += `<div class="gs-h">Pokémon</div>` + mons.items.map(p => item('mon', p.n, TK_IMG + p.id + '.png', dexName(p.n), '#' + p.id)).join('') + (mons.n > 5 ? item('dexq', raw, '📖', `See all ${mons.n} in the Pokédex`, 'Filter, sort and compare there', 'gs-more') : '');
+        if (mons.items.length) h += `<div class="gs-h">Pokémon</div>` + mons.items.map(p => item('mon', p.n, TK_IMG + p.id + '.png', dexName(p.n), '#' + p.id)).join('') + (mons.n > 5 ? item('dexq', raw, '@.dex-card .mode-img', `See all ${mons.n} in the Pokédex`, 'Filter, sort and compare there', 'gs-more') : '');
         const tr = []; try { Object.keys(GAME_TEAMS).forEach(id => (GAME_TEAMS[id].trainers || []).forEach((t, ti) => { if (rank(t.n, nq) >= 0) tr.push({ id, ti, n: t.n, r: rank(t.n, nq) }); })); } catch (e) {}
         tr.sort((a, b) => a.r - b.r);
-        if (tr.length) h += `<div class="gs-h">Trainers</div>` + tr.slice(0, 6).map(t => item('tr', t.id + '|' + t.ti, '🧭', t.n, guideGameTitleName(t.id))).join('') + (tr.length > 6 ? `<div class="dx-note" style="font-size:.72rem;color:var(--muted);padding:2px 8px">${tr.length - 6} more. Add a game name or a bit more of the name to narrow it down.</div>` : '');
-        const mv = pick(dexCache.moves || [], m => dexName(m), nq, 4); if (mv.items.length) h += `<div class="gs-h">Moves</div>` + mv.items.map(m => item('mv', m, '💥', dexName(m), 'Open in the Pokédex')).join('');
-        const ab = pick(dexCache.abils || [], a => dexName(a), nq, 4); if (ab.items.length) h += `<div class="gs-h">Abilities</div>` + ab.items.map(a => item('ab', a, '🔮', dexName(a), 'Open in the Pokédex')).join('');
+        if (tr.length) h += `<div class="gs-h">Trainers</div>` + tr.slice(0, 6).map(t => item('tr', t.id + '|' + t.ti, '@.guide-card .mode-img', t.n, guideGameTitleName(t.id))).join('') + (tr.length > 6 ? `<div class="dx-note" style="font-size:.72rem;color:var(--muted);padding:2px 8px">${tr.length - 6} more. Add a game name or a bit more of the name to narrow it down.</div>` : '');
+        const mv = pick(dexCache.moves || [], m => dexName(m), nq, 4); if (mv.items.length) h += `<div class="gs-h">Moves</div>` + mv.items.map(m => item('mv', m, '', dexName(m), 'Open in the Pokédex')).join('');
+        const ab = pick(dexCache.abils || [], a => dexName(a), nq, 4); if (ab.items.length) h += `<div class="gs-h">Abilities</div>` + ab.items.map(a => item('ab', a, '', dexName(a), 'Open in the Pokédex')).join('');
         const tm = savedTeams.filter(t => rank(t.name || '', nq) >= 0 || (t.pokemonList || []).some(p => rank(p.name || '', nq) >= 0)).slice(0, 4);
-        if (tm.length) h += `<div class="gs-h">Your teams</div>` + tm.map(t => item('team', t.id, t.mode === 'draft' ? '📋' : '👥', t.name || 'Unnamed team', `${(t.pokemonList || []).length} Pokémon`)).join('');
+        if (tm.length) h += `<div class="gs-h">Your teams</div>` + tm.map(t => item('team', t.id, '@.draft-card .mode-img', t.name || 'Unnamed team', `${(t.pokemonList || []).length} Pokémon`)).join('');
         if (!h) h = `<div class="dx-note" style="padding:10px 4px">${(dexCache.species ? '' : 'Still loading the Pokémon list… ')}No matches for "${calcEsc(raw)}".</div>`;
         out.innerHTML = h;
     };
@@ -8061,7 +8069,7 @@ function rgBattle(id, shiny) {
     const showHint = boss ? seen.b < 2 : seen.n < 2; if (boss) seen.b++; else seen.n++;      // the tip only shows for your first 2 encounters (and first 2 bosses)
     try { localStorage.setItem('beanRangerSeen', JSON.stringify(seen)); } catch (e) {}
     const ov = document.createElement('div'); ov.className = 'rg-ov'; rgLock();
-    ov.innerHTML = `<div class="rg-box" style="${mt ? `--rg1:color-mix(in srgb,${mt[0]} 40%,#0b1530);--rg2:color-mix(in srgb,${mt[1]} 30%,#0b1530)` : ''}"><button class="rg-x" aria-label="Let it go">✕</button><div class="rg-hd">${tier === 2 ? '<span class="rg-warn boss">Boss</span> ' : tier === 1 ? '<span class="rg-warn mini">Mini-boss</span> ' : ''}A wild ${shiny ? 'shiny ' : ''}${calcEsc(rgName(id))}!<small>${gm ? calcEsc(gm.name) + ' route' : 'Draw loops around it!'}</small></div><div class="rg-bars"><div class="rg-row"><span class="rg-lab">Health</span><div class="rg-bar" id="rgHp"><i></i></div><b class="rg-num" id="rgHpN">${hpMax}/${hpMax}</b></div><div class="rg-row"><span class="rg-lab">Time</span><div class="rg-bar" id="rgTm"><i></i></div><b class="rg-num" id="rgTmN">${tMax}s</b></div></div><canvas class="rg-cv" width="320" height="320"></canvas>${showHint ? `<div class="rg-hint" id="rgHint">${boss ? '⚠️ Dodge the shockwaves! If a ring touches your line, you lose that loop.' : '👆 Draw a loop around it to catch it.'}<br><small>The timer starts when you touch the screen.</small></div>` : ''}</div>`;
+    ov.innerHTML = `<div class="rg-box" style="${mt ? `--rg1:color-mix(in srgb,${mt[0]} 40%,#0b1530);--rg2:color-mix(in srgb,${mt[1]} 30%,#0b1530)` : ''}"><button class="rg-x" aria-label="Let it go">✕</button><div class="rg-hd">${tier === 2 ? '<span class="rg-warn boss">Boss</span> ' : tier === 1 ? '<span class="rg-warn mini">Mini-boss</span> ' : ''}A wild ${shiny ? 'shiny ' : ''}${calcEsc(rgName(id))}!<small>${gm ? calcEsc(gm.name) + ' route' : 'Draw loops around it!'}</small></div><div class="rg-bars"><div class="rg-row"><span class="rg-lab">Health</span><div class="rg-bar" id="rgHp"><i></i></div><b class="rg-num" id="rgHpN">${hpMax}/${hpMax}</b></div><div class="rg-row"><span class="rg-lab">Time</span><div class="rg-bar" id="rgTm"><i></i></div><b class="rg-num" id="rgTmN">${tMax}s</b></div></div><canvas class="rg-cv" width="320" height="320"></canvas>${showHint ? `<div class="rg-hint" id="rgHint">${boss ? '⚠️ Dodge the shockwaves! If a ring touches your line, you lose that loop.' : 'Draw a loop around it to catch it.'}<br><small>The timer starts when you touch the screen.</small></div>` : ''}</div>`;
     document.body.appendChild(ov);
     const box = ov.querySelector('.rg-box'), sub = ov.querySelector('.rg-hd small'), hpEl = ov.querySelector('#rgHp i'), tmEl = ov.querySelector('#rgTm i'), hpN = ov.querySelector('#rgHpN'), tmN = ov.querySelector('#rgTmN');
     const cv = ov.querySelector('canvas'), cx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), img = new Image(); img.src = profileImg(id, shiny);
